@@ -1,6 +1,6 @@
 # **WASTE REPORT DATA GRAPHICS**
 ## TL;DR
-- Go [here]() to view graphics.
+- Go [here](https://sv-data-projects.github.io/waste-report-graphics/) to view graphics.
 - Go [here](https://docs.google.com/spreadsheets/d/1V5HL7zCHGETUCDT8-3ZiDm9XncmOTEo9WDSP1Xe3wd0/edit#gid=272100684) to edit data.
 - Scroll down to custom queries for how to modify graphics with query strings.
 - You are in the right place if you're trying to edit code.
