@@ -1,0 +1,93 @@
+lg_ply_pid	lga_pid	vic_lga__2	vic_lga__3	FID	type	wrrg
+452	VIC245	FALLS CREEK ALPINE RESORT (UNINCORPORATED)	FALLS CREEK ALPINE RESORT (UNINC)	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.1	unincorporated	North East Waste and Resource Recovery Group
+465	VIC246	MOUNT BULLER ALPINE RESORT (UNINCORPORATED)	MOUNT BULLER ALPINE RESORT (UNINC)	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.2	unincorporated	North East Waste and Resource Recovery Group
+475	VIC231	CORANGAMITE SHIRE	CORANGAMITE	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.3	lga	Barwon South West Waste and Resource Recovery Group
+480	VIC226	KINGSTON CITY	KINGSTON	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.4	lga	Metropolitan Waste and Resource Recovery Group
+481	VIC227	FRANKSTON CITY	FRANKSTON	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.5	lga	Metropolitan Waste and Resource Recovery Group
+484	VIC230	GOLDEN PLAINS SHIRE	GOLDEN PLAINS	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.6	lga	Grampians Central West Waste and Resource Recovery Group
+491	VIC190	MOIRA SHIRE	MOIRA	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.7	lga	Goulburn Valley Waste and Resource Recovery Group
+492	VIC191	INDIGO SHIRE	INDIGO	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.8	lga	North East Waste and Resource Recovery Group
+493	VIC192	WODONGA CITY	WODONGA	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.9	lga	North East Waste and Resource Recovery Group
+502	VIC205	DAREBIN CITY	DAREBIN	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.10	lga	Metropolitan Waste and Resource Recovery Group
+504	VIC207	MAROONDAH CITY	MAROONDAH	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.11	lga	Metropolitan Waste and Resource Recovery Group
+522	VIC232	WEST WIMMERA SHIRE	WEST WIMMERA	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.12	lga	Grampians Central West Waste and Resource Recovery Group
+531	VIC234	MARIBYRNONG CITY	MARIBYRNONG	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.13	lga	Metropolitan Waste and Resource Recovery Group
+533	VIC235	HOBSONS BAY CITY	HOBSONS BAY	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.14	lga	Metropolitan Waste and Resource Recovery Group
+538	VIC195	MANNINGHAM CITY	MANNINGHAM	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.15	lga	Metropolitan Waste and Resource Recovery Group
+539	VIC196	WHITEHORSE CITY	WHITEHORSE	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.16	lga	Metropolitan Waste and Resource Recovery Group
+540	VIC201	BOROONDARA CITY	BOROONDARA	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.17	lga	Metropolitan Waste and Resource Recovery Group
+542	VIC209	KNOX CITY	KNOX	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.18	lga	Metropolitan Waste and Resource Recovery Group
+543	VIC210	MONASH CITY	MONASH	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.19	lga	Metropolitan Waste and Resource Recovery Group
+552	VIC202	YARRA CITY	YARRA	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.20	lga	Metropolitan Waste and Resource Recovery Group
+553	VIC203	STONNINGTON CITY	STONNINGTON	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.21	lga	Metropolitan Waste and Resource Recovery Group
+554	VIC250	MURRINDINDI SHIRE	MURRINDINDI	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.22	lga	Goulburn Valley Waste and Resource Recovery Group
+562	VIC152	HINDMARSH SHIRE	HINDMARSH	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.23	lga	Grampians Central West Waste and Resource Recovery Group
+578	VIC173	BASS COAST SHIRE	BASS COAST	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.24	lga	Gippsland Waste and Resource Recovery Group
+576	VIC93	GREATER SHEPPARTON CITY	GREATER SHEPPARTON	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.25	lga	Goulburn Valley Waste and Resource Recovery Group
+351	VIC173	BASS COAST SHIRE	BASS COAST	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.26	lga	Gippsland Waste and Resource Recovery Group
+615	VIC236	MOORABOOL SHIRE	MOORABOOL	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.27	lga	Grampians Central West Waste and Resource Recovery Group
+612	VIC241	BALLARAT CITY	BALLARAT	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.28	lga	Grampians Central West Waste and Resource Recovery Group
+352	VIC173	BASS COAST SHIRE	BASS COAST	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.29	lga	Gippsland Waste and Resource Recovery Group
+643	VIC94	HEPBURN SHIRE	HEPBURN	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.30	lga	Grampians Central West Waste and Resource Recovery Group
+644	VIC105	MOUNT ALEXANDER SHIRE	MOUNT ALEXANDER	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.31	lga	Loddon Mallee Waste and Resource Recovery Group
+648	VIC169	CENTRAL GOLDFIELDS SHIRE	CENTRAL GOLDFIELDS	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.32	lga	Grampians Central West Waste and Resource Recovery Group
+649	VIC183	BULOKE SHIRE	BULOKE	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.33	lga	Loddon Mallee Waste and Resource Recovery Group
+650	VIC214	GANNAWARRA SHIRE	GANNAWARRA	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.34	lga	Loddon Mallee Waste and Resource Recovery Group
+680	VIC222	MILDURA RURAL CITY	MILDURA	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.35	lga	Loddon Mallee Waste and Resource Recovery Group
+686	VIC110	STRATHBOGIE SHIRE	STRATHBOGIE	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.36	lga	Goulburn Valley Waste and Resource Recovery Group
+679	VIC242	ALPINE SHIRE	ALPINE	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.37	lga	North East Waste and Resource Recovery Group
+684	VIC225	SURF COAST SHIRE	SURF COAST	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.38	lga	Barwon South West Waste and Resource Recovery Group
+683	VIC215	GREATER GEELONG CITY	GREATER GEELONG	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.39	lga	Barwon South West Waste and Resource Recovery Group
+685	VIC199	BENALLA RURAL CITY	BENALLA	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.40	lga	North East Waste and Resource Recovery Group
+681	VIC131	MORELAND CITY	MORELAND	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.41	lga	Metropolitan Waste and Resource Recovery Group
+678	VIC248	MOUNT HOTHAM ALPINE RESORT (UNINCORPORATED)	MOUNT HOTHAM ALPINE RESORT (UNINC)	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.42	unincorporated	North East Waste and Resource Recovery Group
+682	VIC121	MOONEE VALLEY CITY	MOONEE VALLEY	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.43	lga	Metropolitan Waste and Resource Recovery Group
+638	VIC186	WANGARATTA RURAL CITY	WANGARATTA	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.44	lga	North East Waste and Resource Recovery Group
+624	VIC221	WYNDHAM CITY	WYNDHAM	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.45	lga	Metropolitan Waste and Resource Recovery Group
+625	VIC219	LATROBE CITY	LATROBE	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.46	lga	Gippsland Waste and Resource Recovery Group
+639	VIC244	MANSFIELD SHIRE	MANSFIELD	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.47	lga	North East Waste and Resource Recovery Group
+662	VIC223	GLENELG SHIRE	GLENELG	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.48	lga	Barwon South West Waste and Resource Recovery Group
+654	VIC233	SOUTHERN GRAMPIANS SHIRE	SOUTHERN GRAMPIANS	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.49	lga	Barwon South West Waste and Resource Recovery Group
+655	VIC229	MOYNE SHIRE	MOYNE	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.50	lga	Barwon South West Waste and Resource Recovery Group
+657	VIC166	NORTHERN GRAMPIANS SHIRE	NORTHERN GRAMPIANS	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.51	lga	Grampians Central West Waste and Resource Recovery Group
+665	VIC178	SOUTH GIPPSLAND SHIRE	SOUTH GIPPSLAND	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.52	lga	Gippsland Waste and Resource Recovery Group
+656	VIC200	YARRIAMBIACK SHIRE	YARRIAMBIACK	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.53	lga	Grampians Central West Waste and Resource Recovery Group
+653	VIC220	ARARAT RURAL CITY	ARARAT	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.54	lga	Grampians Central West Waste and Resource Recovery Group
+658	VIC217	PYRENEES SHIRE	PYRENEES	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.55	lga	Grampians Central West Waste and Resource Recovery Group
+659	VIC153	HORSHAM RURAL CITY	HORSHAM	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.56	lga	Grampians Central West Waste and Resource Recovery Group
+652	VIC228	MACEDON RANGES SHIRE	MACEDON RANGES	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.57	lga	Loddon Mallee Waste and Resource Recovery Group
+664	VIC194	BAW BAW SHIRE	BAW BAW	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.58	lga	Gippsland Waste and Resource Recovery Group
+667	VIC237	MELTON CITY	MELTON	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.59	lga	Metropolitan Waste and Resource Recovery Group
+660	VIC198	HUME CITY	HUME	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.60	lga	Metropolitan Waste and Resource Recovery Group
+663	VIC197	WHITTLESEA CITY	WHITTLESEA	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.61	lga	Metropolitan Waste and Resource Recovery Group
+661	VIC189	BRIMBANK CITY	BRIMBANK	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.62	lga	Metropolitan Waste and Resource Recovery Group
+675	VIC243	EAST GIPPSLAND SHIRE	EAST GIPPSLAND	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.63	lga	Gippsland Waste and Resource Recovery Group
+669	VIC185	LODDON SHIRE	LODDON	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.64	lga	Loddon Mallee Waste and Resource Recovery Group
+668	VIC239	CAMPASPE SHIRE	CAMPASPE	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.65	lga	Goulburn Valley Waste and Resource Recovery Group
+671	VIC206	YARRA RANGES SHIRE	YARRA RANGES	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.66	lga	Metropolitan Waste and Resource Recovery Group
+677	VIC218	WELLINGTON SHIRE	WELLINGTON	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.67	lga	Gippsland Waste and Resource Recovery Group
+672	VIC212	CARDINIA SHIRE	CARDINIA	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.68	lga	Metropolitan Waste and Resource Recovery Group
+676	VIC211	MITCHELL SHIRE	MITCHELL	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.69	lga	Goulburn Valley Waste and Resource Recovery Group
+674	VIC193	GREATER BENDIGO CITY	GREATER BENDIGO	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.70	lga	Loddon Mallee Waste and Resource Recovery Group
+673	VIC213	CASEY CITY	CASEY	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.71	lga	Metropolitan Waste and Resource Recovery Group
+670	VIC216	NILLUMBIK SHIRE	NILLUMBIK	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.72	lga	Metropolitan Waste and Resource Recovery Group
+267	VIC249	MOUNT BAW BAW ALPINE RESORT (UNINCORPORATED)	MOUNT BAW BAW ALPINE RESORT (UNINC)	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.73	unincorporated	Gippsland Waste and Resource Recovery Group
+281	VIC177	GLEN EIRA CITY	GLEN EIRA	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.74	lga	Metropolitan Waste and Resource Recovery Group
+283	VIC247	GREATER DANDENONG CITY	GREATER DANDENONG	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.75	lga	Metropolitan Waste and Resource Recovery Group
+304	VIC179	WARRNAMBOOL CITY	WARRNAMBOOL	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.76	lga	Barwon South West Waste and Resource Recovery Group
+307	VIC182	BAYSIDE CITY	BAYSIDE	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.77	lga	Metropolitan Waste and Resource Recovery Group
+313	VIC184	LAKE MOUNTAIN ALPINE RESORT (UNINCORPORATED)	LAKE MOUNTAIN ALPINE RESORT (UNINC)	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.78	unincorporated	Goulburn Valley Waste and Resource Recovery Group
+353	VIC250	MURRINDINDI SHIRE	MURRINDINDI	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.79	lga	Goulburn Valley Waste and Resource Recovery Group
+582	VIC224	COLAC OTWAY SHIRE	COLAC OTWAY	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.80	lga	Barwon South West Waste and Resource Recovery Group
+586	VIC180	SWAN HILL RURAL CITY	SWAN HILL	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.81	lga	Loddon Mallee Waste and Resource Recovery Group
+580	VIC132	MELBOURNE CITY	MELBOURNE	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.82	lga	Metropolitan Waste and Resource Recovery Group
+581	VIC208	PORT PHILLIP CITY	PORT PHILLIP	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.83	lga	Metropolitan Waste and Resource Recovery Group
+357	VIC181	GABO ISLAND (UNINCORPORATED)	GABO ISLAND (UNINC)	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.84	unincorporated	Gippsland Waste and Resource Recovery Group
+379	VIC251	FRENCH-ELIZABETH-SANDSTONE ISLANDS (UNINC)	FRENCH-ELIZABETH-SANDSTONE ISLANDS (UNINC)	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.85	unincorporated	Metropolitan Waste and Resource Recovery Group
+380	VIC251	FRENCH-ELIZABETH-SANDSTONE ISLANDS (UNINC)	FRENCH-ELIZABETH-SANDSTONE ISLANDS (UNINC)	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.86	unincorporated	Metropolitan Waste and Resource Recovery Group
+392	VIC188	BANYULE CITY	BANYULE	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.87	lga	Metropolitan Waste and Resource Recovery Group
+410	VIC187	TOWONG SHIRE	TOWONG	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.88	lga	North East Waste and Resource Recovery Group
+413	VIC238	QUEENSCLIFFE BOROUGH	QUEENSCLIFFE	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.89	lga	Barwon South West Waste and Resource Recovery Group
+420	VIC251	FRENCH-ELIZABETH-SANDSTONE ISLANDS (UNINC)	FRENCH-ELIZABETH-SANDSTONE ISLANDS (UNINC)	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.90	unincorporated	Metropolitan Waste and Resource Recovery Group
+445	VIC240	MOUNT STIRLING ALPINE RESORT (UNINCORPORATED)	MOUNT STIRLING ALPINE RESORT (UNINC)	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.91	unincorporated	North East Waste and Resource Recovery Group
+651	VIC204	MORNINGTON PENINSULA SHIRE	MORNINGTON PENINSULA	ckan_bdf92691_c6fe_42b9_a0e2_a4cd716fa811.92	lga	Metropolitan Waste and Resource Recovery Group

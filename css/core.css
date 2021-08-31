@@ -1,0 +1,106 @@
+
+/*****************************************************************/
+/*****************************************************************/
+/****                                                         ****/
+/****            SV ANNUAL REPORTS - CORE STYLING             ****/
+/****                                                         ****/
+/****  -----------------------------------------------------  ****/
+/****  Stylesheet referencing a shared set of brand colours,  ****/
+/****  an extended data visualisation palette, and loaded     ****/
+/****  fonts and typefaces used across HTMl rendered data     ****/
+/****  visualisations, graphics and illustrations             ****/
+/****  -----------------------------------------------------  ****/
+/****                                                         ****/
+/*****************************************************************/
+/*****************************************************************/
+
+/********************************************/
+/*** COLOUR PALETTES | CSS VARIABLE DEFS  ***/
+/********************************************/
+
+:root {
+    /** PRIMARY SV GREEN AND SECONDARY PALLETTE **/
+    --svGreen:                       #9ACA3C;
+    --svLightGreen:                  #D5E0A1;
+    /** SECONDARY PALLETTE **/
+    --secondaryGreenLight:           #D5E0A1;
+    --secondaryBottleGreen:          #174F37;
+    --secondaryBottleGreenLight:     #79B5AA;
+    --secondaryGrey:                 #B1B1B0;
+    --secondaryGreyLight:            #CFCFCF;
+    --secondaryGreyLightest:         #ECECEC;
+    /** TERTIARY PALETTE **/
+    --tertiaryPurple:               #51284F;
+    --tertiaryPurpleLight:          #8276B3;
+    --tertiaryRed:                  #E04F39;
+    --tertiaryRedLight:             #F78684;
+    --tertiaryYellow:               #EFC041;
+    --tertiaryYellowLight:          #F5E065;
+    --tertiaryCard:                 #B39981;
+    --tertiaryCardLight:            #DCBFA6;
+    --tertiaryEmerald:              #009E71;
+    --tertiaryEmeraldLight:         #93CCB9;
+    --tertiaryBlue:                 #005E88;
+    --tertiaryBlueLight:            #A0D6E9;
+
+    /*** EXTENDED PALETTE  ***/
+    --xLightestPurple:              #A59DC8;     
+    --xOrange:                      #feb076;     
+    --xLime:                        #BBCC66;     
+    --xGreen:                       #66CCAC;     
+    --xBlueCyan:                    #94E1EC;  
+    --xMidBottleGreen:              #488277;     
+    --xMidBlue:                     #48B5EB;     
+    --xMagenta:                     #d780c3;     
+    --xCharcoal:                    #36454F; 
+    --xDarkOrange:                  #863F13; 
+    --xDarkLime:                    #77862D;     
+    --xDarkYellow:                  #A57A0E; 
+    --xDarkCard:                    #6F5843; 
+    --xDarkBlueCyan:                #177283; 
+    --xDarkMagenta:                 #73264C; 
+
+    /*** EXTENDED MONOCHROME  ***/
+    --xGrey100:                     rgb(100, 100, 100);
+}
+
+/***************************************/
+/*** IMPORTED FONTS  | ALL WEIGHTS  ***/
+/***************************************/
+
+    @font-face {
+        font-family: 'DIN Next LT Pro';
+        src: local('DIN Next LT Pro Bold'), local('DIN-Next-LT-Pro-Bold'),
+            url('../fonts/DINNextLTPro-Light.woff2') format('woff2'),
+            url('../fonts/DINNextLTPro-Light.woff') format('woff'),
+            url('../fonts/DINNextLTPro-Light.ttf') format('truetype');
+        font-weight: 300;
+        font-style: light;
+    }
+    @font-face {
+        font-family: 'DIN Next LT Pro';
+        src: local('DIN Next LT Pro Regular'), local('DIN-Next-LT-Pro-Regular'),
+            url('../fonts/DINNextLTPro-Regular.woff2') format('woff2'),
+            url('../fonts/DINNextLTPro-Regular.woff') format('woff'),
+            url('../fonts/DINNextLTPro-Regular.ttf') format('truetype');
+        font-weight: 400;
+        font-style: normal;
+    }
+    @font-face {
+        font-family: 'DIN Next LT Pro';
+        src: local('DIN Next LT Pro Medium'), local('DIN-Next-LT-Pro-Medium'),
+            url('../fonts/DINNextLTPro-Medium.woff2') format('woff2'),
+            url('../fonts/DINNextLTPro-Medium.woff') format('woff'),
+            url('../fonts/DINNextLTPro-Medium.ttf') format('truetype');
+        font-weight: 500;
+        font-style: medium;
+    }
+    @font-face {
+        font-family: 'DIN Next LT Pro';
+        src: local('DIN Next LT Pro Heavy'), local('DIN-Next-LT-Pro-Heavy'),
+            url('../fonts/DINNextLTPro-Heavy.woff2') format('woff2'),
+            url('../fonts/DINNextLTPro-Heavy.woff') format('woff'),
+            url('../fonts/DINNextLTPro-Heavy.ttf') format('truetype');
+        font-weight: 800;
+        font-style: heavy;
+    }

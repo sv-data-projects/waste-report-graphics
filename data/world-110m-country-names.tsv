@@ -1,0 +1,175 @@
+id	name	iso2	iso3
+4	Afghanistan	AF	AFG
+8	Albania	AL	ALB
+12	Algeria	DZ	DZA
+24	Angola	AO	AGO
+10	Antarctica	AQ	ATA
+32	Argentina	AR	ARG
+51	Armenia	AM	ARM
+36	Australia	AU	AUS
+40	Austria	AT	AUT
+31	Azerbaijan	AZ	AZE
+44	Bahamas	BS	BHS
+50	Bangladesh	BD	BGD
+112	Belarus	BY	BLR
+56	Belgium	BE	BEL
+84	Belize	BZ	BLZ
+204	Benin	BJ	BEN
+64	Bhutan	BT	BTN
+68	Bolivia, Plurinational State of	BO	BOL
+70	Bosnia and Herzegovina	BA	BIH
+72	Botswana	BW	BWA
+76	Brazil	BR	BRA
+96	Brunei Darussalam	BN	BRN
+100	Bulgaria	BG	BGR
+854	Burkina Faso	BF	BFA
+108	Burundi	BI	BDI
+116	Cambodia	KH	KHM
+120	Cameroon	CM	CMR
+124	Canada	CA	CAN
+140	Central African Republic	CF	CAF
+148	Chad	TD	TCD
+152	Chile	CL	CHL
+156	China	CN	CHN
+170	Colombia	CO	COL
+178	Congo	CG	COG
+180	"Congo, the Democratic Republic of the"	CD	COD
+188	Costa Rica	CR	CRI
+384	Cote d'Ivoire	CI	CIV
+191	Croatia	HR	HRV
+192	Cuba	CU	CUB
+196	Cyprus	CY	CYP
+203	Czech Republic	CZ	CZE
+208	Denmark	DK	DNK
+262	Djibouti	DJ	DJI
+214	Dominican Republic	DO	DOM
+218	Ecuador	EC	ECU
+818	Egypt	EG	EGY
+222	El Salvador	SV	SLV
+226	Equatorial Guinea	GQ	GNQ
+232	Eritrea	ER	ERI
+233	Estonia	EE	EST
+231	Ethiopia	ET	ETH
+238	Falkland Islands (Malvinas)	FK	FLK
+242	Fiji	FJ	FJI
+246	Finland	FI	FIN
+250	France	FR	FRA
+260	French Southern Territories	TF	ATF
+266	Gabon	GA	GAB
+270	Gambia	GM	GMB
+268	Georgia	GE	GEO
+276	Germany	DE	DEU
+288	Ghana	GH	GHA
+300	Greece	GR	GRC
+304	Greenland	GL	GRL
+320	Guatemala	GT	GTM
+324	Guinea	GN	GIN
+624	Guinea-Bissau	GW	GNB
+328	Guyana	GY	GUY
+332	Haiti	HT	HTI
+340	Honduras	HN	HND
+348	Hungary	HU	HUN
+352	Iceland	IS	ISL
+356	India	IN	IND
+360	Indonesia	ID	IDN
+364	"Iran, Islamic Republic of"	IR	IRN
+368	Iraq	IQ	IRQ
+372	Ireland	IE	IRL
+376	Israel	IL	ISR
+380	Italy	IT	ITA
+388	Jamaica	JM	JAM
+392	Japan	JP	JPN
+400	Jordan	JO	JOR
+398	Kazakhstan	KZ	KAZ
+404	Kenya	KE	KEN
+408	"Korea, Democratic People's Republic of"	KP	PRK
+410	"Korea, Republic of"	KR	KOR
+414	Kuwait	KW	KWT
+417	Kyrgyzstan	KG	KGZ
+418	Lao People's Democratic Republic	LA	LAO
+428	Latvia	LV	LVA
+422	Lebanon	LB	LBN
+426	Lesotho	LS	LSO
+430	Liberia	LR	LBR
+434	Libya	LY	LBY
+440	Lithuania	LT	LTU
+442	Luxembourg	LU	LUX
+807	"Macedonia, the former Yugoslav Republic of"	MK	MKD
+450	Madagascar	MG	MDG
+454	Malawi	MW	MWI
+458	Malaysia	MY	MYS
+466	Mali	ML	MLI
+478	Mauritania	MR	MRT
+484	Mexico	MX	MEX
+498	"Moldova, Republic of"	MD	MDA
+496	Mongolia	MN	MNG
+499	Montenegro	ME	MNE
+504	Morocco	MA	MAR
+508	Mozambique	MZ	MOZ
+104	Myanmar	MM	MMR
+516	Namibia	NA	NAM
+524	Nepal	NP	NPL
+528	Netherlands	NL	NLD
+540	New Caledonia	NC	NCL
+554	New Zealand	NZ	NZL
+558	Nicaragua	NI	NIC
+562	Niger	NE	NER
+566	Nigeria	NG	NGA
+578	Norway	NO	NOR
+512	Oman	OM	OMN
+586	Pakistan	PK	PAK
+275	"Palestinian Territory, Occupied"	PS	PSE
+591	Panama	PA	PAN
+598	Papua New Guinea	PG	PNG
+600	Paraguay	PY	PRY
+604	Peru	PE	PER
+608	Philippines	PH	PHL
+616	Poland	PL	POL
+620	Portugal	PT	PRT
+630	Puerto Rico	PR	PRI
+634	Qatar	QA	QAT
+642	Romania	RO	ROU
+643	Russian Federation	RU	RUS
+646	Rwanda	RW	RWA
+682	Saudi Arabia	SA	SAU
+686	Senegal	SN	SEN
+688	Serbia	RS	SRB
+694	Sierra Leone	SL	SLE
+703	Slovakia	SK	SVK
+705	Slovenia	SI	SVN
+90	Solomon Islands	SB	SLB
+706	Somalia	SO	SOM
+710	South Africa	ZA	ZAF
+728	South Sudan	SS	SSD
+724	Spain	ES	ESP
+144	Sri Lanka	LK	LKA
+729	Sudan	SD	SDN
+740	Suriname	SR	SUR
+748	Swaziland	SZ	SWZ
+752	Sweden	SE	SWE
+756	Switzerland	CH	CHE
+760	Syrian Arab Republic	SY	SYR
+158	"Taiwan, Province of China"	TW	TWN
+762	Tajikistan	TJ	TJK
+834	"Tanzania, United Republic of"	TZ	TZA
+764	Thailand	TH	THA
+626	Timor-Leste	TL	TLS
+768	Togo	TG	TGO
+780	Trinidad and Tobago	TT	TTO
+788	Tunisia	TN	TUN
+792	Turkey	TR	TUR
+795	Turkmenistan	TM	TKM
+800	Uganda	UG	UGA
+804	Ukraine	UA	UKR
+784	United Arab Emirates	AE	ARE
+826	United Kingdom	GB	GBR
+840	United States	US	USA
+858	Uruguay	UY	URY
+860	Uzbekistan	UZ	UZB
+548	Vanuatu	VU	VUT
+862	"Venezuela, Bolivarian Republic of"	VE	VEN
+704	Viet Nam	VN	VNM
+732	Western Sahara	EH	ESH
+887	Yemen	YE	YEM
+894	Zambia	ZM	ZMB
+716	Zimbabwe	ZW	ZWE

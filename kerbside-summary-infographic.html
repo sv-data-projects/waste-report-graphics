@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="Kerbside collection summary infographic">
+        <meta name="author" content="Sustainability Victoria">
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+        <link rel="stylesheet" href="./css/core.css">
+        <style>
+
+            /***********************************************************/
+            /***********************************************************/
+            /****                                                   ****/
+            /**** KERBSIDE COLLECTION SUMMARY GRAPHIC | CUSTOM CSS  ****/
+            /**** ---------------------------------------------     ****/
+            /**** - CSS Variables and loaded fonts from core.css    ****/
+            /****                                                   ****/
+            /***********************************************************/
+            /***********************************************************/
+
+
+            body{
+                font-family: 'DIN Next LT Pro';
+                margin: 0;                          /* Full bleed presentation */
+            }
+
+            /***************************/
+            /*****  GENERAL STYLING  ***/
+            /***************************/
+
+            .lga-label-title{
+                font-size: 30px;
+                font-weight: 500;
+                fill:  var(--secondaryBottleGreenLight);
+                fill:  #000;
+            }
+            .lga-label-small{
+                font-size: 24px;
+                font-weight: 400;
+                mix-blend-mode: darken;
+            }
+            .lga-label-headline{
+                font-size: 60px;
+                font-weight: 700;
+            }
+            .lga-annotation{
+                font-size: 13px;
+            }
+            .lga-label{
+                font-size: 16px;
+                font-weight: 500;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+            .middle{
+                text-anchor: middle;
+            }
+            .garbage{
+                fill: var(--tertiaryRed);
+            }
+            .recyclables {
+                fill: var(--xDarkYellow);
+            }
+            .organics {
+                fill: var(--tertiaryEmerald);
+            }
+
+        </style>
+    </head>
+
+    <body>
+        <div class = "svg-container">
+            <svg id = "streetscene-vis" viewBox="0 0 1080 720" class =extended-typography''>
+                <defs>
+                    <clipPath id="clipPath205" clipPathUnits="userSpaceOnUse">
+                        <rect width="115.155" height="116.277" x="361.85" y="57.914" ry="1.43"/>
+                    </clipPath>
+                    <clipPath id="clipPath1870" clipPathUnits="userSpaceOnUse">
+                        <path id="path1872"d="M120.873 138.9a.128.128 0 00-.128.129v3.888l-13.881.05a.108.108 0 00-.109.107v20.91c0 .06.049.107.109.107 20.582-.111 63.248.059 63.248.059s.128-18.903.128-25.071a.128.128 0 00-.128-.128z"/>
+                    </clipPath>
+                    <clipPath id="clipPath1245" clipPathUnits="userSpaceOnUse">
+                        <path d="M169.207 124.721c-.996.006-1.846.51-2.022 1.928H136.98c-2.216 0-4.053 1.784-4 4 .069 2.386-.046 8.585-.06 9.357l-4.032.054s-1.176-5.292-3.37-6.134c-1.05-.402-3.522-.726-4.583-.018-2.016 1.346-1.619 5.32-1.706 10.245v10.655c0 2.216 1.784 4 4 4h11.394c.692 1.024 1.653 2.245 2.357 2.53h34.165c4.432 0 8-3.569 8-8v-18.689a7.98 7.98 0 00-7.9-7.997c-.174-1.423-1.03-1.93-2.03-1.93h-.008z"/>
+                    </clipPath>
+                    <g id="garbage-bin">
+                        <path fill="#252d2f" d="M4.427-2.15A1.153 2.045 0 013.274-.107 1.153 2.045 0 012.121-2.15a1.153 2.045 0 011.153-2.045 1.153 2.045 0 011.153 2.045"/>
+                        <path fill="#4c5e57" d="M2.161-14.095l9.703.035V-.42l-7.847.115c-.421.052-.623-.192-.65-.683z"/>
+                        <path fill="#3f4c4a" d="M11.78-13.99l3.755-1.058L14.77-2.45c-.194.43-.455.69-.74.89L11.814-.478z"/>
+                        <path fill="#252d2f" d="M13.678-2.045A1.153 2.045 0 0112.525 0a1.153 2.045 0 01-1.154-2.045 1.153 2.045 0 011.154-2.046 1.153 2.045 0 011.153 2.046"/>
+                        <g class="garbage-bin-lid">
+                            <path fill="var(--tertiaryRed"  d="M0-15.56c.024.096.048 1.472.048 1.472l11.842.097 3.76-.912.097-2.127-2.054-.169c-.192-1.773-.751-3.13-3.868-1.595l-3.505.145c-3.178-1.334-2.265.836-3.263 1.378l-1.233.096.073 1.354z"/>
+                            <g fill="#000" opacity=".15" >
+                                <path d="M2.262-16.462l8.794.028c3.646-.395 2.787-.363 0 .555H2.234z"/>
+                                <path d="M12.827-17.276l-1.43.341c-.181-.711-.32-1.27.872-1.497.81-.04.64.616.558 1.156z"/>
+                                <path d="M5.61-18.436c-1.144-.09-1.398.408-1.58 1.275-.182-.711-.247-1.39.664-1.541.81-.04.701.018.917.266z"/>
+                                <path d="M9.917-18.586c-.596.238-.48.512-.468 1.35-.182-.711-.633-1.137.353-1.482.81-.04.538.212.115.132z"/>
+                                <path d="M.52-15.134h10.94c.87-.095 3.746-1.322 3.403-.928-.811.934.033.572-3.404 1.766H.521z"/>
+                            </g>
+                        </g>
+                    </g>
+                    <g id="recycling-bin">
+                        <path fill="#252d2f" d="M4.427-2.15A1.153 2.045 0 013.274-.107 1.153 2.045 0 012.121-2.15a1.153 2.045 0 011.153-2.045 1.153 2.045 0 011.153 2.045"/>
+                        <path fill="#4c5e57" d="M2.161-14.095l9.703.035V-.42l-7.847.115c-.421.052-.623-.192-.65-.683z"/>
+                        <path fill="#3f4c4a" d="M11.78-13.99l3.755-1.058L14.77-2.45c-.194.43-.455.69-.74.89L11.814-.478z"/>
+                        <path fill="#252d2f" d="M13.678-2.045A1.153 2.045 0 0112.525 0a1.153 2.045 0 01-1.154-2.045 1.153 2.045 0 011.154-2.046 1.153 2.045 0 011.153 2.046"/>
+                        <g class="garbage-bin-lid">
+                            <path fill="var(--tertiaryYellow)" d="M0-15.56c.024.096.048 1.472.048 1.472l11.842.097 3.76-.912.097-2.127-2.054-.169c-.192-1.773-.751-3.13-3.868-1.595l-3.505.145c-3.178-1.334-2.265.836-3.263 1.378l-1.233.096.073 1.354z"/>
+                            <g fill="#000" opacity=".15" >
+                                <path d="M2.262-16.462l8.794.028c3.646-.395 2.787-.363 0 .555H2.234z"/>
+                                <path d="M12.827-17.276l-1.43.341c-.181-.711-.32-1.27.872-1.497.81-.04.64.616.558 1.156z"/>
+                                <path d="M5.61-18.436c-1.144-.09-1.398.408-1.58 1.275-.182-.711-.247-1.39.664-1.541.81-.04.701.018.917.266z"/>
+                                <path d="M9.917-18.586c-.596.238-.48.512-.468 1.35-.182-.711-.633-1.137.353-1.482.81-.04.538.212.115.132z"/>
+                                <path d="M.52-15.134h10.94c.87-.095 3.746-1.322 3.403-.928-.811.934.033.572-3.404 1.766H.521z"/>
+                            </g>
+                        </g>
+                    </g>
+                    <g id="organics-bin">
+                        <path fill="#252d2f" d="M4.427-2.15A1.153 2.045 0 013.274-.107 1.153 2.045 0 012.121-2.15a1.153 2.045 0 011.153-2.045 1.153 2.045 0 011.153 2.045"/>
+                        <path fill="#4c5e57" d="M2.161-14.095l9.703.035V-.42l-7.847.115c-.421.052-.623-.192-.65-.683z"/>
+                        <path fill="#3f4c4a" d="M11.78-13.99l3.755-1.058L14.77-2.45c-.194.43-.455.69-.74.89L11.814-.478z"/>
+                        <path fill="#252d2f" d="M13.678-2.045A1.153 2.045 0 0112.525 0a1.153 2.045 0 01-1.154-2.045 1.153 2.045 0 011.154-2.046 1.153 2.045 0 011.153 2.046"/>
+                        <g class="garbage-bin-lid">
+                            <path fill="var(--svGreen)" d="M0-15.56c.024.096.048 1.472.048 1.472l11.842.097 3.76-.912.097-2.127-2.054-.169c-.192-1.773-.751-3.13-3.868-1.595l-3.505.145c-3.178-1.334-2.265.836-3.263 1.378l-1.233.096.073 1.354z"/>
+                            <g fill="#000" opacity=".15" >
+                                <path d="M2.262-16.462l8.794.028c3.646-.395 2.787-.363 0 .555H2.234z"/>
+                                <path d="M12.827-17.276l-1.43.341c-.181-.711-.32-1.27.872-1.497.81-.04.64.616.558 1.156z"/>
+                                <path d="M5.61-18.436c-1.144-.09-1.398.408-1.58 1.275-.182-.711-.247-1.39.664-1.541.81-.04.701.018.917.266z"/>
+                                <path d="M9.917-18.586c-.596.238-.48.512-.468 1.35-.182-.711-.633-1.137.353-1.482.81-.04.538.212.115.132z"/>
+                                <path d="M.52-15.134h10.94c.87-.095 3.746-1.322 3.403-.928-.811.934.033.572-3.404 1.766H.521z"/>
+                            </g>
+                        </g>
+                    </g>
+                </defs>
+                <g transform="scale(3.75)">
+                    <g id="background-layer">
+                        <rect id="horizon"  fill="var(--secondaryGreyLightest)"  fill="#e0edd7"  width="384.401" height="191.519" x="-43.048" y="0"/>
+                        <g id="city-skyline-1" transform="matrix(-1.09149 0 0 1.09149 284.57 -.793)">
+                            <path id="city-sklyine-back-1" fill="#B2B2B2"  fill="#c9d9cf" d="M137.054 160.073v-7.938h12.7v-21.96h10.319v7.938h4.762v10.054h5.557v-26.459h6.879v29.105h15.102l-.02-23.813h6.084v23.813h6.615v-9.26h5.292v-7.674h6.085v11.642h3.704v-15.875h3.44v19.579h4.498v-30.163h8.372l.095 30.163h2.91v-7.938h5.292v7.673h4.498v-12.7h7.408v12.7h2.646v-10.054h5.291v21.167z"/>
+                            <path id="city-skyline-front-1" fill="#cfcfcf"  fill="#b4ccc6" d="M141.567 160.442v-3.826h4.905v-7.849h7.75v8.045h2.846v-10.595h6.279v4.905h5.984v-4.71h2.649v7.555h4.317v-18.934h15.01v9.712h8.633v-21.093h6.475v22.368h9.671v-5.906h9.23v10.752h15.794v-12.37h5.139v14.464h7.707v-4.092h5.994v5.9h4.633v6.184z" />
+                        </g>
+                        <g id="city-skyline-2"  transform="matrix(1.09149 0 0 1.09149 -12.539 -10.893)">
+                            <path id="city-sklyine-back-2" fill="#B2B2B2" fill="#c9d9cf" d="M137.054 160.073v-7.938h12.7v-21.96h10.319v7.938h4.762v10.054h5.557v-26.459h6.879v29.105h15.102l-.02-23.813h6.084v23.813h6.615v-9.26h5.292v-7.674h6.085v11.642h3.704v-15.875h3.44v19.579h4.498v-30.163h8.372l.095 30.163h2.91v-7.938h5.292v7.673h4.498v-12.7h7.408v12.7h2.646v-10.054h5.291v21.167z"/>
+                            <path id="city-skyline-front-2"  fill="#cfcfcf" fill="#b4ccc6" d="M141.567 160.442v-3.826h4.905v-7.849h7.75v8.045h2.846v-10.595h6.279v4.905h5.984v-4.71h2.649v7.555h4.317v-18.934h15.01v9.712h8.633v-21.093h6.475v22.368h9.671v-5.906h9.23v10.752h15.794v-12.37h5.139v14.464h7.707v-4.092h5.994v5.9h4.633v6.184z" />
+                        </g>
+                        <path id="grass-background" fill="#00502e" fill="teal" d="M336.484 170.213C222.7 159.893 86.36 160.091-3.758 171.3l-.176 5.792 340.594-1.086z"/>
+                        <g id="home-1"  transform="translate(-278.84 1.616)">
+                            <rect fill="#6b87a4" stroke-width=".332" width="51.053" height="2.749" x="237.574" y="145.217" ry="1"/>
+                            <path fill="#efe2bb" stroke-width=".522" d="M241.396 147.966h45.126l40.244-3.376v22.138l-85.37 3.905z"/>
+                            <path fill="#c8b7b7" stroke-width=".266" d="M240.587 166.978h47.449l39.642-3.175v4.184l-87.091 2.646z" />
+                            <path fill="#616298" opacity=".5" stroke-width=".1" d="M241.396 148.091h6.942v11.125h-6.942z" />
+                            <path fill="#9cb8d6" stroke-width="1.056" d="M999.93 481.54v67.019h82.379l-.653.498 178.606-.395-89.62-66.775v-.348l-12.514-9.036z"  transform="scale(.26458)"/>
+                            <rect fill="#6b87a4" width="9.612" height="1.51" x="239.25" y="159.138" ry=".549"/>
+                            <path fill="#e3dbdb" opacity=".5" d="M271.005 144.954l-29.523.15 14.632-25.643z" transform="matrix(1.60062 0 0 .69665 -145.54 44.185)"/>
+                            <path fill="#616298" d="M292.294 152.14l12.139-1.059v8.497l-12.139 1.059z" />
+                            <path fill="#ac9d93" d="M256.781 152.88h9.171v17.597h-9.171z" />
+                            <path fill="#6b87a4" stroke-width=".327" d="M278.113 165.53l41.998.147a.999.999 0 011 1v.749a.996.996 0 01-1 1l-41.998-.148a.999.999 0 01-1-1v-.749a.996.996 0 011-1z"  transform="matrix(.99742 -.07184 .06703 .99775 0 0)"/>
+                            <path fill="#616298" opacity=".5" d="M309.552 150.582l12.139-1.058v8.497l-12.139 1.058z" />
+                            <path fill="#616298" opacity=".5" d="M272.672 152.774h8.508v7.993h-8.508z"/>
+                        </g>
+                        <g id="home-2">
+                            <rect fill="#6b87a4" width="96.505" height="2.749" x="237.574" y="145.217" ry="1"/>
+                            <path fill="#efe2bb" stroke-width=".522" d="M241.396 147.966h93.012v22.667h-93.012z"/>
+                            <path fill="#c8b7b7" stroke-width=".266" d="M240.587 164.862h94.499v5.771h-94.499z" />
+                            <path fill="#616298" stroke-width=".1" d="M241.396 148.091h6.942v11.125h-6.942z" />
+                            <path fill="#9cb8d6" stroke-width="1.056" d="M999.93 481.54v67.019h82.379l-.653.498 178.606-.395-89.62-66.775v-.348h-.466z" transform="scale(.26458)"/>
+                            <rect fill="#6b87a4" width="9.612" height="1.51" x="239.25" y="159.138" ry=".549"/>
+                            <path fill="#eeebdd" stroke-width=".265" d="M271.005 144.954l-29.523.15 14.632-25.643z" transform="matrix(1.60062 0 0 .69665 -145.54 44.185)"/>
+                        </g>
+                        <g id="tree-4"  transform="translate(-34.61 -.224)">
+                            <path   fill="#F2855D" fill="#c87137" d="M326.005 171.342v-10.677h-6.452c-2.762 8.62-6.111 6.06-8.17-3.041l-2.921.139c1.19 7.69 4.883 16.973 11.871 9.926v3.3z" />
+                            <circle fill="#00502e" fill="teal" cx="310.077" cy="141.019" r="10.497"/>
+                            <circle fill="#009857" fill="#71c837" cx="318.935" cy="153.631" r="8.679" />
+                            <circle fill="#9ACA3C" fill="#aade87" cx="330.491" cy="157.561" r="8.679"/>
+                            <circle fill="#CED99E" fill="#aade87"  cx="303.976" cy="152.282" r="8.679"/>
+                        </g>
+                        <g id="tree-3"  transform="translate(-105.493 -4.398)">
+                            <path   fill="#F2855D" fill="#c87137" d="M326.005 171.342v-10.677h-6.452c-2.762 8.62-6.111 6.06-8.17-3.041l-2.921.139c1.19 7.69 4.883 16.973 11.871 9.926v3.3z" />
+                            <circle fill="#00502e" fill="teal"  cx="313.046" cy="141.16" r="10.497" />
+                            <circle fill="#009857" fill="#71c837" cx="321.762" cy="154.903" r="8.679"  />
+                            <circle fill="#CED99E" fill="#aade87" cx="330.349" cy="155.44" r="8.679" />
+                            <circle fill="#9ACA3C" fill="#aade87" cx="309.066" cy="155.392" r="8.679" />
+                        </g>
+                        <g id="tree-2"  transform="matrix(.92228 0 0 .92228 -203.556 8.37)">
+                            <path   fill="#F2855D" fill="#c87137" d="M292.244 172.695V162.02h-6.452c-2.762 8.62-6.11 6.06-8.169-3.041l-2.922.138c1.19 7.691 4.883 16.973 11.872 9.927v3.3z"/>
+                            <circle fill="#CED99E" fill="#aade87"  cx="285.205" cy="154.511" r="9.265" />
+                            <circle fill="#8DBF87" fill="#87de87" cx="277.169" cy="141.781" r="10.497"  />
+                            <circle fill="#009857" fill="#b3ff80"  cx="295.94"  cy="159.145" r="8.033" />
+                            <circle fill="#008848" fill="#cfa"     cx="269.364" cy="152.865" r="11.612" />
+                        </g>
+                        <g id="tree-1" transform="matrix(.92228 0 0 .92228 -249.186 11.802)">
+                            <path   fill="#F2855D" fill="#c87137"d="M292.244 172.695V162.02h-6.452c-2.762 8.62-6.11 6.06-8.169-3.041l-2.922.138c1.19 7.691 4.883 16.973 11.872 9.927v3.3z"/>
+                            <circle fill="#CED99E" fill="#aade87"  cx="285.205" cy="154.511" r="9.265"  />
+                            <circle fill="#8DBF87" fill="#87de87"  cx="277.169" cy="141.781" r="10.497" />
+                            <circle fill="#009857" fill="#b3ff80"  cx="295.94"  cy="159.145" r="8.033" />
+                            <circle fill="#008848" fill="#cfa"   cx="269.364" cy="152.865" r="11.612" />
+                        </g>
+                        <path id="road" fill="#7991A9" fill="#486a80" d="M334.731 172.093c-113.113-4.992-287.805-4.896-377.39.525l-.176 2.8 377.741-.524z"/>
+                        <rect id="foreground-grass" fill="#CED99E" fill="#9bc2a2" width="383.858" height="400" x="-42.8" y="174.622"/>
+                        <rect id="footpath"  fill="#cea98d" fill="#c4c09f" width="383.858" height="3.799" x="-42.8" y="178.042"/>
+                    </g>
+
+                    <g id="animation-layer">
+                        <g id="waste-truck">
+                            <g id="chassis-group">
+                                <rect id="undertray"fill="#8ca18e"  width="49.371" height="11.66" x="122.886" y="156.812" ry="2.729" transform="skewX(-.79) scale(1 .9999)"/>
+                                <rect id="undertray-front" fill="#4c6463"  width="9.679" height="7.372" x="96.752" y="162.691"rx="0"/>
+                                <rect id="bumper" fill="#eaf3e0" width="6.584" height="9.51" x="94.782" y="161.087" ry="2.6"/>
+                                <path id="cab" fill="#a4c283" d="M117.099 139.056c-3.214.22-6.522.047-9.766.034-4.367-.07-7.879 4.213-7.97 7.225v15.093c0 .804.648 1.452 1.452 1.452h16.284c1.43 0 2.58-1.151 2.58-2.58v-18.644c0-1.43-1.15-2.58-2.58-2.58zm-11.19 3.33h7.355c.554 0 1 .446 1 1v7.944c0 .554-.446 1-1 1h-9.471c-.554 0-1.263-1.664-1.113-2.197l1.93-6.822c.15-.533.745-.925 1.3-.925z"/>
+                                <path id="engine-bay" fill="#1a1a1a" d="M106.259 159.136h14.296v9.183h-14.296z"/>
+                                <path id="wheel-arch" fill="#758b7b" d="M120.699 168.079c-.667-5.632-2.542-8.408-6.891-8.87-6.248.178-7.558 4.52-7.623 9.481-.042.97-2.146 1.116-2.107.112-.15-5.216-.788-12.362 10.26-12.294 5.34.068 8.465 4.555 8.532 11.563-.039 1.198-2.135 2.023-2.656.116z"/>
+                                <g id="mirror-group">
+                                    <path id="mirror-case" fill="#424e42"d="M100.849 149.816a2.156 4.717 0 01-2.157 4.717 2.156 4.717 0 01-2.156-4.717 2.156 4.717 0 012.156-4.717 2.156 4.717 0 012.157 4.717"/>
+                                    <path id="mirror" fill="#dbecea" d="M100.694 149.768a1.51 4.34 0 01-1.51 4.34 1.51 4.34 0 01-1.509-4.34 1.51 4.34 0 011.51-4.34 1.51 4.34 0 011.51 4.34"/>
+                                </g>
+                                <path id="body-main" fill="#89d684" d="M169.207 124.721c-.996.006-1.846.51-2.022 1.928H136.98c-2.216 0-4.053 1.784-4 4 .069 2.386-.046 8.585-.06 9.357l-4.032.054s-1.176-5.292-3.37-6.134c-1.05-.402-3.522-.726-4.583-.018-2.016 1.346-1.619 5.32-1.706 10.245v10.655c0 2.216 1.784 4 4 4h11.394c.692 1.024 1.653 2.245 2.357 2.53h34.165c4.432 0 8-3.569 8-8v-18.689a7.98 7.98 0 00-7.9-7.997c-.174-1.423-1.03-1.93-2.03-1.93h-.008z"/>
+                                <path id="body-mid" fill="#4c6b44" d="M157.036 124.721c-.996.006-1.846.51-2.022 1.928H124.81c-2.216 0-4.052 1.785-4 4 .069 2.386-.045 8.585-.06 9.357l-4.032.054s-1.176-5.292-3.37-6.134c-1.05-.402-3.522-.726-4.583-.018-2.016 1.346-1.619 5.32-1.706 10.245v10.655c0 2.216 1.784 4 4 4h11.394c.692 1.024 1.653 2.245 2.357 2.53h34.165c4.432 0 8-3.569 8-8v-18.689a7.98 7.98 0 00-7.899-7.997c-.175-1.423-1.03-1.93-2.03-1.93h-.01z" clip-path="url(#clipPath1870)"  transform="translate(12.17)"/>
+                                <path id="body-low" fill="#999" d="M132.416 149.66c-.386.949.289 2.448.289 2.448h-5.918c-1.82 0-3.287 1.206-3.287 2.704 0 1.499 1.466 2.705 3.287 2.705l7.125-.053.71 1.343h45.66v-9.122z" clip-path="url(#clipPath1245)"/>
+                                <rect id="body-detail"  fill="#c2dfab" width="10.537" height="3.257" x="152.505" y="128.557" ry="1.629"/>
+                            </g>
+                            <g id="wheels-group" stroke="none">
+                                <g id="back-wheel">
+                                    <circle id="back-wheel-tyre" cx="159.962" cy="168.457" r="5.227" fill="#313e39"/>
+                                    <circle id="back-wheel-rim" cx="159.962" cy="168.457" r="4.181" fill="#425046"/>
+                                    <circle id="back-wheel-cap" cx="159.962" cy="168.457" r="1.447" fill="#748577"/>
+                                </g>
+                                <g id="mid-wheel">
+                                    <circle id="mid-wheel-tyre" cx="145.916" cy="168.537" r="5.227" fill="#313e39"/>
+                                    <circle id="mid-wheel-rim" cx="145.916" cy="168.537" r="4.181" fill="#425046"/>
+                                    <circle id="mid-wheel-cap" cx="145.916" cy="168.537" r="1.447" fill="#748577"/>
+                                </g>
+                                <g id="front-wheel">
+                                    <circle id="front-wheel-tyre" cx="113.463" cy="168.449" r="5.227" fill="#313e39"/>
+                                    <circle id="front-wheel-rim" cx="113.463" cy="168.449" r="4.181" fill="#425046"/>
+                                    <circle id="front-wheel-cap" cx="113.463" cy="168.449" r="1.447" fill="#748577"/>
+                                </g>
+                            </g>
+                        </g>
+
+                        <use id="organics-bin-1" xlink:href="#organics-bin"  transform = "translate(252, 177) scale(-1 1)"/>
+                        <use id="garbage-bin-1" xlink:href="#garbage-bin"  transform = "translate(238, 177) scale(-1 1)"/>
+                        <use id="recycling-bin-1" xlink:href="#recycling-bin"  transform = "translate(223, 177) scale(-1 1)"/>
+                        <use id="garbage-bin-2" xlink:href="#garbage-bin"  transform = "translate(62, 177)"/>
+                        <use id="recycling-bin-2" xlink:href="#recycling-bin"  transform = "translate(75, 177)"/>
+                    </g>
+
+                    <g id="foreground-layer">
+                        <g id="streetlight-group">
+                            <path fill="#5992c7" opacity=".8" transform="scale(.26458)" d="M220.904 373.309l-20.974 1.326c-30.105-1.082-35.945 26.99-35.834 42.265v275.2c0 .757 2.802 1.367 6.285 1.367 3.482 0 6.287-.61 6.287-1.367V416.9c1.447-23.634 14.93-29.275 23.527-29.255l19.912-.53z"  />
+                            <rect fill="#39506a" width="9.203" height="2.74" x="58.939" y="101.651" rx="22.619" ry=".362"/>
+                            <path fill="#f0ecc9" d="M58.237 102.565h10.889c-.25-2.346 1.366-5.298-5.972-5.34-2.57.102-4.381.864-4.987 1.968z"/>
+                            <path fill="#e6e7c1" d="M51.492 101.727c-4.874-.075-6.415 6.088-6.385 10.13v71.754c0 .2-.317.362.604.362.922 0 1.665-.161 1.664-.362l-.53-71.754c.383-6.254 2.574-8.49 4.638-9.329 1.93-.285 1.509-.648.009-.8z" />
+                            <path fill="#e3dbdb" d="M58.237 102.565h4.707c1.535.25.884-5.041.21-5.34-2.57.102-4.381.864-4.987 1.968z" />
+                        </g>
+                    </g>
+
+                    <g id="annotation-layer" fill="#fff">
+                        <g id="callout-organics">
+                            <path d="M242.88 87.032h31.267c4.385 0 7.916 3.138 7.916 7.034v14.383c0 3.897-3.53 7.035-7.916 7.035H242.88c-4.386 0-7.916-3.138-7.916-7.035V94.066c0-3.896 3.53-7.034 7.916-7.034z"/>
+                            <path d="M254.422 114.23l-9.155 45.457 19.367-45.694z"/>
+                        </g>
+                        <g id="callout-recyclables">
+                            <path d="M166.55 86.868h32.326c4.385 0 7.916 3.137 7.916 7.034v14.383c0 3.897-3.53 7.035-7.916 7.035H166.55c-4.385 0-7.915-3.138-7.915-7.035V93.902c0-3.897 3.53-7.034 7.915-7.034z"/>
+                            <path d="M176.578 114.76l36.873 45.183-26.662-45.421z" />
+                        </g>
+                        <g id="callout-garbage">
+                            <path d="M90.486 87.978h32.854c4.386 0 7.916 3.137 7.916 7.034v14.383c0 3.897-3.53 7.034-7.916 7.034H90.486c-4.386 0-7.916-3.137-7.916-7.034V95.012c0-3.897 3.53-7.034 7.916-7.034z" />
+                            <path d="M100.298 115.83l-26.86 44.113 37.072-44.35z" />
+                        </g>
+                    </g>
+                </g>
+
+            </svg>
+        </div>
+    </body>
+
+    <script>
+
+        ////////////////////////////////////////////////////////////////////////////////
+        /// 0. BUILD SEQUENCE: INIT SETTINGS AND DATA OBJECTS AND LOADING => RENDER  ///
+        ////////////////////////////////////////////////////////////////////////////////
+
+        const settings = {
+            svgID:          'streetscene-vis',
+            year:           '2019-20', 
+            dims: {
+                height:     720, 
+                width:      1080,
+                margin: {
+                    top: 100, right: 50, bottom: 50, left: 100
+                }
+            },
+            variables: {
+                peoplePerHousehold:     2.5
+            }
+        }
+
+        const data = {          // Initiate data object that populated by the parseData() function, 
+            table:      {},
+            schema: {
+                list:  {}
+            }
+        }
+
+        // Call build function
+        buildFromGSheetData(settings)
+
+        function buildFromGSheetData(settings) {
+             d3.select(`#${settings.svgID}`).style('opacity', 0)   
+            // 1. Specify data table links for each table used (tsv published output from each separate sheet/table)
+            const gsTableLinks =   {
+                kerbsideCollectionData:         'https://docs.google.com/spreadsheets/d/e/2PACX-1vSimVJWCqYLTijgqeU-SPGdAFT6wpGprHgjPdpxEElWurVvl28JYr7dHGE3OCSjF4VYH2_QggJUnveO/pub?gid=204435756&single=true&output=tsv',
+            }
+
+            // 2. Asynchronous data load (with Promise.all) and D3 (Fetch API) 
+            Promise.all(
+                Object.values(gsTableLinks).map(link => d3.tsv(link))       // Pass in array of d3.tsv loaders with each link
+            ).then( rawData => {
+                // a. Parse each loaded data table and store in data.table object, using the parseTable helper 
+                rawData.forEach((tableData, i) => {  parseTable(Object.keys(gsTableLinks)[i], tableData) })
+                return data
+
+            }).then( async (data) => {
+                // 3. Initiate vis build sequence with data now loaded
+                await applyQuerySettings(settings)                                    // a. Apply query string settings
+                await transformData(data.table.kerbsideCollectionData)              // b. Parse data
+                await renderVis(data.table.kerbsideCollectionData, settings)        // c. Render visualisation(s)
+            })
+
+            // X. Table data parsing function: trim() header white space and prase numbers with "$" and "," stripped. 
+            const parseTable = (tableName, tableData) => {
+                data.table[tableName] = tableData.map(row => {
+                    const newObj = {}
+                    Object.entries(row).forEach(([key, value]) => {
+                        switch(key.trim().toLowerCase()){
+                            case 'year':
+                                newObj[key.trim()] =  value
+                                break     
+                            default:
+                                newObj[key.trim()] = isNaN(parseFloat(value.replace(/\$|,/g, ''))) ? value : parseFloat(value.replace(/\$|,/g, '')) 
+                        }
+                    })
+                    return newObj
+                })
+            };              
+        };
+
+
+        ////////////////////////////////////
+        // 1. PARSE AND WRANGLE DATA     ///
+        ////////////////////////////////////
+
+        async function applyQuerySettings(settings){
+            // i. Check for query parameters and update material. A date set by the query selector is set while parsing input data 
+            settings.queryParameters = new URLSearchParams(window.location.search)
+            if (settings.queryParameters.has('year')) { 
+                settings.year = settings.queryParameters.get('year')  
+            }
+        };
+
+        async function transformData(kerbsideData) {      
+            // 1. Extract lists
+            data.schema.list.year =   [...new Set(kerbsideData.map( d => d.year))]
+        };
+
+
+        //////////////////////////////////////////////
+        // 2. RENDER THE LOCAL GOVERNMENT GRAPHIC  ///
+        //////////////////////////////////////////////
+
+        async function renderVis(data, settings){
+            const yearData = data.filter(d => d.year === settings.year)[0],
+                totalCouncilCost = d3.sum(Object.keys(yearData).filter(d => d.slice(d.indexOf('_') + 1) === 'cost').map( d => yearData[d])),
+                totalCollection = d3.sum(Object.keys(yearData).filter(d => d.slice(d.indexOf('_') + 1) === 'volume').map( d => yearData[d])),
+                garbagePerPropertyTonnes = yearData.Garbage_volume / yearData.Population * settings.variables.peoplePerHousehold,
+                garbagePerPropertyCost = yearData.Garbage_cost / yearData.Population * settings.variables.peoplePerHousehold,
+                garbagePerTonneCost = yearData.Garbage_cost / yearData.Garbage_volume
+                recyclingPerPropertyTonnes = yearData.Recycling_volume / yearData.Population * settings.variables.peoplePerHousehold,
+                recyclingPerPropertyCost = yearData.Recycling_cost / yearData.Population * settings.variables.peoplePerHousehold,
+                recyclingPerTonneCost = yearData.Recycling_cost / yearData.Recycling_volume,
+                organicsPerPropertyTonnes = yearData.Organics_volume / yearData.Population * settings.variables.peoplePerHousehold,
+                organicsPerPropertyCost = yearData.Organics_cost / yearData.Population * settings.variables.peoplePerHousehold,
+                organicsPerTonneCost = yearData.Organics_cost / yearData.Organics_volume
+
+            const svg = d3.select(`#${settings.svgID}`),
+                annotationLayer = svg.append('g').classed('annotation-group', true),
+                headlineOffsetY = 140
+
+            annotationLayer.append('text').classed('lga-label-title', true)
+                .text("A look at Local Government waste management in "+settings.year)
+                .attr('x', 50)
+                .attr('y', 60)
+
+            annotationLayer.append('text').classed('lga-label-small', true)
+                .text("Council's spent")
+                .attr('x', 50)
+                .attr('y', headlineOffsetY)
+
+            annotationLayer.append('text').classed('lga-label-headline', true)
+                .text(helpers.numberFormatters.formatCostInteger(totalCouncilCost/1000000))
+                .attr('x', 50)
+                .attr('y', headlineOffsetY+60)
+
+            annotationLayer.append('text').classed('lga-label-headline', true)
+                .text("million")
+                .attr('x', 50)
+                .attr('y', headlineOffsetY+110)
+
+            annotationLayer.append('text').classed('lga-label-small', true)
+                .text("...and collected")
+                .attr('x', 310)
+                .attr('y', headlineOffsetY)
+
+            annotationLayer.append('text').classed('lga-label-headline', true)
+                .text(`${helpers.numberFormatters.formatComma1dec(totalCollection/1000000)} million tonnes`)
+                .attr('x', 310)
+                .attr('y', headlineOffsetY+60)
+
+            annotationLayer.append('text').classed('lga-label-small', true)
+                .html(`of <tspan class='garbage'>garbage</tspan>, <tspan class ="recyclables">recyclables</tspan> and <tspan class ="organics">organics</tspan> from`)
+                .attr('x', 310)
+                .attr('y', headlineOffsetY +90)
+
+            annotationLayer.append('text').classed('lga-label-small', true)
+                .html(`households at at average of ${helpers.numberFormatters.formatCostInteger(totalCouncilCost/totalCollection)} per tonne`)
+                .attr('x', 310)
+                .attr('y', headlineOffsetY +118)
+
+            annotationLayer.append('text').classed('lga-label garbage middle', true)
+                .text("Garbage")
+                .attr('x', 323 + 75)
+                .attr('y', 350)
+
+            annotationLayer.append('text').classed('lga-annotation', true)
+                .text(`On average, ${helpers.numberFormatters.formatComma(garbagePerPropertyTonnes*1000)} kg of garbage was collected from each serviced property at a cost of ${helpers.numberFormatters.formatCostInteger(garbagePerPropertyCost)}.`)
+                .attr('x', 323)
+                .attr('y', 368)
+                .attr('dy', 0)
+                .call(helpers.wrap, 160, 1.1)
+
+            annotationLayer.append('text').classed('lga-label recyclables middle', true)
+                .text("Recyclables")
+                .attr('x', 608 + 75)
+                .attr('y', 350)
+
+            annotationLayer.append('text').classed('lga-annotation', true)
+                .text(`On average, ${helpers.numberFormatters.formatComma(recyclingPerPropertyTonnes*1000)} kg of recyclables were collected from each serviced property at a cost of ${helpers.numberFormatters.formatCostInteger(recyclingPerPropertyCost)}.`)
+                .attr('x', 608)
+                .attr('y', 368)
+                .attr('dy', 0)
+                .call(helpers.wrap, 160, 1.1)
+
+            annotationLayer.append('text').classed('lga-label organics middle', true)
+                .text("Organics")
+                .attr('x', 893 + 75)
+                .attr('y', 350)
+            annotationLayer.append('text').classed('lga-annotation', true)
+                .text(`On average, ${helpers.numberFormatters.formatComma(organicsPerPropertyTonnes*1000)} kg of organics were collected from each serviced property at a cost of ${helpers.numberFormatters.formatCostInteger(organicsPerPropertyCost)}.`)
+                .attr('x', 893)
+                .attr('y', 368)
+                .attr('dy', 0)
+                .call(helpers.wrap, 160, 1.1)
+
+            // Animate in
+            d3.select(`#${settings.svgID}`).transition().duration(1500)
+                .style('opacity', null)   
+
+        };
+
+
+        ////////////////////////////////////
+        /// X. HELPER FUNCTIONS |        ///
+        ////////////////////////////////////
+
+        const helpers= {
+            numberFormatters: {
+                formatComma:           	d3.format(",.0f"),
+                formatComma1dec:       	d3.format(",.1f"),
+                formatComma2dec:       	d3.format(",.2f"),
+                formatInteger:         	d3.format(".0f"),   
+                formatCostInteger:     	d3.format("$,.0f"),  
+                formatCost1dec:        	d3.format("$,.1f"),  
+                formatPct:          	d3.format(".0%"), 
+                formatPct1dec:          d3.format(".1%")  
+            },
+            numberParsers: {
+                parseDateSlash: d3.timeParse("%d/%m/%Y")
+            },
+            slugify: function (str) {
+                str = str.replace(/^\s+|\s+$/g, '').toLowerCase(); // trim           
+                const from = "àáäâèéëêìíïîòóöôùúüûñç·/_,:;",      // remove accents, swap ñ for n, etc
+                    to   = "aaaaeeeeiiiioooouuuunc------"
+                for (var i=0, l=from.length ; i<l ; i++) {
+                    str = str.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
+                }
+                str = str.replace(/[^a-z0-9 -]/g, '') // remove invalid chars
+                    .replace(/\s+/g, '-') // collapse whitespace and replace by -
+                    .replace(/-+/g, '-'); // collapse dashes
+                return str;
+            }, 
+            wrap: function(text, width, lineHeight, centerVertical = false) {
+                text.each(function() {
+                    let text = d3.select(this),
+                        words = text.text().split(/\s+/).reverse(),
+                        word,
+                        line = [],
+                        lineNumber = 0,
+                        y = text.attr("y"),
+                        x = text.attr("x"),
+                        fontSize = parseFloat(text.style("font-size")),
+                        dy = parseFloat(text.attr("dy")),
+                        tspan = text.text(null).append("tspan").attr("x", x).attr("y", y).attr("dy", dy + "em");
+
+                    while (word = words.pop()) {
+                        line.push(word);
+                        tspan.text(line.join(" "));
+
+                        if (tspan.node().getComputedTextLength() > width) {
+                            line.pop();
+                            tspan.text(line.join(" "));
+                            line = [word];
+                            tspan = text.append("tspan")
+                                .attr("x", x)
+                                .attr("y",  y)
+                                .attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+                        }                    
+                    }            
+                    if(centerVertical){
+                        text.style("transform",  "translateY(-"+(10 * (lineNumber))+"px)")
+                    }
+                })
+            }
+        }
+
+    </script>
+</html>
+

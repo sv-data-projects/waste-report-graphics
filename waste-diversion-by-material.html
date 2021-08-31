@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="Waste diversion radial chart with table">
+        <meta name="author" content="Sustainability Victoria">
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+        <link rel="stylesheet" href="./css/core.css">
+        <style>
+
+            /***********************************************************/
+            /***********************************************************/
+            /****                                                   ****/
+            /**** WASTE DIVERSSION GRPAHIC AND TABLE  | CUSTOM CSS  ****/
+            /**** ---------------------------------------------     ****/
+            /**** - CSS Variables and loaded fonts from core.css    ****/
+            /****                                                   ****/
+            /***********************************************************/
+            /***********************************************************/
+
+            body{
+                font-family: 'DIN Next LT Pro';
+                margin: 0;
+            }
+
+            /**********************************************************/
+            /**** RADIAL TABLE & BAR CHART FOR MATERIALS BREAKDOWN ****/
+            /**********************************************************/
+
+            .main-title{
+                fill: #000;
+                font-size: 30px;
+                font-weight: 500;
+                text-transform: uppercase;
+            }
+            .centered.main-title{
+                font-size: 26px;
+                text-anchor: middle;
+            }
+            .bg-rect{
+                fill: none
+            }
+            .radialBar-title-label,
+            .table-header,
+            .radialBar-subtitle-label{    
+                fill: rgb(40, 40, 40);
+            }
+            .radialBar-pct-label,
+            .radialBar-material-label{
+                fill: #fff;
+                font-weight: 500;
+            }
+            .material-data-table,
+            .radialBar-pct-label,
+            .radialBar-material-label,
+            .table-header{
+                font-size: 14px;
+            }
+            .table-header,
+            .material-data-table, 
+            .radialBar-title-label,
+            .radialBar-pct-label, 
+            .diversion-rate.material-data-table{
+                text-anchor: end;
+            }
+            .table-header{
+                font-weight: 500;
+            }
+            .table-header.material,
+            .arc-label.material{
+                text-anchor: start;
+            }
+            .material-data-table{
+                dominant-baseline: hanging; 
+            }
+            .radialBar-title-label{
+                font-weight: bold;
+            }
+            .radialBar-pct-label,
+            .radialBar-material-label{
+                mix-blend-mode: hard-light;
+            }
+            .diversion-rate.material-data-table{
+                font-weight: bold;
+                mix-blend-mode: screen;
+            }
+            .arc.paper-and-cardboard{
+                fill: var(--xBlueCyan);
+            }
+            .material-data-table.paper-and-cardboard{
+                fill: var(--xDarkBlueCyan);
+            }
+            .arc.plastics{
+                fill: var(--tertiaryYellow);
+            }
+            .material-data-table.plastics{
+                fill: var(--xDarkYellow);
+            }
+            .arc.metals{
+                fill: var(--xMidBlue);
+            }
+            .material-data-table.metals{
+                fill: var(--tertiaryBlue);
+            }
+            .arc.glass{
+                fill: var(--tertiaryPurpleLight)
+            }
+            .material-data-table.glass{
+                fill: var(--tertiaryPurple)
+            }
+            .arc.organics{
+                fill: var(--xGreen );
+            }
+            .material-data-table.organics{
+                fill: var(--tertiaryEmerald );
+            }
+            .arc.aggregates-masonry-and-soil{
+                fill: var(--tertiaryRedLight);
+            }
+            .material-data-table.aggregates-masonry-and-soil{
+                fill: var(--tertiaryRed);
+            }
+            .arc.rubber{
+                fill: var(--xMagenta);
+            }
+            .material-data-table.rubber{
+                fill: var(--xDarkMagenta);
+            }
+            .arc.textiles{
+                fill: var(--xOrange);
+            }
+            .material-data-table.textiles{
+                fill: var(--xDarkOrange);
+            }
+            .arc.other-materials{
+                fill: var(--tertiaryCard);
+            }
+            .material-data-table.other-materials{
+                fill: var(--xDarkCard);
+            }
+            .radialBar-material-label{
+                fill: var(--xCharcoal);
+            }
+            .arc{
+                opacity: 0.8;
+            }
+
+            /********************************/
+            /********   DARK MODE ***********/
+            /********************************/
+
+            .dark #radial-bar-vis .bg-rect,
+            .dark .radialBar-pct-label,
+            .dark .radialBar-material-label{
+                fill: rgb(40, 40, 40);
+            }
+            .dark #radial-bar-vis .main-title,
+            .dark .table-header,
+            .dark .radialBar-title-label,
+            .dark .table-header,
+            .dark .radialBar-subtitle-label{
+                fill: #fff;
+            }
+            .dark .material-data-table.plastics{
+                fill: var(--tertiaryYellowLight);
+            }
+            .dark .material-data-table.paper-and-cardboard{
+                fill: var(--xBlueCyan);
+            }
+            .dark .material-data-table.metals{
+                fill: var(--tertiaryBlueLight);
+            }
+            .dark .material-data-table.glass{
+                fill: var(--xLightestPurple)
+            }
+            .dark .material-data-table.organics{
+                fill: var(--xGreen );
+            }
+            .dark .material-data-table.aggregates-masonry-and-soil{
+                fill: var(--tertiaryRedLight);
+            }
+            .dark .material-data-table.rubber{
+                fill: var(--xMagenta);
+            }
+            .dark .material-data-table.textiles{
+                fill: var(--xOrange);
+            }
+            .dark .material-data-table.other-materials{
+                fill: var(--tertiaryCard);
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class = "svg-container">
+            <svg id = "radial-bar-vis">
+            </svg>
+        </div>
+    </body>
+
+    <script>
+
+        /////////////////////////////////////////////////////////////////////////////////
+        /// 0. BUILD SEQUENCE: INIT SETTINGS AND DATA OBJECTS AND LOADING => RENDER  ///
+        ////////////////////////////////////////////////////////////////////////////////
+
+        const data = {          // Initiate data object that populated by the parseData() function, 
+            table:      {},
+            byPeriod:   {},
+            byType:   {
+                material: {}
+            },
+            schema: {
+                list:  { }
+            }
+        }
+
+        const settings = {
+            svgID:        'radial-bar-vis',
+            year:         '2019-20', 
+            layout:       'landscape',           // Options are 'portrait', 'landscape' and 'chart-only'
+        }
+
+        const state = {
+            visual: {
+                mode:   ''
+            }
+        }
+
+        // Call build function
+        buildFromGSheetData(settings)
+
+        function buildFromGSheetData(settings) {
+            // 1. Specify data table links for each table used (tsv published output from each separate sheet/table)
+            const gsTableLinks =   {
+                wasteByStream:                       'https://docs.google.com/spreadsheets/d/e/2PACX-1vSimVJWCqYLTijgqeU-SPGdAFT6wpGprHgjPdpxEElWurVvl28JYr7dHGE3OCSjF4VYH2_QggJUnveO/pub?gid=0&single=true&output=tsv',
+                wasteByMaterialFlow:                 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSimVJWCqYLTijgqeU-SPGdAFT6wpGprHgjPdpxEElWurVvl28JYr7dHGE3OCSjF4VYH2_QggJUnveO/pub?gid=272100684&single=true&output=tsv',
+            }
+            // 2. Asynchronous data load (with Promise.all) and D3 (Fetch API) 
+            Promise.all(
+                Object.values(gsTableLinks).map(link => d3.tsv(link))       // Pass in array of d3.tsv loaders with each link
+            ).then( rawData => {
+                // a. Parse each loaded data table and store in data.table object, using the parseTable helper 
+                rawData.forEach((tableData, i) => {  parseTable(Object.keys(gsTableLinks)[i], tableData) })
+                return data
+
+            }).then( async (data) => {
+                // 3. Initiate vis build sequence with data now loaded
+                await applyQuerySettings(settings)                                               // a. Apply query string settings
+                await transformData(data.table.wasteByStream, data.table.wasteByMaterialFlow)    // b. Parse data
+                await renderVis(data.byType.material, settings)                                 // c. Render visualisation(s)
+            })
+
+            // X. Table data parsing function: trim() header white space and prase numbers with "$" and "," stripped. 
+            const parseTable = (tableName, tableData) => {
+                data.table[tableName] = tableData.map(row => {
+                    const newObj = {}
+                    Object.entries(row).forEach(([key, value]) => {
+                        switch(key.trim().toLowerCase()){
+                            case 'year':
+                                newObj[key.trim()] =  value
+                                break     
+                            default:
+                                newObj[key.trim()] = isNaN(parseFloat(value.replace(/\$|,/g, ''))) ? value : parseFloat(value.replace(/\$|,/g, '')) 
+                        }
+                    })
+                    return newObj
+                })
+            };   
+        };
+
+
+        ////////////////////////////////////
+        // 1. PARSE AND WRANGLE DATA     ///
+        ////////////////////////////////////
+
+        async function applyQuerySettings(settings){
+            // i. Check for query parameters and update material. A date set by the query selector is set while parsing input data 
+            settings.queryParameters = new URLSearchParams(window.location.search)
+            if (settings.queryParameters.has('year')) { 
+                settings.year = settings.queryParameters.get('year')  
+            }
+            if (settings.queryParameters.has('mode')) { 
+                d3.selectAll(`.svg-container`).classed("dark", settings.queryParameters.get('mode') === 'dark')
+            }
+            if (settings.queryParameters.has('layout')) { 
+                settings.layout = settings.queryParameters.get('layout') 
+            }
+        };
+
+        async function transformData(wasteStreamData, materialData) {      
+            // 1. Extract lists
+            data.schema.list.stream =  [...new Set(wasteStreamData.map( d => d.stream))]
+            data.schema.list.year  =   [...new Set(wasteStreamData.map( d => d.year))]
+            data.schema.list.year.forEach( year =>  {
+                data.byPeriod[year]  = {}
+                data.schema.list.stream.forEach( stream => {
+                    if(typeof data.byPeriod[year].byStream === 'undefined'){
+                        data.byPeriod[year].byStream =  {}
+                    } 
+                    data.byPeriod[year].byStream[stream] = {        // Note conversion to Mt for graphic is done in the rendering functions
+                        Diverted:                   wasteStreamData.filter( d => d.year === year && d.stream === stream)[0]['Recovered (kt)'],
+                        Landfilled:                 wasteStreamData.filter( d => d.year === year && d.stream === stream)[0]['Landfilled (kt)'],
+                        "Locally reprocessed":      wasteStreamData.filter( d => d.year === year && d.stream === stream)[0]['Reprocessed in Victoria (kt)']
+                    }
+                })
+            })
+            data.schema.list.material = [...new Set(materialData.filter(d => d.level ===1).map(d => d.source))]
+
+            // 2. Shape data by type:  Material > destination > end products
+            data.schema.list.material.forEach( material => {                    // For each unique material...
+                data.byType.material[material] = {value: 0}
+                materialData
+                    .filter(d => d.year === settings.year && d.level ===1 && d.source === material)         // Filter for level 1 (first material > destination) and match the material  
+                    .forEach( d => {
+                        data.byType.material[material].value += d.value         // Sum the value of output flows
+                        data.byType.material[material].class = `${helpers.slugify(d.materialClass)} material`         // Assign the specified (material) class
+                    })
+                // Add the diversion rates per material
+                materialData
+                    .filter(d => d.year === settings.year && d.level ===1 && d.source === material)         // Filter for level 1 (first material > destination) and match the material  
+                    .forEach( d => {
+                        if(d.targetClass === 'recovered'){
+                            data.byType.material[material].diversion = d.value  / data.byType.material[material].value      
+                            data.byType.material[material].diverted = d.value 
+                        } else if(d.targetClass === 'landfill'){
+                            data.byType.material[material].landfill = d.value 
+                        }
+                    })
+            })
+        };
+
+
+        ////////////////////////////////////////////////////////////////////////
+        // 2.  RENDER THE TABLE AND CIRCULAR BAR VIS FOR MATERIALS BREAKDOWN ///
+        ////////////////////////////////////////////////////////////////////////
+
+        async function renderVis(data, settings){
+            // 0. Re-shape chartData (for better clarity when defining data binding accessors) and setup geometry
+                let chartData = []
+                Object.entries(data).sort().forEach(([material, d]) => {
+                    chartData.push({
+                        material,
+                        class:          d.class,
+                        diversionRate:  d.diversion,
+                        diverted:       d.diverted,
+                        landfill:       d.landfill,
+                        total:          d.diverted + d.landfill,
+                    })
+                })
+                    
+                chartData = chartData.sort((a,b) => b.diversionRate - a.diversionRate ).filter( d => d.diversionRate !== 0)
+
+                // Setup geometry for each layout       
+                switch(settings.layout){
+                    case 'landscape':
+
+                        settings.dims = {
+                            height:     720, 
+                            width:      1080,
+                            margin: {
+                                top: 50, right: 50, bottom: 50, left: 50
+                            }
+                        }
+
+                        settings.geometry = {
+                            arcPadding:     2,
+                            chartRadius:    300,
+                            circlePos: {
+                                x: settings.dims.width * 0.70, 
+                                y: settings.dims.height / 2 + settings.dims.margin.top
+                            }
+                        }
+                        settings.geometry.chartRadius = (settings.dims.height -settings.dims.margin.top) / 2 - settings.dims.margin.top
+                        settings.geometry.arcMinRadius = settings.geometry.chartRadius  * 0.4
+
+                        settings.geometry.tableOffset = {
+                            label:              -settings.geometry.circlePos.x + settings.dims.margin.left,  
+                            total:              -settings.geometry.circlePos.x + settings.dims.margin.left + 250, 
+                            landfill:           -settings.geometry.circlePos.x + settings.dims.margin.left + 320, 
+                            diversion:          -settings.geometry.circlePos.x + settings.dims.margin.left + 390,  
+                            diversionRate:      -10,
+                            labelVertical:      5,
+                            y:                  0
+                        }
+                        break
+
+                    case 'portrait':
+                    case 'chart-only':
+                        settings.dims = {
+                            height:     1080, 
+                            width:      720,
+                            margin: {
+                                top: 50, right: 50, bottom: 50, left: 50
+                            }
+                        }
+
+                        settings.geometry = {
+                            arcPadding:     2,
+                            chartRadius:    200,
+                            circlePos: {
+                                x: settings.dims.width * 0.50, 
+                                y: settings.dims.height * 0.35 + settings.dims.margin.top
+                            }
+                        }
+
+                        settings.geometry.chartRadius = (settings.dims.height -settings.dims.margin.top) *0.35 - settings.dims.margin.top
+                        settings.geometry.arcMinRadius = settings.geometry.chartRadius * 0.4
+
+                        settings.geometry.tableOffset = {
+                            label:              -settings.geometry.circlePos.x + settings.dims.margin.left + 70,  
+                            total:              -settings.geometry.circlePos.x + settings.dims.margin.left + 330, 
+                            landfill:           -settings.geometry.circlePos.x + settings.dims.margin.left + 430, 
+                            diversion:          -settings.geometry.circlePos.x + settings.dims.margin.left + 530,  
+                            diversionRate:      -10,
+                            labelVertical:      8,
+                            y:                  settings.dims.height * 0.65
+                        }
+                        break
+                    default:
+                }
+
+
+            // 1. Setup scales and helper functions for shape and layout of radial 
+                const arcScale = d3.scaleLinear()
+                    // .domain([0, d3.max(chartData, d => d.diversionRate)]) 
+                    .domain([0, 1])                         // Set to "1" for 100% instead of implying from data domain 
+                    .range([0, 2 * Math.PI])
+
+                const arc = d3.arc()                        // Arc shape generation
+                    .innerRadius((d, i) => getInnerRadius(i))
+                    .outerRadius((d, i) => getOuterRadius(i))
+                    .startAngle(0)
+                    .endAngle((d, i) => arcScale(d))
+
+                const arcWidth = (settings.geometry.chartRadius - settings.geometry.arcMinRadius - chartData.length * settings.geometry.arcPadding) / chartData.length,
+                    arcTween = (d, i) =>  t => arc(d3.interpolate(0, d.diversionRate)(t), i)
+                    rad2deg = (angle) => angle * 180 / PI
+                    getOuterRadius = (index) => getInnerRadius(index) + arcWidth;
+                    getInnerRadius = (index) => settings.geometry.arcMinRadius + (chartData.length - (index + 1)) * (arcWidth + settings.geometry.arcPadding) 
+        
+            // 2. Setup SVG
+                const svg= d3.select(`#${settings.svgID}`).attr("viewBox", `0 0 ${settings.dims.width} ${settings.dims.height}`)
+
+                const defs = svg.append('defs'),
+                    backgroundLayer = svg.append('g').classed('bg-group', true),                // Background layer
+                    canvas = svg.append('g').classed('vis-group', true)                         // Centered rendering layer
+                        .attr("height", settings.dims.height - settings.dims.margin.top - settings.dims.margin.bottom)
+                        .attr("width", settings.dims.width - settings.dims.margin.left - settings.dims.margin.right)
+                        .attr('transform', `translate(${settings.geometry.circlePos.x}, ${settings.geometry.circlePos.y})`),
+                    annotationLayer = svg.append('g').classed('annotation-group', true)        // Annotation layer
+                
+            // 3. Add the chart arcs
+                const arcs = canvas.append('g')
+                    .attr('class', 'arc-group')
+                    .selectAll('path')
+                    .data(chartData)
+                        .join('path')
+                        .attr('class', d => `${d.class} arc`)
+
+                    arcs.transition()            // Random fun on load
+                        .delay((d, i) => i * 500)
+                        .duration(1500)
+                        .attrTween('d', arcTween)
+
+            // 4. Add table/axis group
+                if(settings.layout !== 'chart-only'){
+                    const  tableHeaders = canvas.append('g').classed('table-headers', true),
+                        tableAxis = canvas.append('g').classed('r axis table', true)
+                            .selectAll('g')
+                                .data(chartData)
+                                .join('g')
+
+                    // a. Tables headers (added directly to canvas group)
+                    canvas.append('text').attr("class", `material-data-table table-header material`)
+                        .attr('x', settings.geometry.tableOffset.label)
+                        .attr('y', -getInnerRadius(0) - arcWidth * 2 + settings.geometry.tableOffset.y)
+                        .text('Collected waste material')
+                    canvas.append('text').attr("class", `material-data-table table-header total`)
+                        .attr('x', settings.geometry.tableOffset.total)
+                        .attr('y', -getInnerRadius(0) - arcWidth * 2 + settings.geometry.tableOffset.y )
+                        .text('Total')
+                    canvas.append('text').attr("class", `material-data-table table-header landfill`)
+                        .attr('x', settings.geometry.tableOffset.landfill)
+                        .attr('y', -getInnerRadius(0) - arcWidth * 2 + settings.geometry.tableOffset.y)
+                        .text('Landfill')
+                    canvas.append('text').attr("class", `material-data-table table-header diversion`)
+                        .attr('x', settings.geometry.tableOffset.diversion)
+                        .attr('y', -getInnerRadius(0) - arcWidth * 2 + settings.geometry.tableOffset.y )
+                        .text('Recycled')
+
+                    // b. Table and axis group
+                    tableAxis.append('text')
+                        .attr("class", d => `${d.class} arc-label material-data-table`)
+                        .attr('x', settings.geometry.tableOffset.label)
+                        .attr('y', (d, i) => -getInnerRadius(i) - arcWidth + settings.geometry.tableOffset.labelVertical + settings.geometry.tableOffset.y)
+                        .text(d => d.material)
+                    tableAxis.append('text')
+                        .attr("class", d => `${d.class} total-volume material-data-table`)
+                        .attr('x', settings.geometry.tableOffset.total)
+                        .attr('y', (d, i) => -getInnerRadius(i) - arcWidth + settings.geometry.tableOffset.labelVertical + settings.geometry.tableOffset.y)
+                        .text(d => `${helpers.numberFormatters.formatComma(d.total /1000)} kt`)
+                    tableAxis.append('text')
+                        .attr("class", d => `${d.class} diversion-volume material-data-table`)
+                        .attr('x', settings.geometry.tableOffset.landfill)
+                        .attr('y', (d, i) => -getInnerRadius(i) - arcWidth + settings.geometry.tableOffset.labelVertical + settings.geometry.tableOffset.y)
+                        .text(d => `${helpers.numberFormatters.formatComma(d.landfill /1000)} kt`)
+                    tableAxis.append('text')
+                        .attr("class", d => `${d.class} landfill-volume material-data-table`)
+                        .attr('x', settings.geometry.tableOffset.diversion)
+                        .attr('y', (d, i) => -getInnerRadius(i) - arcWidth + settings.geometry.tableOffset.labelVertical + settings.geometry.tableOffset.y)
+                        .text(d => `${helpers.numberFormatters.formatComma(d.diverted /1000)} kt`)
+                }
+
+            // 5. Add background layer and annotation
+                backgroundLayer.append('rect').classed('bg-rect', true)
+                    .attr('width', settings.dims.width)
+                    .attr('height', settings.dims.height)
+
+                annotationLayer.append('text').classed('main-title', true)
+                    .classed('centered', settings.layout === 'landscape' ? false : true)
+                    .attr('transform', `translate(${settings.layout === 'landscape' ? settings.dims.margin.left : settings.dims.width * 0.5} , ${settings.dims.margin.top})`)
+                    .text(`What materials did Victorians recover in ${settings.year}?`)
+
+            // 6. Add a curved labels for diversion radial chart 
+                chartData.forEach((d, i) => {
+                    const slugMaterialName =  helpers.slugify(d.material)
+                        labelOffset = 6, 
+                        labelRadius = getInnerRadius(i) + labelOffset,
+                        startPos = {
+                            x: settings.geometry.circlePos.x ,
+                            y: settings.geometry.circlePos.y - labelRadius,
+                        }, 
+                        labelPath = `M${startPos.x} ${startPos.y}  A${labelRadius}, ${labelRadius}, 0, 0, 1, ${startPos.x }, ${startPos.y + labelRadius * 2}
+                            A${labelRadius}, ${labelRadius}, 0, 0, 1, ${startPos.x }, ${startPos.y}`
+
+                    defs.append('path')
+                        .attr('id', `label-path-${slugMaterialName}`)
+                        .attr('d', labelPath)         
+
+                    // Material label
+                    annotationLayer.append('text')
+                        .classed(`radialBar-material-label text-on-path ${slugMaterialName}` , true)
+                        .append('textPath').attr("xlink:href", `#label-path-${slugMaterialName}`)
+                            .attr('startOffset', '3px')
+                            .text(d.material)	
+
+                    // Data label
+                    annotationLayer.append('text')
+                        .classed(`radialBar-pct-label text-on-path ${slugMaterialName}` , true)
+                        .append('textPath').attr("xlink:href", `#label-path-${slugMaterialName}`)
+                            .attr('startOffset', helpers.numberFormatters.formatPct1dec(d.diversionRate - 0.005))
+                            .text(helpers.numberFormatters.formatPct1dec(d.diversionRate))
+                })
+
+            // 7. Add title labels
+            const titleOffset = 10, 
+                titleLabelRadius = settings.geometry.chartRadius + titleOffset
+                titleStartPos = {
+                    x: settings.geometry.circlePos.x - titleLabelRadius,
+                    y: settings.geometry.circlePos.y,
+                }, 
+                titleLabelPath = `M${titleStartPos.x} ${titleStartPos.y} A${titleLabelRadius}, ${titleLabelRadius}, 0, 0, 1, ${settings.geometry.circlePos.x + titleLabelRadius}, ${titleStartPos.y }`
+
+            defs.append('path')
+                .attr('id', 'radialBar-label-path')
+                .attr('d', titleLabelPath)
+
+            annotationLayer.append('text')
+                .classed('radialBar-title-label text-on-path' , true)
+                .append('textPath').attr("xlink:href", "#radialBar-label-path")
+                    .attr('startOffset', '49%')
+                    .text(`Closing the gaps`)
+
+            annotationLayer.append('text')
+                .classed('radialBar-subtitle-label text-on-path' , true)
+                .append('textPath').attr("xlink:href", "#radialBar-label-path")
+                    .attr('startOffset', '49.5%')
+                    .text(`- comparing recovery rates for Victorian waste materials in ${settings.year}`)	
+
+
+            // 8. Add UI toggle for dark theme with shift key
+            document.body.onkeyup = function(e){
+                if(e.keyCode == 16){
+                    d3.selectAll(`.svg-container`).classed("dark", !d3.selectAll('.svg-container').classed("dark"))
+                }
+            }
+        };
+
+
+        ////////////////////////////////////
+        /// X. HELPER FUNCTIONS |        ///
+        ////////////////////////////////////
+
+        const helpers= {
+            numberFormatters: {
+                formatComma:           	d3.format(",.0f"),
+                formatComma1dec:       	d3.format(",.1f"),
+                formatComma2dec:       	d3.format(",.2f"),
+                formatInteger:         	d3.format(".0f"),   
+                formatCostInteger:     	d3.format("$,.0f"),  
+                formatCost1dec:        	d3.format("$,.1f"),  
+                formatPct:          	d3.format(".0%"), 
+                formatPct1dec:          d3.format(".1%")  
+            },
+            numberParsers: {
+                parseDateSlash: d3.timeParse("%d/%m/%Y")
+            },
+            slugify: function (str) {
+                str = str.replace(/^\s+|\s+$/g, '').toLowerCase(); // trim           
+                const from = "àáäâèéëêìíïîòóöôùúüûñç·/_,:;",      // remove accents, swap ñ for n, etc
+                    to   = "aaaaeeeeiiiioooouuuunc------"
+                for (var i=0, l=from.length ; i<l ; i++) {
+                    str = str.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
+                }
+                str = str.replace(/[^a-z0-9 -]/g, '') // remove invalid chars
+                    .replace(/\s+/g, '-') // collapse whitespace and replace by -
+                    .replace(/-+/g, '-'); // collapse dashes
+                return str;
+            }, 
+            wrap: function(text, width, lineHeight, centerVertical = false) {
+                text.each(function() {
+                    let text = d3.select(this),
+                        words = text.text().split(/\s+/).reverse(),
+                        word,
+                        line = [],
+                        lineNumber = 0,
+                        y = text.attr("y"),
+                        x = text.attr("x"),
+                        fontSize = parseFloat(text.style("font-size")),
+                        dy = parseFloat(text.attr("dy")),
+                        tspan = text.text(null).append("tspan").attr("x", x).attr("y", y).attr("dy", dy + "em");
+
+                    while (word = words.pop()) {
+                        line.push(word);
+                        tspan.text(line.join(" "));
+
+                        if (tspan.node().getComputedTextLength() > width) {
+                            line.pop();
+                            tspan.text(line.join(" "));
+                            line = [word];
+                            tspan = text.append("tspan")
+                                .attr("x", x)
+                                .attr("y",  y)
+                                .attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+                        }                    
+                    }            
+                    if(centerVertical){
+                        text.style("transform",  "translateY(-"+(10 * (lineNumber))+"px)")
+                    }
+                })
+            }
+        }
+
+    </script>
+</html>
+

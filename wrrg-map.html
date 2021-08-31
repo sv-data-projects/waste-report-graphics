@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="Victorian WRRG data map">
+        <meta name="author" content="Sustainability Victoria">
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+        <link rel="stylesheet" href="./css/core.css">
+        <style>
+
+            /***********************************************************/
+            /***********************************************************/
+            /****                                                   ****/
+            /**** VICTORRINA WRRG WASTE DATA MAP  | CUSTOM CSS      ****/
+            /**** -----------------------------------------------   ****/
+            /**** - CSS Variables and loaded fonts from core.css    ****/
+            /****                                                   ****/
+            /***********************************************************/
+            /***********************************************************/
+
+            body{
+                font-family: 'DIN Next LT Pro';
+                margin: 0;                          /* Full bleed presentation */
+            }
+
+
+            /********************************/
+            /*****  WRRG MAP TYPOGRAPHY   ***/
+            /********************************/
+                .align-middle{
+                    text-anchor: middle;
+                }
+                .main-title,
+                .main-subtitle{
+                    fill: #000;
+                    dominant-baseline: 'hanging';
+                    mix-blend-mode: multiply;
+                }
+                .main-title{
+                    font-size: 30px;
+                    font-weight: 500;
+                    text-transform: uppercase;
+                }
+                .main-subtitle{
+                    font-size: 14px;
+                }
+                .wrrg-infoPane-label,
+                .wrrg-infoPane-data, 
+                .donut-diversion-pct{
+                    font-size: 10px;
+                }
+                .donut-diversion-pct{
+                    font-weight: bold;
+                    text-anchor: middle;
+                    dominant-baseline: middle;
+                }
+                .lga-label{
+                    font-size: 8px; 
+                    text-anchor: middle;
+                    dominant-baseline: middle;
+                    pointer-events: none;
+                    fill: #000;
+                    mix-blend-mode: luminosity;
+                }
+                .donut-diversion-pct,
+                .wrrg-icon,
+                .wrrg-infoPane-header,
+                .wrrg-infoPane-label,
+                .wrrg-infoPane-data{
+                    fill: rgba(100, 100, 100, 1);   
+                    background-blend-mode: multiply;
+                }
+                .wrrg-infoPane-header{
+                    font-size: 16px;
+                    font-weight: 500;
+                    text-anchor: middle;
+                }
+                .wrrg-infoPane-label{
+                    font-weight: bold;
+                }
+                .wrrg-infoPane-data{
+                    text-anchor: end;
+                }
+
+            /************************************/
+            /*****  WRRG MAP GENERAL STYLING  ***/
+            /************************************/
+                .lga-base{
+                    fill: none;
+                    stroke-width: 0.25px;
+                    cursor: pointer;
+                }
+                .lga-base.showStroke{
+                    stroke: #fff;
+                }
+                .wrrg-infoPane-background{
+                    mix-blend-mode: color-dodge;
+                    opacity: 0.3;
+                    fill: var(--secondaryGreyLight);
+                }
+                .wrrg-infoPane-divider{
+                    stroke:#000;
+                    stroke-width: 0.5px;
+                }
+                .donut-arc{
+                    stroke: #fff;
+                    stroke-width: 0.5px;
+                    fill: var(--secondaryGreyLight);
+                }
+                .donut-arc.diversion{
+                    fill: var(--svGreen);       
+                }
+
+
+            /************************************/
+            /*****  CATEGEGORIAL WRRG COLOURS ***/
+            /************************************/
+
+                .multi-colour .wrrg-infoPane-background.barwon-south-west-waste-and-resource-recovery-group,
+                .multi-colour .diversion.barwon-south-west-waste-and-resource-recovery-group,
+                .multi-colour .lga-base.barwon-south-west-waste-and-resource-recovery-group{
+                    fill: var(--svLightGreen);
+                }
+                .multi-colour .lga-base.barwon-south-west-waste-and-resource-recovery-group{
+                    stroke: var(--svLightGreen);
+                }
+                .multi-colour .wrrg-infoPane-background.gippsland-waste-and-resource-recovery-group,
+                .multi-colour .diversion.gippsland-waste-and-resource-recovery-group,
+                .multi-colour .lga-base.gippsland-waste-and-resource-recovery-group{
+                    fill: var(--tertiaryCardLight);
+                }
+                .multi-colour .lga-base.gippsland-waste-and-resource-recovery-group{
+                    stroke: var(--tertiaryCardLight);
+                }
+                .multi-colour .wrrg-infoPane-background.goulburn-valley-waste-and-resource-recovery-group,
+                .multi-colour .diversion.goulburn-valley-waste-and-resource-recovery-group,
+                .multi-colour .lga-base.goulburn-valley-waste-and-resource-recovery-group{
+                    fill: var(--tertiaryRedLight);
+                }
+                .multi-colour .lga-base.goulburn-valley-waste-and-resource-recovery-group{
+                    stroke: var(--tertiaryRedLight);
+                }
+                .multi-colour .wrrg-infoPane-background.grampians-central-west-waste-and-resource-recovery-group,
+                .multi-colour .diversion.grampians-central-west-waste-and-resource-recovery-group,
+                .multi-colour .lga-base.grampians-central-west-waste-and-resource-recovery-group{
+                    fill: var(--tertiaryYellowLight);
+                }
+                .multi-colour .lga-base.grampians-central-west-waste-and-resource-recovery-group{
+                    stroke: var(--tertiaryYellowLight);
+                }
+                .multi-colour .wrrg-infoPane-background.loddon-mallee-waste-and-resource-recovery-group,
+                .multi-colour .diversion.loddon-mallee-waste-and-resource-recovery-group,
+                .multi-colour .lga-base.loddon-mallee-waste-and-resource-recovery-group{
+                    fill: var(--tertiaryBlueLight);
+                }
+                .multi-colour .lga-base.loddon-mallee-waste-and-resource-recovery-group{
+                    stroke: var(--tertiaryBlueLight);
+                }
+                .multi-colour .wrrg-infoPane-background.metropolitan-waste-and-resource-recovery-group,
+                .multi-colour .diversion.metropolitan-waste-and-resource-recovery-group,
+                .multi-colour .lga-base.metropolitan-waste-and-resource-recovery-group{
+                    fill: var(--tertiaryPurpleLight);
+                }
+                .multi-colour .lga-base.metropolitan-waste-and-resource-recovery-group{
+                    stroke: var(--tertiaryPurpleLight);
+                }
+                .multi-colour .wrrg-infoPane-background.north-east-waste-and-resource-recovery-group,        
+                .multi-colour .lga-base.north-east-waste-and-resource-recovery-group,
+                .multi-colour .diversion.north-east-waste-and-resource-recovery-group{
+                    fill: var(--secondaryBottleGreenLight);
+                }
+                .multi-colour .lga-base.north-east-waste-and-resource-recovery-group{
+                    stroke: var(--secondaryBottleGreenLight);
+                }
+        </style>
+    </head>
+
+    <body>
+
+        <div id = "map-container">
+            <svg id ="map"></svg>
+        </div>
+
+        <script>
+            ////////////////////////////////////////////////////////////////////////////////
+            /// 0. BUILD SEQUENCE: INIT SETTINGS AND DATA OBJECTS AND LOADING => RENDER  ///
+            ////////////////////////////////////////////////////////////////////////////////
+
+            const settings = { 
+                svgID:                  'map',
+                year:                   '2019-20',
+                colourScale:         'ramp',         // 'ramp' or 'categorical'
+                showGlass:              true,
+                dims: {
+                    width:              1080,
+                    height:             720,
+                    margin: {
+                        top: 50,    left: 30,   right: 30,  bottom: 50
+                    }
+                },
+                geometry: {              
+                    projection:         d3.geoMercator(),      // Choice of map projection (see d3 docs for standard projections, and add d3-geo-projection plugin for further projections)
+                    centerLong:         143.7,                 // Used to center the map on Victoria
+                    centerLat:          -36.1,                 // ..
+                    projectionScale:    4000                    // and scale the projection to fit the canvas (note: )
+                },
+                infoPane: {
+                    dims: {
+                        width:      230,
+                        height:     140,
+                        rx:         10,
+                        ry:         10    
+                    }    
+                }
+            }
+
+            const data = {
+                table:      {},
+                schema: {
+                    list: {
+                        collection: ['Garbage', 'Recyclables', 'Organics', 'Glass'],
+                        chain:      ['collected', 'processed']
+                    }
+                },
+                byWRRG: {},
+            }
+
+            // Build from GSheet data
+            buildFromGSheetData(settings)
+
+            function buildFromGSheetData(settings) {
+                    // 1. Specify data table links for each table used (tsv published output from each separate sheet/table)
+                    const gsTableLinks =   {
+                        kerbsideByWRRG:                         'https://docs.google.com/spreadsheets/d/e/2PACX-1vSimVJWCqYLTijgqeU-SPGdAFT6wpGprHgjPdpxEElWurVvl28JYr7dHGE3OCSjF4VYH2_QggJUnveO/pub?gid=1987838964&single=true&output=tsv',
+                    }
+                    // 2. Asynchronous data load (with Promise.all) and D3 (Fetch API) 
+                    Promise.all([
+                        d3.tsv(gsTableLinks.kerbsideByWRRG),
+                        d3.json('data/victorianLGAs.geojson'),			// a. LGA map shape data
+                        d3.tsv("data/victorianLGAs.txt"),			    // b. LGA map meta data, including the mapping of LGAs to WRRGs
+                    ]).then( rawData => {
+                        // 3. Parse each loaded data table and store in data.table object, using the parseTable helper 
+                        parseTable('kerbsideByWRRG', rawData[0])
+                        return rawData
+                    }).then( async (rawData) => {
+                        // 4. Initiate vis build sequence with data now loaded
+                        await applyQuerySettings(settings)                      // a. Update settings if a query string is passed in
+                        await transformData(data.table.kerbsideByWRRG)             // b. Parse data used in visualisation
+                        await renderMap(settings, rawData[1], rawData[2])	    // c. Renders map and export data annotation
+                    })
+
+                    // X. Table data parsing function: trim() header white space and prase numbers with "$" and "," stripped. 
+                    const parseTable = (tableName, tableData) => {
+                        data.table[tableName] = tableData.map(row => {
+                            const newObj = {}
+                            Object.entries(row).forEach(([key, value]) => {
+                                switch(key.trim().toLowerCase()){
+                                    case 'year':
+                                        newObj[key.trim()] =  value
+                                        break     
+                                    default:
+                                        newObj[key.trim()] = isNaN(parseFloat(value.replace(/\$|,/g, ''))) ? value : parseFloat(value.replace(/\$|,/g, '')) 
+                                }
+                            })
+                            return newObj
+                        })
+                    };                     
+                };
+
+            ///////////////////////////////////
+            /// 1. DATA PARSING FUNCTION    ///
+            ///////////////////////////////////
+
+            async function applyQuerySettings(settings){
+                // i. Check for query parameters and update material. A date set by the query selector is set while parsing input data 
+                settings.queryParameters = new URLSearchParams(window.location.search)
+                if (settings.queryParameters.has('year')) { 
+                    settings.year = settings.queryParameters.get('year')  
+                }
+                if (settings.queryParameters.has('colourScale')) { 
+                    settings.colourScale = settings.queryParameters.get('colourScale')  
+                    d3.select(`#${settings.svgID}`).classed('multi-colour', settings.colourScale === 'categorical')
+                }
+                if (settings.queryParameters.has('showGlass')) { 
+                    settings.showGlass = settings.queryParameters.get('showGlass').toLowerCase() === 'false' ? false : true  
+                }   
+            };
+
+            async function transformData(wrrgData){
+                // Extract lists 
+                data.schema.list.wrrg = [...new Set(wrrgData.map(d => d.WRRG))]
+                data.schema.list.year = [...new Set(wrrgData.map(d => d.year))]
+
+                // Group data by WRRG
+                wrrgData.filter(d => d.year === settings.year).forEach(d => {
+                    data.schema.list.wrrg.forEach( wrrg => {
+                        if(d.WRRG === wrrg){
+                            data.byWRRG[wrrg] = {}
+                            data.schema.list.collection.forEach( collection => {
+                                data.byWRRG[wrrg][collection] = {}
+                                data.schema.list.chain.forEach(chainType => {
+                                    if(typeof(d[`${collection} ${chainType}`]) !== 'undefined'){
+                                        data.byWRRG[wrrg][collection][chainType] = d[`${collection} ${chainType}`]
+                                    }
+                                })
+                            })
+                        }
+                    })
+                })
+            };
+
+
+            ///////////////////////////////////////
+            /// 2. MAP VIS RENDERING FUNCTION   ///
+            ///////////////////////////////////////
+
+            function renderMap(settings, mapShapeData, mapMetaData){
+                // 0. OPTIMISE LAYOUT FOR GLASS INCLUSION/EXCLUSION
+                switch(settings.showGlass){
+                    case true: 
+                        // Center map
+                        settings.geometry.translationPctX =  0.47,             // Setting used (as a proportion of width to horizontally position the map 
+                        settings.geometry.translationPctY =  0.435             // .. (use with geometry settings to create margins and space for annotation)
+                        // Position callouts
+                        settings.infoPane.wrrgPos = {
+                            "Barwon South West Waste and Resource Recovery Group": {
+                                label: "Barwon South West",
+                                labelOffsetY: 20,
+                                cx: 150,         cy: 610,
+                                pointerX: 390,   pointerY: -60,
+                                pointerSide: 'right'
+                            }, 
+                            "Gippsland Waste and Resource Recovery Group": {
+                                label: "Gippsland",
+                                labelOffsetY: 20,
+                                cx:       860,        cy: 610,
+                                pointerX: -10,        pointerY: -80,
+                                pointerSide: 'top'
+                            }, 
+                            "Goulburn Valley Waste and Resource Recovery Group": {
+                                label: "Goulburn Valley",
+                                labelOffsetY: 20,
+                                cx: 670,        cy: 200,
+                                pointerX: 60,   pointerY: 230,
+                                pointerSide: 'bottom'                    
+                            },
+                            "Grampians Central West Waste and Resource Recovery Group": {
+                                label: "Grampians Central West",
+                                labelOffsetY: 20,
+                                cx: 150,         cy: 405,
+                                pointerX: 400,   pointerY: 40,
+                                pointerSide: 'right'
+                            },
+                            "Loddon Mallee Waste and Resource Recovery Group": {
+                                label: "Loddon Mallee",
+                                labelOffsetY: 40,
+                                cx: 150,         cy: 200,
+                                pointerX: 430,   pointerY: 120,
+                                pointerSide: 'right'
+                            },
+                            "Metropolitan Waste and Resource Recovery Group": {
+                                label: "Metropolitan",
+                                labelOffsetY: 40,
+                                cx: 510,        cy: 650,
+                                pointerX: 220,  pointerY: -120,
+                                pointerSide: 'top'
+                            },
+                            "North East Waste and Resource Recovery Group": {
+                                label: "North East",
+                                labelOffsetY: 40,
+                                cx: 940,        cy: 300,
+                                pointerX: -120, pointerY: 130,
+                                pointerSide: 'left'
+                            }
+                        }
+                        break
+
+                    case false:     
+                        // Center map
+                        settings.geometry.translationPctX =  0.45,             // Setting used (as a proportion of width to horizontally position the map 
+                        settings.geometry.translationPctY =  0.435             // .. (use with geometry settings to create margins and space for annotation)
+                        // Position callouts
+                        settings.infoPane.wrrgPos = {
+                            "Barwon South West Waste and Resource Recovery Group": {
+                                label: "Barwon South West",
+                                labelOffsetY: 20,
+                                cx: 200,        cy: 610,
+                                pointerX: 350,   pointerY: -50,
+                                pointerSide: 'right'
+                            }, 
+                            "Gippsland Waste and Resource Recovery Group": {
+                                label: "Gippsland",
+                                labelOffsetY: 20,
+                                cx:         860,        cy: 610,
+                                pointerX: -30,   pointerY: -100,
+                                pointerSide: 'top'
+                            }, 
+                            "Goulburn Valley Waste and Resource Recovery Group": {
+                                label: "Goulburn Valley",
+                                labelOffsetY: 20,
+                                cx: 670,        cy: 200,
+                                pointerX: 30,   pointerY: 250,
+                                pointerSide: 'bottom'                    
+                            },
+                            "Grampians Central West Waste and Resource Recovery Group": {
+                                label: "Grampians Central Valley",
+                                labelOffsetY: 20,
+                                cx: 150,         cy: 405,
+                                pointerX: 400,   pointerY: 40,
+                                pointerSide: 'right'
+                            },
+                            "Loddon Mallee Waste and Resource Recovery Group": {
+                                label: "Loddon Mallee",
+                                labelOffsetY: 40,
+                                cx: 150,        cy: 200,
+                                pointerX: 400,   pointerY: 150,
+                                pointerSide: 'right'
+                            },
+                            "Metropolitan Waste and Resource Recovery Group": {
+                                label: "Metropolitan",
+                                labelOffsetY: 40,
+                                cx: 530,    cy: 650,
+                                pointerX: 180,   pointerY: -130,
+                                pointerSide: 'top'
+                            },
+                            "North East Waste and Resource Recovery Group": {
+                                label: "North East",
+                                labelOffsetY: 40,
+                                cx: 940,        cy: 300,
+                                pointerX: -150,   pointerY: 150,
+                                pointerSide: 'left'
+                            }   
+                        }   
+                        break
+
+                    default: 
+                }
+
+                // 1. WRANGLE DATA
+                // a. Setup a mapping object of of LGA to WRRG
+                const lgaNameWrrgMap = {}
+                mapMetaData.map(d => lgaNameWrrgMap[d.vic_lga__3] = d.wrrg   )          // Note: "vic_lga__3" is the LGA name field name shared between the geojson and txt data files. The "wrrg" field in the txt file maps the WRRG to LGA name 
+                // b. Filter out duplicate LGAs in mapMetaData and unincorporated regions => for use in labelled
+                let mapMetaDataUnique = [];
+                mapMetaData.map(x => mapMetaDataUnique.filter(a => a.vic_lga__3 == x.vic_lga__3).length > 0 ? null : mapMetaDataUnique.push(x))
+                mapMetaDataUnique = mapMetaDataUnique.filter(d => d.type === 'lga')  
+
+                // 2. SPECIFY LAYOUT GROUPS: Layers appended in rendering order
+                const svg = d3.select(`#${settings.svgID}`).attr('viewBox', `0 0 ${settings.dims.width} ${settings.dims.height}`),
+                    mapGroup = svg.append('g').classed('map-group', true),
+                    lgas = mapGroup.append('g').classed('lga-group', true), 
+                    wrrgs = mapGroup.append('g').classed('wrrg-group', true), 
+                    annotation = mapGroup.append('g').classed('labels-layers', true),
+                    lgaLabels  = annotation.append('g').classed('lgaLabels-group', true),
+                    infoPanes = annotation.append('g').classed('infoPane-group', true)
+
+                const icons = {        
+                    'Organics':             'M24.693-19.657a1.337 1.337 0 00-.948-.483 83.169 83.169 0 00-4.71-.117c-15.562 0-21.91 3.082-24.496 5.668C-11.4-8.652-10.327-.008-9.81 2.69a40.338 40.338 0 00-2.227 3.037 23.104 23.104 0 01-1.711-1.71 5.294 5.294 0 001.983-2.616c1.165-3.316-.7-7.518-1.85-9.276-1.257-1.923-1.535-6.977-1.535-8.763a1.338 1.338 0 00-2.19-1.033c-6.961 5.733-8.963 14.066-6.876 18.81 1.204 2.736 3.343 4.243 6.021 4.243.733 0 1.38-.114 1.876-.24a25.112 25.112 0 002.859 2.904c-3.35 5.946-3.721 10.486-3.745 10.834a1.336 1.336 0 001.337 1.426 1.34 1.34 0 001.333-1.242c.003-.036.298-3.716 2.894-8.702A36.17 36.17 0 01-7.883 4.62c2.387.435 4.698.668 6.87.668 22.703 0 25.972-23.684 26.002-23.923a1.328 1.328 0 00-.296-1.021zM-18.194 2.707c-1.62 0-2.788-.866-3.571-2.646-1.733-3.94.543-9.694 4.077-13.676.197 2.336.675 5.433 1.834 7.206 1.005 1.538 2.32 4.777 1.564 6.923a2.649 2.649 0 01-1.11 1.392c-.78-1.164-1.442-2.474-1.74-3.86a1.337 1.337 0 10-2.618.565c.317 1.472.938 2.85 1.687 4.09-.041.002-.08.006-.123.006zM18.35-8.121C13.26.283 5.065 3.807-5.848 2.247-3.098-.72.57-3.832 5.454-6.711a1.337 1.337 0 10-1.359-2.305C-.792-6.136-4.553-3.036-7.458.014c-.268-3.308 0-8.822 3.89-12.71 3.103-3.105 11.342-4.884 22.604-4.884 1.215 0 2.256.022 3.032.047-.431 1.974-1.47 5.7-3.718 9.412z',
+                    'Landfill':             'M15.323 2.42h1.612v1.612h-1.612zm8.064-14.517H25v1.613h-1.613zM8.871 10.483h1.613v1.614H8.87zm14.28-8.634l-1.14 1.14.472.473a3.11 3.11 0 01.904 2.183 3.11 3.11 0 01-.904 2.183l-.473.473 1.14 1.14.473-.472A4.732 4.732 0 0025 5.645a4.732 4.732 0 00-1.377-3.323zm-4.603-4.847c0 1.629.635 3.16 1.787 4.313l.869.868 1.14-1.14-.869-.87a4.457 4.457 0 01-1.314-3.171c0-1.405.671-2.747 1.795-3.59l1.109-.831-.968-1.29-1.11.83a6.13 6.13 0 00-2.439 4.88zm-1.431-6.01l1.109-.83-.968-1.291-1.109.831a6.13 6.13 0 00-2.44 4.88c0 1.63.635 3.16 1.787 4.313l.87.87 1.14-1.14-.87-.87a4.46 4.46 0 01-1.313-3.173c0-1.405.67-2.747 1.794-3.59zm1.668-2.852l1.14 1.14.473-.473a4.667 4.667 0 001.376-3.323 4.667 4.667 0 00-1.376-3.324l-.473-.472-1.14 1.14.472.473c.583.583.904 1.359.904 2.183 0 .824-.32 1.6-.904 2.183zm-6.67-9.525a10.078 10.078 0 016.008-2.002c1.124 0 2.038.914 2.038 2.039a1.19 1.19 0 01-1.187 1.187 1.18 1.18 0 01-1.062-.657l-.255-.51-1.442.722.255.51a2.784 2.784 0 002.504 1.548c1.544 0 2.8-1.257 2.8-2.8A3.655 3.655 0 0018.123-25a11.7 11.7 0 00-6.976 2.325l-.34.256.967 1.29zm.15 7.799l-10.07.56a3.18 3.18 0 00-2.07 5.42l.918.919 1.14-1.14-.918-.919a1.567 1.567 0 011.02-2.67l10.07-.56a3.143 3.143 0 00.588-6.184 1.115 1.115 0 01-.846-1.084v-.917h-1.613v.917c0 1.255.85 2.344 2.068 2.649a1.528 1.528 0 01-.286 3.009zM-21.027-3.52a2.1 2.1 0 00-.747 1.598v.616A2.113 2.113 0 00-18.72.584l.17-.086v.308h1.614V.498l.17.085a2.113 2.113 0 003.056-1.888v-.616a2.113 2.113 0 00-2.112-2.111c-.068 0-.134.017-.2.023l-3.012-6.022 7.329-3.67 3.937 7.252a3.7 3.7 0 00-.77.825 5.314 5.314 0 00-3.96 2.351l-.27.407 1.341.894.271-.406a3.707 3.707 0 013.09-1.654h.499l.222-.446a2.102 2.102 0 011.89-1.167h.615v-1.613h-.616c-.295 0-.582.037-.86.102l-3.971-7.315a1.618 1.618 0 00-2.158-.678l-10.045 5.046a1.635 1.635 0 00-.726 2.186zm1.587 2.66c-.315.158-.721-.094-.721-.446v-.616c0-.352.406-.605.721-.446l.892.446v.616zm4.117-1.062v.616c0 .352-.404.605-.721.446l-.891-.446v-.616l.89-.446c.317-.159.722.094.722.446zm-5.152-7.387l2.638 5.276h-.711v.308l-.17-.085a2.114 2.114 0 00-.75-.2l-2.297-4.654zM2.504-2.865l1.443-.722a3.704 3.704 0 00-3.33-2.058H.458A3.7 3.7 0 00-2.61-7.258h-.616v1.613h.616A2.1 2.1 0 01-.722-4.478l.224.446H.616a2.1 2.1 0 011.888 1.167zM-7.258.806V-.806h-.138a6.272 6.272 0 00-4.464 1.849l1.14 1.14A4.669 4.669 0 01-7.396.806zm4.839 3.226h1.613v1.613H-2.42zm-8.065 1.613h1.613v1.613h-1.613zm3.226 14.516h1.613v1.613h-1.613zm6.452-6.451H.806v1.613H-.806zm-4.34-27.42c.325 0 .652-.077.944-.222l.17-.086v.308h1.613v-.308l.17.085a2.113 2.113 0 003.056-1.888v-.616a2.113 2.113 0 00-3.056-1.889l-.17.086v-.308h-1.613v.308l-.17-.085a2.113 2.113 0 00-3.056 1.888v.616c0 1.165.947 2.111 2.111 2.111zm3.618-3.173c.317-.157.722.094.722.446v.616c0 .352-.405.606-.722.446l-.891-.446v-.616zm-4.117.446c0-.352.407-.603.722-.446l.89.446v.616l-.89.446c-.316.159-.722-.094-.722-.446zM6.622 3.502l-.085.17 1.443.722.085-.171A7.68 7.68 0 008.87.806H7.258c0 .931-.22 1.863-.636 2.696zm4.49-5.334L11.7-4.07c.217-.829-.265-1.684-1.098-1.949l-1.115-.354a1.678 1.678 0 00-1.998.805L6.27-3.244C4.006-2.614 2.102-1.213.878.73L.7 1.015C.602.975.506.932.406.898L.255.848l-.511 1.529.151.05a4.343 4.343 0 012.663 2.51 3.673 3.673 0 003.426 2.321c.4 0 .792-.064 1.166-.189l1.065-.354a2.1 2.1 0 011.312 0l1.508.502.51-1.53-.152-.05.22-.629a8.662 8.662 0 00-.5-6.84zM7.706 5.184l-1.065.355A2.067 2.067 0 014.057 4.34a5.953 5.953 0 00-1.943-2.545l.13-.206C3.306-.097 4.997-1.29 7.006-1.769l.356-.084 1.555-2.964c.005-.009.04-.03.082-.017l1.141.356-.745 2.84.28.533a6.954 6.954 0 01.416 5.58l-.232.665a3.706 3.706 0 00-2.154.044zm.55 16.59h.616v-1.613h-.616c-1.42 0-2.696.79-3.33 2.06l1.442.72a2.099 2.099 0 011.888-1.167zm-6.543-1.613h1.041l.237-.236a4.67 4.67 0 013.324-1.377h.944v-1.613h-.944a6.27 6.27 0 00-4.216 1.613h-.386a5.057 5.057 0 00-4.914 3.837l1.565.39a3.447 3.447 0 013.35-2.614zm15.65 0h-.1c-.12-.113-.25-.213-.373-.322.083-.165.162-.33.24-.499l4.14-1.656-.6-1.498-2.766 1.107c.162-.54.291-1.09.393-1.645l2.972-1.19-.6-1.497-2.033.814 3.971-6.95-4.864 1.215-4.864-1.216 4.02 7.034-.022.265-1.79-1.79-1.14 1.14 2.612 2.612c-.06.25-.126.499-.2.746l-1.27-1.272-1.141 1.14 1.795 1.795c-.052.116-.102.233-.157.348a11.737 11.737 0 00-6.437-1.907H8.87v1.613h.277c2.726 0 5.29 1.062 7.217 2.99l.237.236h.76a5 5 0 013.694 1.613h-41.94a5.674 5.674 0 013.949-1.613h.333l.76-.759a2.963 2.963 0 013.364-.546l.827.414.722-1.443-.827-.413a4.568 4.568 0 00-1.004-.36 7.29 7.29 0 014.695-1.732h.807v-1.612h-.807c-.39 0-.779.033-1.162.084a6.512 6.512 0 013.136-3.395l-.722-1.443a8.172 8.172 0 00-1.913 1.34l-.367-.367A9.12 9.12 0 00-15.54 8.87h-1.783l.353-2.018a2.365 2.365 0 00-.526-1.93 2.515 2.515 0 00-1.934-.89h-.17c-1.07 0-2.019.659-2.362 1.642l-.327.937-.995.317C-24.31 7.255-25 8.179-25 9.226c0 1.116.78 2.08 1.897 2.347l.875.208a9.157 9.157 0 00.145 9.165l.53.884c-.44.361-.842.772-1.189 1.235L-24.194 25h48.08l-.584-1.167a6.607 6.607 0 00-5.94-3.672zm.38-10.459l1.588-.397-1.588 2.779-1.588-2.78zm-41.13-.476c0-.343.239-.648.593-.76l1.764-.562.592-1.697c.117-.337.454-.562.839-.562h.17c.276 0 .53.115.7.315.086.104.222.32.17.617l-.422 2.421-2.1 1.4-1.647-.393c-.388-.093-.658-.413-.658-.78zm2.688 10.89a7.536 7.536 0 01.192-8.062l.122-.183 2.082-1.387h2.765a7.507 7.507 0 015.306 2.198l.438.437a8.208 8.208 0 00-1.268 2.731 8.898 8.898 0 00-4 2.903 4.485 4.485 0 00-1.92 1.121l-.294.295a7.27 7.27 0 00-2.923.779z',
+                    'Recyclables':          'M3.704.063a.753.753 0 00-.257 1.03l1.031 1.724-1.46-.03.008-.434c0-.156-.09-.37-.204-.471-.1-.093-.329-.147-.444-.157a.746.746 0 00-.392.175L-.287 4.083a.675.675 0 00-.2.488c0 .186.076.359.195.472l2.163 2.253c.097.11.305.204.453.204.336 0 .61-.274.61-.6l.008-.432 2.03.043a2.392 2.392 0 002.285-1.493l.69-1.672c.094-.225.152-.466.177-.715l-.002-.008.002-.004a2.394 2.394 0 00-.334-1.442L6.608-.8a.744.744 0 00-.466-.34.728.728 0 00-.56.085zm2.6 4.56c-.22.537-.736.892-1.31.857l-2.445-.05a.683.683 0 00-.435.16.717.717 0 00-.17.3L.682 4.577l1.31-1.257a.615.615 0 00.58.486l2.737.052c.058.008.116.002.173.008.105.01.213.027.318.027.024 0 .047-.006.072-.008.121-.005.239-.021.358-.038.09-.014.181-.026.272-.049.05-.012.1-.012.148-.027zM5.868-.03l1.035 1.734c.12.196.184.416.194.643a.435.435 0 01-.047.04c-.359.304-.791.442-1.287.463-.023 0-.046-.003-.068-.003L4.472.802zM-6.052 6.184c.018.012.041.008.06.02.4.274.865.427 1.357.429h2.3a.75.75 0 00.75-.75V3.698a.75.75 0 00-.75-.748h-1.997l.768-1.225.366.229c.13.08.367.113.511.068.32-.1.5-.441.412-.727l-.702-3.067a.691.691 0 00-.822-.51l-3.07.706a.718.718 0 00-.365.255.621.621 0 00.185.855l.367.228-1.08 1.722a2.403 2.403 0 00.108 2.723l1.079 1.454c.146.2.323.375.523.523zm3.435-.583h-2.016a1.438 1.438 0 01-.65-.165A1.924 1.924 0 01-5.3 4.76c.008-.047.012-.094.022-.141.044-.186.122-.359.217-.528.022-.039.051-.076.076-.115h2.368zm-4.271-3.57L-5.582-.05a.603.603 0 00-.085-.746l1.765-.403.406 1.769a.582.582 0 00-.326-.023.706.706 0 00-.389.272l-1.442 2.307-.008.004c-.113.131-.193.282-.28.428-.03.054-.074.101-.103.157-.053.105-.084.218-.123.327-.035.097-.085.19-.11.29l-.55-.737a1.378 1.378 0 01-.061-1.563zm4.405-3.986c.019.012.04.022.054.03.107.052.22.077.333.077a.728.728 0 00.655-.392l.983-1.736.69 1.28-.386.211a.682.682 0 00-.262.299c-.123.305.015.65.382.814l3.013.902a.7.7 0 00.85-.463l.894-2.993a.701.701 0 00-.043-.484.613.613 0 00-.828-.243l-.38.208-.965-1.786a2.394 2.394 0 00-2.42-1.248l-1.802.222a2.41 2.41 0 00-.708.202c-.013.006-.017.019-.027.025a2.398 2.398 0 00-1.063.984L-4.647-4.04a.745.745 0 00-.066.57.734.734 0 00.35.446zM.21-6.465a1.372 1.372 0 011.39.716l1.164 2.162a.607.607 0 00.692.297l-.517 1.732-1.734-.517a.613.613 0 00.127-.743l-1.3-2.396v-.002c-.02-.055-.057-.103-.08-.156a2.984 2.984 0 00-.245-.478c-.047-.07-.109-.128-.16-.194-.083-.103-.159-.214-.254-.304zm-2.832.918c.11-.194.268-.346.449-.468.253.083.5.184.698.363.006.006.008.014.015.018.173.159.29.385.407.612l-1.15 2.041-1.414-.807zm6.341-19.445c-.536.01-1.078.029-1.614.052-4.29.192-8.35.864-10.276 1.701-2.309 1.005-5.126 1.734-7.707 4.375a.694.694 0 00-.174.66c-.042.15-.07.303-.07.468v3.61c0 .33.082.633.261.903.18.27.502.52.92.52h1.91v25.136a6.693 6.693 0 00-3.472 5.867c0 3.697 3.01 6.7 6.7 6.7a6.703 6.703 0 005.295-2.604H7.416c2.207 0 3.953-1.643 4.08-3.68l1.943-31.418h1.945c.417 0 .758-.25.937-.521.179-.27.26-.574.26-.903v-3.61c0-.33-.081-.632-.26-.903-.18-.27-.52-.52-.937-.52h-1.007l-.295-2.882c-.028-.275-.078-.536-.226-.799-.1-.177-.312-.357-.555-.468-1.882-1.175-4.822-1.62-7.985-1.684-.528-.011-1.06-.01-1.597 0zm.018 1.406c3.65-.027 7.173.421 8.835 1.458a.694.694 0 00.087.035c.015.043.042.091.052.19l.278 2.743h-26.35c1.869-1.354 3.823-1.976 5.745-2.812 1.477-.642 5.616-1.393 9.79-1.58.522-.023 1.041-.03 1.563-.034zm10.38 5.815h1.059c.005.019.017.013.017.035v3.61c0 .022-.015.018-.017.035h-29.909v-3.593h28.485a.694.694 0 00.364-.087zm-25.76 5.069H12.05l-1.944 31.331c-.081 1.307-1.152 2.379-2.69 2.379H-3.678a6.64 6.64 0 00.573-2.708v-.018a6.662 6.662 0 00-.52-2.586v-.017a6.679 6.679 0 00-1.007-1.632c0-.005.005-.014 0-.017a6.8 6.8 0 00-.92-.903 6.691 6.691 0 00-4.253-1.545c-.162 0-.33.021-.486.035-.066.006-.126.01-.191.017-.04.006-.082.013-.122.017-.07.01-.137.022-.208.035a6.75 6.75 0 00-.833.173v-24.562zm1.84 25.673c.184 0 .36.017.538.034.358.036.709.106 1.042.209.832.257 1.57.72 2.17 1.319.064.064.13.123.19.19.053.06.106.114.157.174.005.006-.006.014 0 .018.212.259.411.536.572.833v.017c.16.297.298.61.4.937v.018c.1.328.172.671.208 1.024v.017c.017.174.034.343.034.52V18.334c0 .173-.017.336-.034.504a5.08 5.08 0 01-.035.278v.017a5.504 5.504 0 01-.07.347v.034c-.028.125-.066.244-.104.365v.017c-.032.105-.082.21-.121.313-.009.021-.01.047-.017.07-.014.032-.022.07-.035.103-.037.087-.08.16-.122.243-.034.072-.066.139-.104.209-.026.047-.06.092-.087.138a5.345 5.345 0 01-.208.33.694.694 0 00-.035.07.694.694 0 00-.035.052 5.292 5.292 0 01-4.304 2.204 5.314 5.314 0 01-5.312-5.329 5.326 5.326 0 012.916-4.756h.017a.694.694 0 00.14-.052 5.604 5.604 0 011.075-.382 5.08 5.08 0 011.163-.139zm0 1.44a3.902 3.902 0 00-3.888 3.889 3.902 3.902 0 003.888 3.888A3.902 3.902 0 00-5.916 18.3a3.902 3.902 0 00-3.888-3.888zm0 1.39c1.385 0 2.5 1.111 2.5 2.499 0 1.388-1.115 2.5-2.5 2.5a2.492 2.492 0 01-2.5-2.5c0-1.388 1.115-2.5 2.5-2.5z',
+                    'Garbage':              'M3.718-24.992a65.18 65.18 0 00-1.614.052c-4.29.192-8.35.864-10.276 1.701-2.309 1.005-5.126 1.734-7.707 4.375a.694.694 0 00-.174.66c-.042.15-.07.303-.07.468v3.61c0 .33.082.633.261.903.18.27.502.52.92.52h1.91v25.136a6.693 6.693 0 00-3.472 5.867c0 3.697 3.01 6.7 6.7 6.7a6.703 6.703 0 005.295-2.604H7.416c2.207 0 3.953-1.643 4.08-3.68l1.943-31.418h1.945c.417 0 .758-.25.937-.521.179-.27.26-.574.26-.903v-3.61c0-.33-.081-.632-.26-.903-.18-.27-.52-.52-.937-.52h-1.007l-.295-2.882c-.028-.275-.078-.536-.226-.799-.1-.177-.312-.357-.555-.468-1.882-1.175-4.822-1.62-7.985-1.684-.528-.011-1.06-.01-1.597 0zm.018 1.406c3.65-.027 7.173.421 8.835 1.458a.694.694 0 00.087.035c.015.043.042.091.052.19l.278 2.743h-26.35c1.869-1.354 3.823-1.976 5.745-2.812 1.477-.642 5.616-1.393 9.79-1.58.522-.023 1.041-.03 1.563-.034zm10.38 5.815h1.059c.005.019.017.013.017.035v3.61c0 .022-.015.018-.017.035h-29.909v-3.593h28.485a.694.694 0 00.364-.087zm-25.76 5.069H12.05l-1.944 31.331c-.081 1.307-1.152 2.379-2.69 2.379H-3.678a6.64 6.64 0 00.573-2.708v-.018a6.662 6.662 0 00-.52-2.586v-.017a6.679 6.679 0 00-1.007-1.632c0-.005.005-.014 0-.017a6.8 6.8 0 00-.92-.903 6.691 6.691 0 00-4.253-1.545c-.162 0-.33.021-.486.035-.066.006-.126.01-.191.017-.04.006-.082.013-.122.017-.07.01-.137.022-.208.035a6.75 6.75 0 00-.833.173v-24.562zm1.84 25.673c.184 0 .36.017.538.034.358.036.709.106 1.042.209.832.257 1.57.72 2.17 1.319.064.064.13.123.19.19.053.06.106.114.157.174.005.006-.006.014 0 .018.212.259.411.536.572.833v.017c.16.297.298.61.4.937v.018c.1.328.172.671.208 1.024v.017c.017.174.034.343.034.52V18.334c0 .173-.017.336-.034.504-.01.09-.02.188-.035.278v.017a5.504 5.504 0 01-.07.347v.034c-.028.125-.066.244-.104.365v.017c-.032.105-.082.21-.121.313-.009.021-.01.047-.017.069-.014.033-.022.071-.035.104-.037.087-.08.16-.122.243-.034.072-.066.139-.104.209-.026.047-.06.092-.087.138a5.345 5.345 0 01-.208.33.694.694 0 00-.035.07.694.694 0 00-.035.052 5.292 5.292 0 01-4.304 2.204 5.314 5.314 0 01-5.312-5.329 5.326 5.326 0 012.916-4.756h.017a.694.694 0 00.14-.052 5.604 5.604 0 011.075-.382 5.083 5.083 0 011.163-.139zm0 1.44a3.902 3.902 0 00-3.888 3.889 3.902 3.902 0 003.888 3.888A3.902 3.902 0 00-5.916 18.3a3.902 3.902 0 00-3.888-3.888zm0 1.39c1.385 0 2.5 1.111 2.5 2.499 0 1.388-1.115 2.5-2.5 2.5a2.492 2.492 0 01-2.5-2.5c0-1.388 1.115-2.5 2.5-2.5z',
+                    'Glass':                'M7.292 20.833H-3.125a1.041 1.041 0 01-1.042-1.041V-3.125a1.041 1.041 0 011.042-1.042H7.208a1.04 1.04 0 01.737.305 1.338 1.338 0 01.388.82v22.834a1.041 1.041 0 01-1.041 1.041zm-9.375-2.083H6.25V-2.083h-8.333zm4.166-37.5h-4.166a1.042 1.042 0 010-2.083h4.166a1.042 1.042 0 010 2.083zM5.134 25h-9.779a3.693 3.693 0 01-3.688-3.689V-2.083a10.398 10.398 0 012.725-5.699 29.42 29.42 0 002.386-3.433l.097-.162v-10.816c0-2.605 1.546-2.807 2.02-2.807h2.21a2.023 2.023 0 012.02 2.02v11.624l.226.374a24.995 24.995 0 002.46 3.357A9.369 9.369 0 018.24-3.27a6.513 6.513 0 01.093 1.187V21.8A3.203 3.203 0 015.134 25zM-1.01-22.92c.025.065-.032.288-.032.727v11.106a1.047 1.047 0 01-.15.538l-.246.41a31.309 31.309 0 01-2.557 3.675 8.426 8.426 0 00-2.255 4.38v23.395a1.607 1.607 0 001.605 1.606h9.78A1.117 1.117 0 006.25 21.8V-2.083a4.655 4.655 0 00-.065-.849A7.868 7.868 0 004.23-6.268a27.113 27.113 0 01-2.661-3.636l-.377-.622a1.039 1.039 0 01-.15-.539V-22.98z'
+                }
+
+                // 3. SPECIFY MAP PROJECTION AND MAP PROJECTION PATH GENERATOR
+                const projection = settings.geometry.projection,				   // Specify map projection type
+                    path = d3.geoPath().projection(projection)                     // Path generator function
+                projection 																
+                    .translate([settings.dims.width * settings.geometry.translationPctX,  settings.dims.height * settings.geometry.translationPctY])
+                    .scale(settings.geometry.projectionScale)
+                    .center([settings.geometry.centerLong, settings.geometry.centerLat]);
+
+                // 4. COLOUR SCALE (USED FOR ENCODING DATA IN REGION COLOURS)
+                const diversionRate = {}
+                data.schema.list.wrrg.forEach( wrrg => diversionRate[wrrg] = d3.sum(Object.values(data.byWRRG[wrrg]).map(d => d.processed)) /d3.sum(Object.values(data.byWRRG[wrrg]).map(d => d.collected)) )
+                const wrrgColor = d3.scaleLinear()
+                    .domain(d3.extent(Object.values(diversionRate)) )
+                    .range(['#D5E0A1', '#00502e'])
+
+                // 5. ADD VICTORIAN LGA MAP SHAPE: this is a base layer with no fill but with an outline
+                lgas.selectAll('path')
+                    .data(mapShapeData.features)
+                    .join('path')
+                        .attr('id', d => helpers.slugify(d.properties.vic_lga__3.toLowerCase()) )
+                        .attr('d', path)			
+                        .attr('class',  d => {      // Add (slugified) classes for LGA shapes including WRRG name
+                            let className = `lga-base ${helpers.slugify(d.properties.vic_lga__3)} `
+                            className +=  typeof(lgaNameWrrgMap[d.properties.vic_lga__3]) !== 'undefined' ? helpers.slugify(lgaNameWrrgMap[d.properties.vic_lga__3]) : '' 
+                            return className
+                        })
+                        .style('fill',  d => settings.colourScale === 'ramp' ? wrrgColor(diversionRate[lgaNameWrrgMap[d.properties.vic_lga__3]]) : null)
+                        .style('stroke', d => settings.colourScale === 'ramp' ? d =>  wrrgColor(diversionRate[lgaNameWrrgMap[d.properties.vic_lga__3]]) : null )
+                        .on('mouseover', onWrrgMouseover)
+                        .on('mouseout', onWrrgMouseout)
+
+                // 6. MAP ANNOTATION LAYER
+                // a. Add LGA names (for testing or to show on hover)
+                lgaLabels.selectAll('text')
+                    .data(mapMetaDataUnique)
+                    .join('text')
+                        .attr('class',  d => {      // Add (slugified) classes for LGA labels including WRRG name
+                            let className = `lga-label ${helpers.slugify(d.vic_lga__3)} `
+                            className +=  typeof(lgaNameWrrgMap[d.vic_lga__3]) !== 'undefined' ? helpers.slugify(lgaNameWrrgMap[d.vic_lga__3]) : '' 
+                            return className
+                        })
+                        .attr('x', d => {       
+                            const shapeBBox = document.getElementById(helpers.slugify(d.vic_lga__3)).getBBox()    // Get LGA shape bounding box dims and position
+                            return shapeBBox.x + shapeBBox.width / 2                                              // to attach a label at the center
+                        })
+                        .attr('y', d => { 
+                            const shapeBBox = document.getElementById(helpers.slugify(d.vic_lga__3)).getBBox()    // Get LGA shape bounding box dims and position
+                            return shapeBBox.y + shapeBBox.height / 2                                              // to attach a label at the center
+                        })
+                        .text(d => d.vic_lga__3)
+                        .style('opacity', 0)        // Set as invisible
+
+                // 7. EVENT LISTENERS
+                function onWrrgMouseover(){
+                    const wrrgClass  = this.classList[2]  
+                    d3.selectAll(`.lga-label.${wrrgClass}`).style('opacity', null)            // Show label           
+                    d3.selectAll(`.lga-base:not(.${wrrgClass})`).style('opacity', 0.2)        // Focus on the LGA (lower opacity of other LGA shapes)
+                        .classed('showStroke', true)  
+                }
+                function onWrrgMouseout(){
+                    d3.selectAll(`.lga-label`).style('opacity', 0)          // Hide labels
+                    d3.selectAll(`.lga-base`).style('opacity', null)        // Return LGA shapes to full opacity
+                        .classed('showStroke', false)  
+                }
+
+                // 8. ADD INFO PANES BY WRRG
+                data.schema.list.wrrg.forEach( wrrg => {
+                    let headerLines
+                    const garbageOffset = 90,
+                        recyclablesOffset = 145,
+                        organicsOffset = 200,
+                        glassOffset = 250,
+                        extraWidth = glassOffset - organicsOffset - 10,
+                        includeGlass = (data.byWRRG[wrrg]['Glass'].collected > 0 && settings.showGlass) ? true :false           // Test for whether to add glass to the WRGg pane
+
+                    // a. Pane background and pointer
+                    const wrrgPane = infoPanes.append('g')
+                        .classed('wrrg-infoPane', true)
+                        .attr('transform', `translate(${settings.infoPane.wrrgPos[wrrg].cx - settings.infoPane.dims.width/2} , ${settings.infoPane.wrrgPos[wrrg].cy  - settings.infoPane.dims.height/2})`)
+
+                    const backgrounRect = wrrgPane.append('rect').classed(`wrrg-infoPane-background ${helpers.slugify(wrrg)}`, true)
+                        .attr('width', settings.infoPane.dims.width + (includeGlass ? extraWidth : 0))
+                        .attr('height', settings.infoPane.dims.height)
+                        .attr('rx', settings.infoPane.dims.rx)
+                        .attr('ry', settings.infoPane.dims.ry)
+
+                    let pointerCoords
+                    switch(settings.showGlass){
+                        case true:
+                            pointerCoords = {
+                                top: {
+                                    start:      {x: (settings.infoPane.dims.width + (includeGlass ? extraWidth : 0)) / 2 - settings.infoPane.dims.ry * 5, y: 0},
+                                    end:        {x: (settings.infoPane.dims.width + (includeGlass ? extraWidth : 0)) / 2 + settings.infoPane.dims.ry * 5, y: 0}  
+                                },
+                                right:{ 
+                                    start:      {x: settings.infoPane.dims.width  + (includeGlass ? extraWidth : 0), y: +settings.infoPane.dims.ry * 3},
+                                    end:        {x: settings.infoPane.dims.width  + (includeGlass ? extraWidth : 0), y: +settings.infoPane.dims.height - settings.infoPane.dims.ry * 3}  
+                                },
+                                bottom: {
+                                    start:      {x: (settings.infoPane.dims.width + (includeGlass ? extraWidth : 0))/ 2 - settings.infoPane.dims.ry * 5, y: +settings.infoPane.dims.height},
+                                    end:        {x: (settings.infoPane.dims.width  + (includeGlass ? extraWidth : 0))/ 2 + settings.infoPane.dims.ry * 5, y: +settings.infoPane.dims.height}  
+                                },
+                                left:{ 
+                                    start:      {x: 0, y: 0 +settings.infoPane.dims.ry * 3},
+                                    end:        {x: 0, y: +settings.infoPane.dims.height - settings.infoPane.dims.ry * 3}    
+                                }
+                            }
+                            break
+
+                       case false:
+                            pointerCoords = {
+                                top: {
+                                    start:      {x: settings.infoPane.dims.width / 2 - settings.infoPane.dims.ry * 5, y: 0},
+                                    end:        {x: settings.infoPane.dims.width / 2 + settings.infoPane.dims.ry * 5, y: 0}  
+                                },
+                                right:{ 
+                                    start:      {x: settings.infoPane.dims.width, y: +settings.infoPane.dims.ry * 3},
+                                    end:        {x: settings.infoPane.dims.width, y: +settings.infoPane.dims.height - settings.infoPane.dims.ry * 3}  
+                                },
+                                bottom: {
+                                    start:      {x: settings.infoPane.dims.width / 2 - settings.infoPane.dims.ry * 5, y: +settings.infoPane.dims.height},
+                                    end:        {x: settings.infoPane.dims.width / 2 + settings.infoPane.dims.ry * 5, y: +settings.infoPane.dims.height}  
+                                },
+                                left:{ 
+                                    start:      {x: 0, y: 0 +settings.infoPane.dims.ry * 3},
+                                    end:        {x: 0, y: +settings.infoPane.dims.height - settings.infoPane.dims.ry * 3}    
+                                }
+                            }
+                            break
+                        default:
+                    }
+
+                    const pointerSide = settings.infoPane.wrrgPos[wrrg].pointerSide,                        
+                        pointerPath = `M${pointerCoords[pointerSide].start.x},${pointerCoords[pointerSide].start.y} L${settings.infoPane.wrrgPos[wrrg].pointerX},${settings.infoPane.wrrgPos[wrrg].pointerY}  L${pointerCoords[pointerSide].end.x}, ${pointerCoords[pointerSide].end.y} Z`
+        
+                    const backgroundPointer = wrrgPane.append('path')
+                        .classed(`wrrg-infoPane-background ${helpers.slugify(wrrg)}`, true)
+                        .attr('d', pointerPath)
+
+                    // b. Divider
+                    wrrgPane.append('path').classed('wrrg-infoPane-divider', true)
+                        .attr('transform', `translate(${0} , ${95})`)
+                        .attr('d', `M10,0 H${(settings.infoPane.dims.width - 10 ) + (includeGlass ? extraWidth : 0 )}`)
+
+                    // c. WRRG header
+                    wrrgPane.append('text').classed('wrrg-infoPane-header', true)
+                        .attr('transform', `translate(${settings.infoPane.dims.width/ 2} , ${20})`)
+                        .text(settings.infoPane.wrrgPos[wrrg].label)
+                        .attr('x', 0).attr('y', 0).attr('dy', 0)
+                        .call(helpers.wrap, 200, 1.1)
+
+                    // d. Diversion rate donut chart and labels group
+                    const labelGroup = wrrgPane.append('g').attr('transform', `translate(${10} , ${0})`)
+                    renderDonut(labelGroup, {x: 20, y: 50}, {r: 20  }, {pct: diversionRate[wrrg], materialClass:  helpers.slugify(wrrg)} )
+                    labelGroup.append('text').classed('wrrg-infoPane-label ', true)
+                        .attr('transform', `translate(${0} , ${80})`)
+                        .text('Diversion')
+                    labelGroup.append('text').classed('wrrg-infoPane-label ', true)
+                        .attr('transform', `translate(${0} , ${110})`)
+                        .text('Collected')
+                    labelGroup.append('text').classed('wrrg-infoPane-label', true)
+                        .attr('transform', `translate(${0} , ${125})`)
+                        .text('Processed')
+
+                    // e. Garbage group
+                    const garbageGroup = wrrgPane.append('g')
+                            .attr('transform', `translate(${garbageOffset} , ${0})`)
+                    garbageGroup.append('path').classed('wrrg-icon garbage', true)
+                        .attr('d', icons.Garbage)
+                        .attr('transform', `translate(${0} , ${50}) scale(0.65)`)
+                    garbageGroup.append('text').classed('wrrg-infoPane-label align-middle', true)
+                        .attr('transform', `translate(${0} , ${80})`)
+                        .text('Garbage')
+                    garbageGroup.append('text').classed('wrrg-infoPane-data', true)
+                        .attr('transform', `translate(${20} , ${110})`)
+                        .text(`${helpers.numberFormatters.formatComma(data.byWRRG[wrrg]['Garbage'].collected)} t`)
+
+                    // f. Recyclables group
+                    const recyclablesGroup = wrrgPane.append('g')
+                        .attr('transform', `translate(${recyclablesOffset} , ${0})`)
+                    recyclablesGroup.append('path').classed('wrrg-icon garbage', true)
+                        .attr('d', icons.Recyclables)
+                        .attr('transform', `translate(${0} , ${50}) scale(0.65)`)
+                    recyclablesGroup.append('text').classed('wrrg-infoPane-label align-middle', true)
+                        .attr('transform', `translate(${0} , ${80})`)
+                        .text('Recyclables')
+                    recyclablesGroup.append('text').classed('wrrg-infoPane-data', true)
+                        .attr('transform', `translate(${20} , ${110})`)
+                        .text(`${helpers.numberFormatters.formatComma(data.byWRRG[wrrg]['Recyclables'].collected)} t`)
+                    recyclablesGroup.append('text').classed('wrrg-infoPane-data', true)
+                        .attr('transform', `translate(${20} , ${125})`)
+                        .text(`${helpers.numberFormatters.formatComma(data.byWRRG[wrrg]['Recyclables'].processed)} t`)
+
+                    // g. Organics group
+                    const organicsGroup = wrrgPane.append('g')
+                        .attr('transform', `translate(${organicsOffset} , ${0})`)
+                    organicsGroup.append('path').classed('wrrg-icon garbage', true)
+                        .attr('d', icons.Organics)
+                        .attr('transform', `translate(${0} , ${50}) scale(0.5)`)
+                    organicsGroup.append('text').classed('wrrg-infoPane-label align-middle', true)
+                        .attr('transform', `translate(${0} , ${80})`)
+                        .text('Organics')
+                    organicsGroup.append('text').classed('wrrg-infoPane-data', true)
+                        .attr('transform', `translate(${20} , ${110})`)
+                        .text(`${helpers.numberFormatters.formatComma(data.byWRRG[wrrg]['Organics'].collected)} t`)
+                    organicsGroup.append('text').classed('wrrg-infoPane-data', true)
+                        .attr('transform', `translate(${20} , ${125})`)
+                        .text(`${helpers.numberFormatters.formatComma(data.byWRRG[wrrg]['Organics'].processed)} t`)
+
+                    // h. Glass group
+                    if(includeGlass){
+                        const glassGroup = wrrgPane.append('g')
+                            .attr('transform', `translate(${glassOffset} , ${0})`)
+                        glassGroup.append('path').classed('wrrg-icon garbage', true)
+                            .attr('d', icons.Glass)
+                            .attr('transform', `translate(${0} , ${50}) scale(0.65)`)
+                        glassGroup.append('text').classed('wrrg-infoPane-label align-middle', true)
+                            .attr('transform', `translate(${0} , ${80})`)
+                            .text('Glass')
+                        glassGroup.append('text').classed('wrrg-infoPane-data', true)
+                            .attr('transform', `translate(${10} , ${110})`)
+                            .text(`${helpers.numberFormatters.formatComma(data.byWRRG[wrrg]['Glass'].collected)} t`)
+                        glassGroup.append('text').classed('wrrg-infoPane-data', true)
+                            .attr('transform', `translate(${10} , ${125})`)
+                            .text(`${helpers.numberFormatters.formatComma(data.byWRRG[wrrg]['Glass'].processed)} t`)
+                    }
+                })
+
+            // 7. ADD TITLE ANNOTATION
+            annotation.append('text').classed('main-title', true)
+                .attr('transform', `translate(${settings.dims.margin.left}, ${settings.dims.margin.top})`)
+                .text('Victorian waste collection data')
+            annotation.append('text').classed('main-subtitle', true)
+                .attr('transform', `translate(${settings.dims.margin.left}, ${settings.dims.margin.top + 25})`)
+                .text(`by Waste Resource and Recovery Group in ${settings.year}`)
+
+        }; // end renderMap()
+
+
+            function renderDonut(container, coords, dims, data ){
+                // Setup shape generator and data
+                const arc = d3.arc().innerRadius(dims.r * 0.67).outerRadius(dims.r - 1),
+                    pie = d3.pie().padAngle(0.005)
+                        .sort(null)
+                        .value(d => d.value),
+                    chartData = pie([
+                        {value: data.pct,    class: 'diversion '+data.materialClass},
+                        {value: 1- data.pct, class: 'landfill'}
+                    ])
+                const donutGroup = container.append('g')
+                donutGroup.append('g').classed('arc-group', true)
+                    .selectAll("path.donut-arc")
+                    .data(chartData)
+                    .join("path").attr('class', d => `${d.data.class} donut-arc`)            
+                        .attr("d", arc)
+                        .style("transform", `translate(${coords.x}px, ${coords.y}px) scale(-1, 1)` )
+                donutGroup.append('text')
+                    .attr('class', `${data.materialClass} donut-diversion-pct`)  
+                    .text(helpers.numberFormatters.formatPct(data.pct))
+                    .style("transform", `translate(${coords.x}px, ${coords.y}px)` )
+            };
+
+
+            /////////////////////////////
+            /// X HELPER FUNCTIONS    ///
+            /////////////////////////////
+
+            const helpers= {
+                numberFormatters: {
+                    formatComma:           	d3.format(",.0f"),
+                    formatComma1dec:       	d3.format(",.1f"),
+                    formatComma2dec:       	d3.format(",.2f"),
+                    formatInteger:         	d3.format(".0f"),   
+                    formatCostInteger:     	d3.format("$,.0f"),  
+                    formatCost1dec:        	d3.format("$,.1f"),  
+                    formatPct:          	d3.format(".0%"), 
+                    formatPct1dec:          d3.format(".1%")  
+                },
+                numberParsers: {
+                    parseDateSlash: d3.timeParse("%d/%m/%Y")
+                },
+                slugify: function (str) {
+                    str = str.replace(/^\s+|\s+$/g, '').toLowerCase(); // trim           
+                    const from = "àáäâèéëêìíïîòóöôùúüûñç·/_,:;",      // remove accents, swap ñ for n, etc
+                        to   = "aaaaeeeeiiiioooouuuunc------"
+                    for (let i=0, l=from.length ; i<l ; i++) {
+                        str = str.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
+                    }
+                    str = str.replace(/[^a-z0-9 -]/g, '') // remove invalid chars
+                        .replace(/\s+/g, '-') // collapse whitespace and replace by -
+                        .replace(/-+/g, '-'); // collapse dashes
+                    return str;
+                }, 
+                wrap: function(text, width, lineHeight) {
+                    text.each(function() {
+                        let text = d3.select(this),
+                            words = text.text().split(/\s+/).reverse(),
+                            word,
+                            line = [],
+                            lineNumber = 0,
+                            y = text.attr("y"),
+                            x = text.attr("x"),
+                            fontSize = parseFloat(text.style("font-size")),
+                            dy = parseFloat(text.attr("dy")),
+                            tspan = text.text(null).append("tspan").attr("x", x).attr("y", y).attr("dy", dy + "em");
+
+                        while (word = words.pop()) {
+                            line.push(word);
+                            tspan.text(line.join(" "));
+
+                            if (tspan.node().getComputedTextLength() > width) {
+                                line.pop();
+                                tspan.text(line.join(" "));
+                                line = [word];
+                                tspan = text.append("tspan")
+                                    .attr("x", x)
+                                    .attr("y",  y)
+                                    .attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+                            }                    
+                        }            
+                    })
+                }
+            }
+
+
+        </script>
+    </body>
+
+</html>

@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="Kerbside bin composition">
+        <meta name="author" content="Sustainability Victoria">
+        <link rel="stylesheet" href="./css/core.css">
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/4.3.2/iframeResizer.contentWindow.js" integrity="sha512-cJ7aOLpXbec1Km9craM6xL6UOdlWf9etIz7f+cwQv2tuarLm3PLb3dv3ZqIK++SE4ui+EE0nWqKB0dOaAOv9gQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>  
+
+        <style>
+
+            /***********************************************************/
+            /***********************************************************/
+            /****                                                   ****/
+            /**** KERBSIDE BIN COMPOSITION GRAPHIC  | CUSTOM CSS    ****/
+            /**** ---------------------------------------------     ****/
+            /**** - CSS Variables and loaded fonts from core.css    ****/
+            /****                                                   ****/
+            /***********************************************************/
+            /***********************************************************/
+
+            body{
+                font-family: 'DIN Next LT Pro';
+            }
+
+            /************************/
+            /*****  TYPOGRAPHY    ***/
+            /************************/
+            .recycling-breakdown-material-label{
+                font-size: 14px;
+                font-weight: 300;
+                dominant-baseline: middle;
+                text-anchor: end;
+            }
+            .bin-outline{
+                stroke:  var(--xCharcoal);
+                stroke-width: 0.5px;
+                stroke-linejoin: round;
+            }
+
+            /*******************************/
+            /*****  COLOUR ASSIGNMENT    ***/
+            /*******************************/
+            .bin{
+                fill: var(--xCharcoal );
+            }
+            .recycling{
+                fill: var(--xCharcoal );
+            }
+            .paper,
+            .paper-and-cardboard{
+                fill: var(--xBlueCyan );
+            }
+            .recycling-breakdown-material-label.paper,
+            .recycling-breakdown-material-label.paper-and-cardboard{
+                fill: var(--xDarkBlueCyan);
+            }
+            .plastics{
+                fill: var(--tertiaryYellow);
+            }
+            .recycling-breakdown-material-label.plastics{
+                fill: var(--xDarkYellow);
+            }
+            .metals{
+                fill: var(--xMidBlue);
+            }
+            .recycling-breakdown-material-label.metals{
+                fill: var(--tertiaryBlue);
+            }
+            .glass{
+                fill: var(--tertiaryPurpleLight)
+            }
+            .recycling-breakdown-material-label.glass{
+                fill: var(--tertiaryPurple);
+            }
+            .contaminants{
+                fill: var(--tertiaryRed);
+            }
+            .recycling-breakdown-material-label.contaminants{
+                fill: var(--tertiaryRed);
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class = "svg-container">
+            <svg id = "bin-vis" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"></svg>
+        </div>
+    </body>
+
+    <script>
+
+        /////////////////////////////////////////////////////////////////////////////////
+        /// 0. BUILD SEQUENCE: INIT SETTINGS AND DATA OBJECTS AND LOADING => RENDER  ///
+        ////////////////////////////////////////////////////////////////////////////////
+
+        const settings = {
+            svgID:          'bin-vis',
+            year:           '2019-20', 
+            dims: {
+                height:     720, 
+                width:      540,
+                margin: {
+                    top: 100, right: 50, bottom: 50, left: 100
+                }
+            }
+        }
+
+        const data = {          // Initiate data object that populated by the parseData() function, 
+            table:    {},
+            schema: {
+                list:  {}
+            }
+        }
+
+        // Call build function
+        buildFromGSheetData(settings)
+
+        function buildFromGSheetData(settings) {
+            // 1. Specify data table links for each table used (tsv published output from each separate sheet/table)
+            const gsTableLinks =  {
+                kerbsideCollectionData:         'https://docs.google.com/spreadsheets/d/e/2PACX-1vSimVJWCqYLTijgqeU-SPGdAFT6wpGprHgjPdpxEElWurVvl28JYr7dHGE3OCSjF4VYH2_QggJUnveO/pub?gid=204435756&single=true&output=tsv',
+                kerbsideComposition:            'https://docs.google.com/spreadsheets/d/e/2PACX-1vSimVJWCqYLTijgqeU-SPGdAFT6wpGprHgjPdpxEElWurVvl28JYr7dHGE3OCSjF4VYH2_QggJUnveO/pub?gid=1848611910&single=true&output=tsv',
+            }
+
+            // 2. Asynchronous data load (with Promise.all) and D3 (Fetch API) 
+            Promise.all(
+                Object.values(gsTableLinks).map(link => d3.tsv(link))       // Pass in array of d3.tsv loaders with each link
+            ).then( rawData => {
+                // a. Parse each loaded data table and store in data.table object, using the parseTable helper 
+                rawData.forEach((tableData, i) => {  parseTable(Object.keys(gsTableLinks)[i], tableData) })
+                return data
+
+            }).then( async (data) => {
+                // 3. Initiate vis build sequence with data now loaded
+                await applyQuerySettings(settings)                                                       // a. Update settings if a query string is passed in
+                await transformData(data.table.kerbsideCollectionData, data.table.kerbsideComposition)                 // b. Parse data
+                await renderVis(data.table.kerbsideCollectionData, data.table.kerbsideComposition, settings)       // c. Render visualisation(s)
+            })
+
+            // X. Table data parsing function: trim() header white space and prase numbers with "$" and "," stripped. 
+            const parseTable = (tableName, tableData) => {
+                data.table[tableName] = tableData.map(row => {
+                    const newObj = {}
+                    Object.entries(row).forEach(([key, value]) => {
+                        switch(key.trim().toLowerCase()){
+                            case 'year':
+                                newObj[key.trim()] =  value
+                                break     
+                            default:
+                                newObj[key.trim()] = isNaN(parseFloat(value.replace(/\$|,/g, ''))) ? value : parseFloat(value.replace(/\$|,/g, '')) 
+                        }
+                    })
+                    return newObj
+                })
+            };                
+        };
+
+
+        //////////////////////////////////
+        // 1. PARSE AND WRANGLE DATA   ///
+        //////////////////////////////////
+
+        async function applyQuerySettings(settings){
+            // i. Check for query parameters and update material. A date set by the query selector is set while parsing input data 
+            settings.queryParameters = new URLSearchParams(window.location.search)
+            if (settings.queryParameters.has('year')) { 
+                settings.year = settings.queryParameters.get('year')  
+            }
+        };
+
+        async function transformData(kerbsideData, recycleBinData) {      
+            // 1. Extract lists
+            data.schema.list.year =   [...new Set(kerbsideData.map( d => d.year))]
+            data.schema.list.kerbsideRecycleMaterials =   [...new Set(recycleBinData.map( d => d.material))]
+            data.schema.list.kerbsideRecycleMaterialGroups =   [...new Set(recycleBinData.map( d => d.group))]
+        };
+
+
+        /////////////////////////////////
+        // 2. RENDER THE BIN GRAPHIC  ///
+        /////////////////////////////////
+
+        async function renderVis(collectionData, compositionData, settings){
+            // 0. Data and icon setup
+            const yearData = collectionData.filter(d => d.year === settings.year)[0],
+                recycleBinData =  compositionData.filter(d => d.year === settings.year)
+
+            const icons = {
+                bin:        "M16.444-2.62a.889.864 0 01-.888.864.889.864 0 01-.89-.864.889.864 0 01.89-.865.889.864 0 01.888.865M15.4-6.07l.582-12.974H1.796l.8 17.776c.028.693.615 1.24 1.328 1.24h9.29A3.386 3.386 0 0112.2-3.77c.482-1.33 1.75-2.242 3.199-2.3zm4.156-15.567h-1.334v.865h1.334a.438.438 0 00.444-.432.438.438 0 00-.444-.433zM15.809-5.2h-.005a2.348 2.348 0 00-.248-.013c-1.456-.008-2.652 1.116-2.694 2.531-.042 1.415 1.085 2.604 2.539 2.678 1.453.075 2.702-.993 2.813-2.404.111-1.412-.957-2.651-2.405-2.792zm-.253 4.308c-.982 0-1.778-.773-1.778-1.728s.796-1.729 1.778-1.729c.981 0 1.777.774 1.777 1.729 0 .458-.187.898-.52 1.222a1.803 1.803 0 01-1.257.506zm1.333-19.015a.439.439 0 00.444-.432v-.432H.444A.438.438 0 000-20.34c0 .239.199.432.444.432zm.444-2.16c0-.24-.199-.433-.444-.433H2.667c-.565 0-1.069.347-1.258.864h15.924z",
+                binBody:    "M15.4-6.069l.582-12.974H1.796l.8 17.776c.028.693.615 1.24 1.328 1.24h9.29A3.386 3.386 0 0112.2-3.77c.482-1.33 1.75-2.242 3.199-2.3z",
+                binWheel:   "M16.444-2.62a.877.877 0 01-.888.864.877.877 0 01-.89-.864c0-.478.399-.865.89-.865.49 0 .888.387.888.865M15.81-5.2h-.005a2.348 2.348 0 00-.248-.013c-1.456-.008-2.652 1.116-2.694 2.531-.042 1.415 1.085 2.604 2.539 2.678 1.453.075 2.702-.993 2.813-2.404.111-1.412-.957-2.651-2.405-2.792zm-.253 4.308c-.982 0-1.778-.773-1.778-1.728s.796-1.729 1.778-1.729c.981 0 1.777.774 1.777 1.729 0 .458-.187.898-.52 1.222a1.803 1.803 0 01-1.257.506z",
+                binLid:     "M19.556-21.636h-1.334v.865h1.334a.438.438 0 00.444-.432.438.438 0 00-.444-.433zm-2.667 1.729a.439.439 0 00.444-.432v-.432H.444A.438.438 0 000-20.34c0 .239.199.432.444.432zm.444-2.16c0-.24-.199-.433-.444-.433H2.667c-.565 0-1.069.347-1.258.864h15.924z",
+            }
+            // 1. Setup SVG Canvas and layers
+            const svg = d3.select('#bin-vis').attr('viewBox', `0 0  ${settings.dims.width} ${settings.dims.height} `)
+                .attr('xmlns', "http://www.w3.org/2000/svg" )
+                .attr('xmlns:xlink', "http://www.w3.org/1999/xlink")
+
+            const defs = svg.append('defs')
+
+            const recyclingInsert = {x: settings.dims.width * 0.35, y: settings.dims.height * 0.5},
+                iconWidth = 20,  iconHeight = 22.5, iconBinHeight = 19.3, iconScale = 1.15
+
+            // 2. Render Recycling breakdown "Bin breakdown graphic"
+            const recycleBinScale = 15, chartBgRadius = 90,
+                recyclingBreakdownChart = svg.append('g').classed('icon-chart', true).attr('id', 'recycling-breakdown-icon-chart')
+                    .attr('transform', `translate(${recyclingInsert.x}, ${recyclingInsert.y})`)
+
+            let cumulativeProp = -iconBinHeight
+
+                // a. Cxreate chart data
+                const recycleBinChartData = []
+                data.schema.list.kerbsideRecycleMaterialGroups.forEach (group => {
+                    recycleBinChartData.push({ group,  volume: d3.sum(recycleBinData.filter(d => d.group === group).map(d => d.volume)) })
+                })
+                // b. Add Background bin body
+                recyclingBreakdownChart.append('path')
+                    .attr('d', icons.binBody)
+                    .attr('transform', `translate(${0} , ${0})  scale(${recycleBinScale})`)
+                    .classed('bin-outline', true)
+
+                // c. Add each material group
+                recycleBinChartData.forEach((d, i) => {
+                    const material = d.group,
+                        materialSlug = helpers.slugify(d.group),
+                        materialProp = d.volume / d3.sum(recycleBinData.map(d => d.volume)),
+                        clipHeight =  materialProp * iconBinHeight
+                    
+                    // i. Add part of an icon with a clipath                
+                    defs.append('clipPath').attr('id', `recycle-bin-${materialSlug}`)
+                        .append('rect')
+                        .attr('x', 0)                            
+                        .attr('y', cumulativeProp)
+                        .attr('height', clipHeight)
+                        .attr('width', iconWidth)
+
+                    recyclingBreakdownChart.append('path')
+                        .classed(`recycling-breakdown ${materialSlug}`, true)
+                        .attr('d', icons.binBody)
+                        .attr('clip-path', `url(#recycle-bin-${materialSlug})`)
+                        .attr('transform', `translate(${0} , ${0}) scale(${recycleBinScale})`)
+
+                    // ii. Add label    
+                    recyclingBreakdownChart.append('text')
+                        .classed(`recycling-breakdown-material-label ${materialSlug}`, true) 
+                        .attr('transform',  `translate(${0} , ${(cumulativeProp + clipHeight /2) * recycleBinScale})` )
+                        .text(`${material}: ${helpers.numberFormatters.formatPct1dec(materialProp)}`) 
+
+                    cumulativeProp +=clipHeight     // Update cumulative position for label
+                })
+                // d. Add Bin wheel and lid
+                recyclingBreakdownChart.append('path')
+                    .classed('bin', true)
+                    .attr('d', icons.binWheel)
+                    .attr('transform', `translate(${0} , ${0})  scale(${recycleBinScale})`)
+
+                recyclingBreakdownChart.append('path')
+                    .attr('d', icons.binLid)
+                    .attr('transform', `translate(${0} , ${0})  scale(${recycleBinScale})`)
+                    .classed('recycling', true)
+        };
+
+
+        ////////////////////////////////
+        /// X. HELPER FUNCTIONS      ///
+        ////////////////////////////////
+
+        const helpers= {
+            numberFormatters: {
+                formatPct:          	d3.format(".0%"), 
+                formatPct1dec:          d3.format(".1%")  
+            },
+            numberParsers: {
+                parseDateSlash: d3.timeParse("%d/%m/%Y")
+            },
+            slugify: function (str) {
+                str = str.replace(/^\s+|\s+$/g, '').toLowerCase(); // trim           
+                const from = "àáäâèéëêìíïîòóöôùúüûñç·/_,:;",      // remove accents, swap ñ for n, etc
+                    to   = "aaaaeeeeiiiioooouuuunc------"
+                for (var i=0, l=from.length ; i<l ; i++) {
+                    str = str.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
+                }
+                str = str.replace(/[^a-z0-9 -]/g, '') // remove invalid chars
+                    .replace(/\s+/g, '-') // collapse whitespace and replace by -
+                    .replace(/-+/g, '-'); // collapse dashes
+                return str;
+            }, 
+            wrap: function(text, width, lineHeight, centerVertical = false) {
+                text.each(function() {
+                    let text = d3.select(this),
+                        words = text.text().split(/\s+/).reverse(),
+                        word,
+                        line = [],
+                        lineNumber = 0,
+                        y = text.attr("y"),
+                        x = text.attr("x"),
+                        fontSize = parseFloat(text.style("font-size")),
+                        dy = parseFloat(text.attr("dy")),
+                        tspan = text.text(null).append("tspan").attr("x", x).attr("y", y).attr("dy", dy + "em");
+
+                    while (word = words.pop()) {
+                        line.push(word);
+                        tspan.text(line.join(" "));
+
+                        if (tspan.node().getComputedTextLength() > width) {
+                            line.pop();
+                            tspan.text(line.join(" "));
+                            line = [word];
+                            tspan = text.append("tspan")
+                                .attr("x", x)
+                                .attr("y",  y)
+                                .attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+                        }                    
+                    }            
+                    if(centerVertical){
+                        text.style("transform",  "translateY(-"+(10 * (lineNumber))+"px)")
+                    }
+                })
+            }
+        }
+
+    </script>
+</html>

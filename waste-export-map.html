@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Victorian recovered material export map">
+    <meta name="author" content="Sustainability Victoria">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+            body{
+            font-family: 'DIN Next LT Pro';
+            margin: 0;
+        }
+
+        /******************************/
+        /*** VISUALISATION STYLING  ***/
+        /******************************/
+        .main-title,
+        .main-subtitle,
+        .total-exports-label,
+        .total-exports-vol,
+        .total-material-name,
+        .total-exports-chart-label,
+        .total-material-vol, 
+        .total-exports-total,
+        .state.victoria, 
+        .country-label,
+        .country-label-pct, 
+        .infopane-group text,
+        .infopane-group .total-bar,
+        .infopane-group .material-bar, 
+        .total-bar.all-exports,
+        .total-material-bar{
+            fill: var(--secondaryBottleGreen);
+        }
+        .main-title{
+            font-size: 36px;
+            font-weight: 500;
+            dominant-baseline: hanging;
+            mix-blend-mode: darken;
+            text-transform: uppercase;
+            fill: #000;
+        }
+        .main-subtitle{
+            font-size: 16px;
+            font-weight: 500;
+            dominant-baseline: hanging;
+            mix-blend-mode: darken;
+            fill: #000;
+        }
+        .total-exports-label{
+            font-size: 16px;
+            font-weight: 400;
+        }
+        .total-exports-vol{
+            font-size: 16px;
+            font-weight: 800;  
+            text-anchor: end;
+        }
+        .total-material-name{
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .total-exports-chart-label,
+        .total-material-vol{
+            font-size: 10px;
+        }
+        .total-material-vol{
+            text-anchor: end;
+        }
+        .total-exports-total{
+            font-size: 30px;
+            font-weight: bold;
+            stroke-width: 1.25px;
+            fill: rgba(255, 255, 255, 0.8); 
+            stroke: var(--secondaryBottleGreen);
+       }
+        .state,
+        .country{
+            fill: var(--secondaryGreyLightest);
+            stroke: #fff;
+            stroke-width: 0.5px;
+        }
+        .country.export-country{
+            fill: var(--secondaryBottleGreenLight)
+        }
+        .country-label,
+        .country-label-pct{
+            font-size: 14px;
+            font-weight: 500;
+            text-anchor: middle;
+            dominant-baseline: middle;
+            text-shadow: 2px 2px 2px #fff;
+        }
+        .country-label-pct{
+            font-size: 12px;
+        }
+        .export-connector{
+            stroke-width: 1;
+            stroke: var(--secondaryBottleGreenLight);
+            mix-blend-mode: multiply;
+            fill: none;
+        }
+        .info-page-bg{
+            fill: var(--secondaryBottleGreenLight);
+            opacity: 0.15;
+        }
+        .info-page-header{
+            font-size: 18px;
+            font-weight: 500;
+        }
+        .info-page-subheader{
+            font-size: 10px;
+        }
+        .country-total-vol{
+            font-size: 10px;
+            font-weight: 500;
+        }
+        .country-total-vol,
+        .country-material-vol,
+        .info-page-subheader.align-right{
+            text-anchor: end
+        }
+        .country-list-name{
+            font-size: 10px;
+            font-weight: 500;
+        }
+        .country-material-vol,
+        .country-material-name{
+            font-size: 8px;
+        }
+  </style>
+</head>
+
+<body>
+
+  <div id = "map-container">
+      <svg id ="map"></svg>
+  </div>
+
+  <!-- JavaScript Libraries -->
+    <script>
+
+        ////////////////////////////////////////////////////////////////////////////////
+        /// 0. BUILD SEQUENCE: INIT SETTINGS AND DATA OBJECTS AND LOADING => RENDER  ///
+        ////////////////////////////////////////////////////////////////////////////////
+
+        const settings = { 
+            svgID:                  'map',
+            year:                   '2019-20',              
+            dims: {
+                width:              1080,
+                height:             720,
+            },
+            geometry: {              
+                projection:         d3.geoMercator(),      // Choice of map projection (see d3 docs for standard projections, and add d3-geo-projection plugin for further projections)
+                centerLong:         133.7,               // Used to center the map on Victoria
+                centerLat:          -8.1,               // ..
+                projectionScale:    340,                 // and scale the projection to fit the canvas (note: )
+            },
+            infoPane: {
+                dims: {
+                    width:      230,
+                    height:     140,
+                    rx:         10,
+                    ry:         10    
+                },
+            }
+        }
+
+        const data = {
+            table:      {},
+            schema: {
+                list: {},
+            },
+            byExportCountry: {},
+            inputData: {}
+        }
+
+        // Build from GSheet data
+        buildFromGSheetData(settings)
+
+        function buildFromGSheetData(settings) {
+            // 1. Specify data table links for each table used (tsv published output from each separate sheet/table)
+            const gsTableLinks =   {
+                exportWasteData:               'https://docs.google.com/spreadsheets/d/e/2PACX-1vSimVJWCqYLTijgqeU-SPGdAFT6wpGprHgjPdpxEElWurVvl28JYr7dHGE3OCSjF4VYH2_QggJUnveO/pub?gid=660443265&single=true&output=tsv',
+            }
+            // 2. Asynchronous data load (with Promise.all) and D3 (Fetch API) 
+            Promise.all([
+                d3.tsv(gsTableLinks.exportWasteData),
+                d3.json('data/world-110m.json'),			   // a. World map
+                d3.json('data/states.geojson.txt')			   // b. Australian states
+            ]).then( rawData => {
+                // 3. Parse each loaded data table and store in data.table object, using the parseTable helper 
+                parseTable('exportWasteData', rawData[0])
+                return rawData
+            }).then( async (rawData) => {
+                // 4. Initiate vis build sequence with data now loaded
+                await applyQuerySettings(settings)                      // a. Update settings if a query string is passed in
+                await transformData(data.table.exportWasteData)             // b. Parse data used in visualisation
+                await renderMap(settings, rawData[1], rawData[2])	    // c. Renders map and export data annotation
+            })
+
+            // X. Table data parsing function: trim() header white space and prase numbers with "$" and "," stripped. 
+            const parseTable = (tableName, tableData) => {
+                data.table[tableName] = tableData.map(row => {
+                    const newObj = {}
+                    Object.entries(row).forEach(([key, value]) => {
+                        switch(key.trim().toLowerCase()){
+                            case 'year':
+                                newObj[key.trim()] =  value
+                                break     
+                            default:
+                                newObj[key.trim()] = isNaN(parseFloat(value.replace(/\$|,/g, ''))) ? value : parseFloat(value.replace(/\$|,/g, '')) 
+                        }
+                    })
+                    return newObj
+                })
+            };   
+        };
+
+
+        /////////////////////////////////////////////
+        /// 1. DATA PARSING AND SHAPING FUNCTION  ///
+        /////////////////////////////////////////////
+
+        async function applyQuerySettings(settings){
+            // i. Check for query parameters and update material. A date set by the query selector is set while parsing input data 
+            settings.queryParameters = new URLSearchParams(window.location.search)
+            if (settings.queryParameters.has('year')) { 
+                settings.year = settings.queryParameters.get('year')  
+            }
+        };
+
+        // Parse input data for export volumes by country
+        async function transformData(exportData){
+            // 1. Extract lists 
+            const yearData = exportData.filter(d => d.year === settings.year)
+            data.schema.list.country = [...new Set(yearData.sort((a, b) => (a.Total < b.Total) ? 1 : -1).map(d => d.Destination).filter(d => d !== 'Others'))]            // Sort ensures list is ranked by total
+            data.schema.list.country.push('Others')               // 'Others' back  to end of array'                                                 
+            data.schema.list.materials = Object.keys(yearData[0]).filter(d => d !== "year" && d !== "Destination" && d !== 'Total' && d !== 'exPathOffsetX' && d !== 'exPathOffsetY'  && d !== 'endOffsetX' && d !== 'endOffsetY')      // Materials are in order of how they are in the raw data (i.e. change column order in data to re-order in vis)
+
+            // 2. Shape data by export country
+            data.schema.list.country.forEach(country => {
+                yearData.forEach(d => {
+                    if(d.Destination === country){
+                        data.byExportCountry[country] = d
+                    }
+                })
+            })
+            // d. Store data for referencing in render 
+            data.inputData.export = exportData.filter(d => d.year === settings.year)
+        }; // end parseData()
+
+        // Render the map visualisation, using the map shape data and parse export data 
+        async function renderMap(settings, worldShapeData, statesShapeData){
+            // 1. SPECIFY LAYOUT GROUPS: Layers appended in rendering order
+            const svg = d3.select(`#${settings.svgID}`).attr('viewBox', `0 0 ${settings.dims.width} ${settings.dims.height}`),
+                mapGroup = svg.append('g').classed('map-group', true),
+                countries = mapGroup.append('g').classed('countries-group', true),
+                ausStates = mapGroup.append('g').classed('aus-states-group', true),
+                exportPaths = mapGroup.append('g').classed('export-path-group', true),
+                annotation = mapGroup.append('g').classed('annotation-group', true),
+                countryLabels = annotation.append('g').classed('country-labels-group', true),
+                titles = annotation.append('g').classed('titles-group', true),
+                infoPane = svg.append('g').classed('infopane-group', true)
+
+            // 2. SPECIFY MAP PROJECTION AND MAP PROJECTION PATH GENERATOR
+            const projection = settings.geometry.projection,				   // Specify map projection type
+                path = d3.geoPath().projection(projection)                     // Path generator function
+
+            projection.scale(settings.geometry.projectionScale)
+                .center([settings.geometry.centerLong, settings.geometry.centerLat])
+                .translate([600, 470])                  // Translate [x, y]  by pixels to centre the map
+
+            const exportPathGenerator = (d) =>  "M" + d[0].x + "," + d[0].y  + "S" + d[1].x + "," + d[1].y  + " " + d[2].x + "," + d[2].y       // Path generator for a curved line
+
+            // 3. ADD WORD AND VICTORIAN LGA MAP SHAPE
+            countries.selectAll('path')
+                .data(worldShapeData.features)
+                .join('path')
+                    .attr('id', d => helpers.slugify(d.properties.name) )
+                    .attr('d', path)			
+                    .attr('class',  d => `country ${helpers.slugify(d.properties.name)} ${helpers.slugify(d.properties.continent)} `)    
+
+            ausStates.selectAll('path')
+                .data(statesShapeData.features)
+                .join('path')
+                    .attr('id', d => helpers.slugify(d.properties.STATE_NAME) )
+                    .attr('d', path)			
+                    .attr('class',  d => `state ${helpers.slugify(d.properties.STATE_NAME)} `)    
+            
+            // 4. COLOR EXPORT COUNTRIES *(BY TOTAL) AND ADD COUNTY LABELS
+            const colourScale = d3.scaleLinear()
+                .domain(d3.extent(data.inputData.export.map(d => d.Total)))
+                .range(['#A0D6E9', '#93CCB9'])
+
+            const exportPathScale = d3.scaleLinear()
+                .domain(d3.extent(data.inputData.export.map(d => d.Total)))
+                .range([0.25, 3])
+
+            const totalExports = d3.sum(data.inputData.export.map(d => d.Total)),
+                totalPaper =    d3.sum(data.inputData.export.map(d => d.Paper)),
+                totalGlass =    d3.sum(data.inputData.export.map(d => d.Glass)),
+                totalMetals =   d3.sum(data.inputData.export.map(d => d.Metals)),
+                totalPlastics = d3.sum(data.inputData.export.map(d => d.Plastic)),
+                totalOther =    d3.sum(data.inputData.export.map(d => d.Other))
+
+            const vicBBox = document.getElementById('victoria').getBBox(),
+                vic_cx =  vicBBox.x + vicBBox.width/2,
+                vic_cy =  vicBBox.y + vicBBox.height/2
+
+            data.schema.list.country.filter(d => d !== 'Others').forEach( country => {
+console.log(country, data.byExportCountry[country].endOffsetX, data.byExportCountry[country].endOffsetY)
+                const countryBBox = d3.select(`#${helpers.slugify(country)}`).node().getBBox(),
+                    country_cx = countryBBox.x + countryBBox.width / 2 + data.byExportCountry[country].endOffsetX,
+                    country_cy = countryBBox.y + countryBBox.height/ 2 + data.byExportCountry[country].endOffsetY,
+                    exportLinkCoords = [ 
+                        {x: vic_cx-2,     y: vic_cy + 10},
+                        {x: d3.mean([vic_cx, country_cx]) + data.byExportCountry[country].exPathOffsetX, y: d3.mean([vic_cy, country_cy]) + data.byExportCountry[country].exPathOffsetY },
+                        {x: country_cx , y: country_cy }
+                    ],
+                    exportTotalVol = data.byExportCountry[country].Total
+
+                // a. Colour country by total volume exported
+                d3.select(`#${helpers.slugify(country)}`)
+                    .style('fill', colourScale(exportTotalVol))
+
+                // b. Add country label and pct
+                countryLabels.append('text')
+                    .classed(`country-label ${helpers.slugify(country)}`, true)
+                    .attr('transform', `translate(${country_cx}, ${country_cy -7})`)
+                    .text(country)
+                countryLabels.append('text')
+                    .classed(`country-label-pct ${helpers.slugify(country)}`, true)
+                    .attr('transform', `translate(${country_cx}, ${country_cy + 6 })`)
+                    .text(helpers.numberFormatters.formatPct1dec(data.byExportCountry[country].Total / totalExports))
+
+                // c. Add Export path from Vic
+                exportPaths.append('path').classed(`export-connector ${helpers.slugify(country)}`, true)
+                    .attr('d', exportPathGenerator(exportLinkCoords))  
+                    .style('stroke-width', exportPathScale(exportTotalVol))
+            })
+
+            // 5. RENDER THE INFO PANE
+            const infoPaneWidth = settings.dims.width * 0.25,
+                infoPaneHeight = settings.dims.height,
+                infoPaneMargin = { top: infoPaneWidth * 0.1, bottom: infoPaneHeight * 0.1, left: infoPaneWidth * 0.1,  right: infoPaneWidth * 0.1}
+
+                // a. Position infoPane
+                infoPane.attr('transform', `translate(${settings.dims.width - infoPaneWidth} , ${0})` )
+
+                // b. Attach a backgound rect
+                infoPane.append('rect').classed('info-page-bg', true)
+                    .attr('width', infoPaneWidth)
+                    .attr('height', infoPaneHeight)
+
+                // c. Headers and subheaders
+                const infoPaneHeader = infoPane.append('text').classed('info-page-header', true)
+                    .attr('x', infoPaneMargin.left)
+                    .attr('y', infoPaneMargin.top + 10)
+                    .attr('dy', 0)
+                    .text('Top ten export countries')
+                    .call(helpers.wrap, infoPaneWidth - infoPaneMargin.left - infoPaneMargin.right, 1.1)
+                
+                infoPane.append('text').classed('info-page-subheader', true)
+                    .attr('x', infoPaneMargin.left)
+                    .attr('y', infoPaneMargin.top + infoPaneHeader.node().getBBox().height + 15)
+                    .text('Country')
+
+                infoPane.append('text').classed('info-page-subheader align-right', true)
+                    .attr('x', infoPaneWidth - infoPaneMargin.right)
+                    .attr('y', infoPaneMargin.top + infoPaneHeader.node().getBBox().height + 15)
+                    .text('Tonnes exported')
+
+                // d. Each country (groups)
+                const countyGroupWidth = infoPaneWidth - infoPaneMargin.left - infoPaneMargin.right,
+                    countryTotalMax =  d3.max(data.inputData.export.map(d => d.Total)),
+                    countryBarScale = d3.scaleLinear()
+                        .domain([0, countryTotalMax])
+                        .range([0, countyGroupWidth]),
+                    totalChartWidth = settings.dims.width /3,
+                    totalMaterialMax = d3.max([totalPaper, totalGlass, totalMetals, totalPlastics, totalOther]),
+                    totalBarScale = d3.scaleLinear()
+                        .domain([0, totalMaterialMax])
+                        .range([0, totalChartWidth])
+
+                let countryGroupYpos = infoPaneMargin.top + infoPaneHeader.node().getBBox().height + 30       
+
+                data.schema.list.country.forEach((country, i) => {
+                    const countryGroup = infoPane.append('g')
+                        .attr('transform', `translate(${infoPaneMargin.left}, ${countryGroupYpos})`)
+                    countryGroup.append('text').classed('country-list-name', true)
+                        .text(`${i +1}. ${country}`)
+
+                    const countryTotalVol = data.byExportCountry[country].Total
+                    countryGroup.append('text').classed('country-total-vol', true)
+                        .attr('x', countyGroupWidth )
+                        .text(`${helpers.numberFormatters.formatComma(countryTotalVol)}`)
+                    countryGroup.append('rect').classed(`total-bar ${helpers.slugify(country)}`, true)
+                        .attr('x', 0)
+                        .attr('y', 3)
+                        .attr('height', 1.5)
+                        .attr('width', countryBarScale(countryTotalVol))
+
+                    // Add materials
+                    if(i < 5 || country === 'Others'){
+                        let materialsCounter = 0                
+                        data.schema.list.materials.forEach((material, i) => {
+                            const materialMax =  d3.max(data.inputData.export.map(d => d[material]))
+                                countryMateriaVol = data.byExportCountry[country][material],
+                                materialYSpace = 13
+                            if(countryMateriaVol > 0){      // Only add a material if its non-zero to save some space
+                                countryGroup.append('text').classed('country-material-name', true)
+                                    .attr('x', 0)
+                                    .attr('y', 15 + materialsCounter * materialYSpace)
+                                    .text(material)
+                                countryGroup.append('text').classed('country-material-vol', true)
+                                    .attr('x', countyGroupWidth )
+                                    .attr('y', 15 + materialsCounter * materialYSpace)
+                                    .text(`${helpers.numberFormatters.formatComma(countryMateriaVol)}`)
+                                countryGroup.append('rect').classed(`material-bar ${helpers.slugify(material)}`, true)
+                                    .attr('x', 0)
+                                    .attr('y', 17 + materialsCounter * materialYSpace)
+                                    .attr('height', 0.6)
+                                    .attr('width', countryBarScale(countryMateriaVol))
+                                materialsCounter ++
+                            }
+                        })
+                    }
+                    // Update start y pos for next country group
+                    countryGroupYpos += countryGroup.node().getBBox().height + 10
+                })
+
+            // 6. ADD ANNOTATION
+            const titleMargin = {left: 30, top: 30}
+            // a. Main title
+            titles.append('text').classed('main-title', true)
+                .attr('x', titleMargin.left)
+                .attr('y', titleMargin.top)
+                .attr('dy', 0)
+                .text(`Victorian recycled material exports`)
+            titles.append('text').classed('main-subtitle', true)
+                .attr('x', titleMargin.left)
+                .attr('y', titleMargin.top + 35)
+                .attr('dy', 0)
+                .text(`a breakdown by export country and materials in ${settings.year}`)
+
+            // b. Totals group (bottom left)
+            const totalGroup = titles.append('g')
+                .attr('transform', `translate(${titleMargin.left}, ${settings.dims.height - 250})`)
+            totalGroup.append('text').classed('total-exports-label', true)
+                .text(`Victoria exported`)
+            totalGroup.append('text').classed('total-exports-total', true)
+                .attr('y', 30)
+                .text(`${helpers.numberFormatters.formatComma(totalExports)} tonnes`)
+            totalGroup.append('text').classed('total-exports-label', true)
+                .attr('y', 50)
+                .text(`of recyclable material`)
+            totalGroup.append('text').classed('total-exports-chart-label', true)
+                .attr('y', 74)
+                .text(`volumes by exported material`)
+
+            // Add materials             
+            data.schema.list.materials.forEach((material, i) => {
+                const  materiaVol = d3.sum(data.inputData.export.map(d => d[material])),
+                    materialYSpace = 20
+                totalGroup.append('text').classed('total-material-name', true)
+                    .attr('x', 0)
+                    .attr('y', 90 + i * materialYSpace)
+                    .text(material)
+                totalGroup.append('rect').classed(`total-material-bar ${helpers.slugify(material)}`, true)
+                    .attr('x', 0)
+                    .attr('y', 93 + i * materialYSpace)
+                    .attr('height', 2)
+                    .attr('width', totalBarScale(materiaVol))
+                totalGroup.append('text').classed('total-material-vol', true)
+                    .attr('x', totalChartWidth )
+                    .attr('y', 90 + i * materialYSpace)
+                    .text(`${helpers.numberFormatters.formatComma(materiaVol)} tonnes`)                    
+            })
+    }; // end renderMap()
+
+
+        /////////////////////////////
+        /// X HELPER FUNCTIONS    ///
+        /////////////////////////////
+
+        const helpers= {
+            numberFormatters: {
+                formatComma:           	d3.format(",.0f"),
+                formatComma1dec:       	d3.format(",.1f"),
+                formatComma2dec:       	d3.format(",.2f"),
+                formatInteger:         	d3.format(".0f"),   
+                formatCostInteger:     	d3.format("$,.0f"),  
+                formatCost1dec:        	d3.format("$,.1f"),  
+                formatPct:          	d3.format(".0%"), 
+                formatPct1dec:          d3.format(".1%")  
+            },
+            numberParsers: {
+                parseDateSlash: d3.timeParse("%d/%m/%Y")
+            },
+            slugify: function (str) {
+                str = str.replace(/^\s+|\s+$/g, '').toLowerCase(); // trim           
+                const from = "àáäâèéëêìíïîòóöôùúüûñç·/_,:;",      // remove accents, swap ñ for n, etc
+                    to   = "aaaaeeeeiiiioooouuuunc------"
+                for (var i=0, l=from.length ; i<l ; i++) {
+                    str = str.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
+                }
+                str = str.replace(/[^a-z0-9 -]/g, '') // remove invalid chars
+                    .replace(/\s+/g, '-') // collapse whitespace and replace by -
+                    .replace(/-+/g, '-'); // collapse dashes
+                return str;
+            }, 
+            wrap: function(text, width, lineHeight) {
+                text.each(function() {
+                    let text = d3.select(this),
+                        words = text.text().split(/\s+/).reverse(),
+                        word,
+                        line = [],
+                        lineNumber = 0,
+                        y = text.attr("y"),
+                        x = text.attr("x"),
+                        fontSize = parseFloat(text.style("font-size")),
+                        dy = parseFloat(text.attr("dy")),
+                        tspan = text.text(null).append("tspan").attr("x", x).attr("y", y).attr("dy", dy + "em");
+
+                    while (word = words.pop()) {
+                        line.push(word);
+                        tspan.text(line.join(" "));
+
+                        if (tspan.node().getComputedTextLength() > width) {
+                            line.pop();
+                            tspan.text(line.join(" "));
+                            line = [word];
+                            tspan = text.append("tspan")
+                                .attr("x", x)
+                                .attr("y",  y)
+                                .attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+                        }                    
+                    }            
+                })
+            }
+        }
+
+    </script>
+</body>
+
+</html>

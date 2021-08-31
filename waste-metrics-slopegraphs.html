@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="Slopegraph experiment">
+        <meta name="author" content="Sustainability Victoria">
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+        <style>
+            /* COLOUR PALETTES | MID-2021 BRAND STYLE GUIDE*/
+            :root {
+                /** PRIMARY SV GREEN AND SECONDARY PALLETTE **/
+                --svGreen:                       #9ACA3C;
+                /** SECONDARY PALLETTE **/
+                --secondaryGreenLight:           #f8faf0;
+                --secondaryBottleGreen:          #174F37;
+                --secondaryBottleGreenLight:     #79B5AA;
+                --secondaryGrey:                 #B1B1B0;
+                --secondaryGreyLight:            #CFCFCF;
+                --secondaryGreyLightest:         #ECECEC;
+                /** TERTIARY PALETTE **/
+                --tertiaryPurple:               #51284F;
+                --tertiaryPurpleLight:          #8276B3;
+                --tertiaryRed:                  #E04F39;
+                --tertiaryRedLight:             #F78684;
+                --tertiaryYellow:               #EFC041;
+                --tertiaryYellowLight:          #F5E065;
+                --tertiaryCard:                 #B39981;
+                --tertiaryCardLight:            #DCBFA6;
+                --tertiaryEmerald:              #009E71;
+                --tertiaryEmeraldLight:         #93CCB9;
+                --tertiaryBlue:                 #005E88;
+                --tertiaryBlueLight:            #A0D6E9;
+                /*** EXTENDED PALETTE  ***/
+                --xLightestPurple:              #A59DC8;     
+                --xOrange:                      #feb076;     
+                --xLime:                        #BBCC66;     
+                --xGreen:                       #66CCAC;     
+                --xBlueCyan:                    #94E1EC;     
+                --xMidBlue:                     #48B5EB;     
+                --xMagenta:                     #d780c3;     
+                --xCharcoal:                    #36454F; 
+                --xDarkOrange:                  #863F13; 
+                --xDarkLime:                    #77862D;     
+                --xDarkYellow:                  #A57A0E; 
+                --xDarkCard:                    #6F5843; 
+                --xDarkBlueCyan:                #177283; 
+                --xDarkMagenta:                 #73264C; 
+                --darkGrey:                     rgb(100, 100, 100);
+            }
+
+        /***************************************/
+        /*** IMPORTED FONTS  | ALL WEIGHTS  ***/
+        /***************************************/
+
+            @font-face {
+                font-family: 'DIN Next LT Pro';
+                src: local('DIN Next LT Pro Light'), local('DIN-Next-LT-Pro-Light'),
+                    url('fonts/DINNextLTPro-Light.woff2') format('woff2'),
+                    url('fonts/DINNextLTPro-Light.woff') format('woff'),
+                    url('fonts/DINNextLTPro-Light.ttf') format('truetype');
+                font-weight: 300;
+                font-style: light;
+            }
+            @font-face {
+                font-family: 'DIN Next LT Pro';
+                src: local('DIN Next LT Pro Regular'), local('DIN-Next-LT-Pro-Regular'),
+                    url('fonts/DINNextLTPro-Regular.woff2') format('woff2'),
+                    url('fonts/DINNextLTPro-Regular.woff') format('woff'),
+                    url('fonts/DINNextLTPro-Regular.ttf') format('truetype');
+                font-weight: 400;
+                font-style: normal;
+            }
+            @font-face {
+                font-family: 'DIN Next LT Pro';
+                src: local('DIN Next LT Pro Medium'), local('DIN-Next-LT-Pro-Medium'),
+                    url('fonts/DINNextLTPro-Medium.woff2') format('woff2'),
+                    url('fonts/DINNextLTPro-Medium.woff') format('woff'),
+                    url('fonts/DINNextLTPro-Medium.ttf') format('truetype');
+                font-weight: 500;
+                font-style: medium;
+            }
+            @font-face {
+                font-family: 'DIN Next LT Pro';
+                src: local('DIN Next LT Pro Heavy'), local('DIN-Next-LT-Pro-Heavy'),
+                    url('fonts/DINNextLTPro-Heavy.woff2') format('woff2'),
+                    url('fonts/DINNextLTPro-Heavy.woff') format('woff'),
+                    url('fonts/DINNextLTPro-Heavy.ttf') format('truetype');
+                font-weight: 800;
+                font-style: heavy;
+            }
+
+            body{
+                font-family: 'DIN Next LT Pro';
+                margin: 0;
+            }
+            .main-title{
+                font-size: 30px;
+                font-weight: 500;
+                fill: #000;
+                mix-blend-mode: multiply;
+                text-transform: uppercase;
+            }
+            .main-subtitle{
+                font-size: 16px;
+                fill: #000;
+                mix-blend-mode: multiply;
+            }
+
+        /*********************/
+        /**** SLOPE CHARTS  ***/
+        /*********************/
+            .slope-path{
+                stroke:  var(--xCharcoal);
+                opacity: 0.75;
+                fill: none;
+            }
+            .slope-path.overall-diversion,
+            .slope-path.overall{
+                stroke-width: 2px;
+                fill: none;
+                opacity: 1;
+            }
+            .node{
+                fill:  var(--xCharcoal);
+            }
+            .chart-title{
+                font-weight: 500;
+                font-size: 16px;
+                text-transform: uppercase;
+                text-anchor: middle;
+            }
+            .chart-subtitle{
+                font-weight: 300;
+                font-size: 10px;
+                text-anchor: middle;
+            }
+            .label{
+                font-weight: 300;
+                dominant-baseline: middle;
+                fill: var(--charcoal);
+            }
+            .label.positive{
+                fill: var(--secondaryBottleGreen);        
+            }
+            .label.negative{
+                fill: var(--tertiaryPurple);        
+            }
+            .label.overall-diversion,
+            .label.overall{
+                text-transform: uppercase;
+                font-weight: 500;
+                opacity: 1;
+            }
+            .label.to{
+                text-anchor: start;
+            }
+            .label.from{
+                text-anchor: end;
+            }
+            .year-label{
+                text-anchor: middle;
+                font-size: 10px;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class = "svg-container">
+            <svg id = "metrics-vis"  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"> </svg>
+        </div>
+    </body>
+
+    <script>
+
+        /////////////////////////////////////////////////////////////////////////////////
+        /// 0. BUILD SEQUENCE: INIT SETTINGS AND DATA OBJECTS AND LOADING => RENDER  ///
+        ////////////////////////////////////////////////////////////////////////////////
+
+        const settings = {
+            svgID:              'metrics-vis',
+            yearFrom:           '2018-19', 
+            yearTo:             '2019-20', 
+            dims: {
+                width:              780,
+                height:             1080,
+                margin: {
+                    top: 50, right: 20, bottom: 50, left: 20
+                }
+            },
+            variables: {
+                peoplePerHousehold:     2.5
+            }
+        }
+
+        const chartSettings = {
+            // Diversion rate for all materials multiple single chart
+            diversionRateTotal: {
+                id:                 'diversionRateTotal',
+                labels: {
+                    title:          "Headline metrics",
+                    subtitle1:      "% of waste diverted from landfill",
+                    subtitle2:      false,
+                    date: {
+                        top:        true,
+                        bottom:     false
+                    },
+                    positiveDirection: 'up'
+                },
+                pos: { x: 30, y: 100 },
+                dims: {
+                    width:  300,
+                    height:  70,
+                    margin: {
+                        top: 50, left: 50, right: 50, bottom: 0
+                    },
+                    labelXPadding:  5,
+                    labelSize:      8
+                },
+                numberFormatter: d3.format(".1%"),
+                yScale: d3.scaleLinear(),
+            }, 
+
+            // Diversion volume total
+            diversionVolumeTotal: {
+                id:                 'diversionVolumeTotal',
+                labels: {
+                    title:          false,
+                    subtitle1:      "tonnes diverted from landfill",
+                    subtitle2:      false,
+                    date: {
+                        top:        false,
+                        bottom:     false
+                    },
+                    positiveDirection: null
+                },
+                pos: { x: 30, y: 180 },
+                dims: {
+                    width:  300,
+                    height:  60,
+                    margin: {
+                        top: 30, left: 50, right: 50, bottom: 0
+                    },
+                    labelXPadding:  5,
+                    labelSize:      8
+                },
+                numberFormatter: d3.format(",.0f"),
+                yScale: d3.scaleLinear(),
+            }, 
+
+            // Waste per person
+            wastePerPerson: {
+                id:                 'wastePerPerson',
+                labels: {
+                    title:          "",
+                    subtitle1:      "waste (kg) per person",
+                    subtitle2:      false,
+                    date: {
+                        top:        false,
+                        bottom:     false
+                    },
+                    positiveDirection: 'down'
+                },
+                pos: {  x: 30, y: 240 },
+                dims: {
+                    width:  300,
+                    height:  60,
+                    margin: {
+                        top: 30, left: 50, right: 50, bottom: 0
+                    },
+                    labelXPadding:  5,
+                    labelSize:      8
+                },
+                numberFormatter: d3.format(",.1f"),
+                yScale: d3.scaleLinear(),
+            }, 
+
+            // Cost per household by type multiple slope chart
+            costPerHousehold: {
+                id:                 'costPerHousehold',
+                labels: {
+                    title:          "Cost of waste services",
+                    subtitle1:      "$ per household spent by Councils for waste service",
+                    subtitle2:      false,
+                    date: {
+                        top:        true,
+                        bottom:     false
+                    },
+                    positiveDirection: 'down'
+                },
+                pos: {  x: 30, y: 340 },
+                dims: {
+                    width:  300,
+                    height:  200,
+                    margin: {
+                        top: 50, left: 50, right: 50, bottom: 0
+                    },
+                    labelXPadding:  5,
+                    labelSize:      8
+                },
+                numberFormatter: d3.format("$,.1f"),
+                yScale: d3.scaleLinear(),
+            }, 
+
+
+            // Diversion rate by material  multiple slope chart
+            diversionRate: {
+                id:                 'diversionRate',
+                labels: {
+                    title:          "Waste diversion rate",
+                    subtitle1:      "% of each material diverted from landfill to resource recovery",
+                    subtitle2:      false,
+                    date: {
+                        top:        true,
+                        bottom:     true
+                    },
+                    positiveDirection: 'up'
+                },
+                pos: {  x: 420, y: 100 },
+                dims: {
+                    width:  300,
+                    height:  450,
+                    margin: {
+                        top: 60, left: 50, right: 50, bottom: 30
+                    },
+                    labelXPadding:  5,
+                    labelSize:      8
+                },
+                numberFormatter: d3.format(".1%"),
+                yScale: d3.scaleLinear(),
+            }, 
+
+            // Diversion by material volume multiple slope chart
+            diversionVolume: {
+                id:                 'diversionVolume',
+                labels: {
+                    title:          "Diversion volume",
+                    subtitle1:      "tonnes of each material diverted from landfill",
+                    subtitle2:      "for resource recovery",
+                    date: {
+                        top:        true,
+                        bottom:     true
+                    },
+                    positiveDirection: null
+                },
+                pos: {  x: 420, y: 600 },
+                dims: {
+                    width:  300,
+                    height:  450,
+                    margin: {
+                        top: 60, left: 50, right: 50, bottom: 30
+                    },
+                    labelXPadding:  5,
+                    labelSize:      8
+                },
+                numberFormatter: d3.format(",.0f"),
+                yScale: d3.scaleLog()
+            },
+
+            // Diversion by export volume multiple slope chart
+            exportVolume: {
+                id:                 'exportVolume',
+                labels: {
+                    title:          "Export volume",
+                    subtitle1:      "tonnes of all materials exported to each country",
+                    subtitle2:      "for resource recovery",
+                    date: {
+                        top:        true,
+                        bottom:     true
+                    },
+                    positiveDirection: null
+                },
+                pos: {  x: 30, y: 600 },
+                dims: {
+                    width:  300,
+                    height:  450,
+                    margin: {
+                        top: 60, left: 50, right: 50, bottom: 30
+                    },
+                    labelXPadding:  5,
+                    labelSize:      8
+                },
+                numberFormatter: d3.format(",.0f"),
+                yScale: d3.scaleLog(),
+            } 
+
+
+        }
+
+        const data = {          // Initiate data object that populated by the parseData() function, 
+            table:     {},
+            charts:     {
+                diversionRateTotal:     {},
+                diversionVolumeTotal:   {},
+                diversionRate:          {},
+                diversionVolume:        {},
+                landfillVolume:         {},
+                totalVolume:            {},
+                export:                 {},
+                exportAll:              {},
+
+                costPerHousehold:      {},
+                wastePerPerson:         {},
+            },
+            schema: {
+                list:  {
+                    kerbsideTypes:      ['Garbage', 'Recycling', 'Organics']
+                }
+            }
+        }
+
+        buildFromGSheetData(settings)
+        // Load data from TSV files from GSheet, using Papa Parse library
+        function buildFromGSheetData(config){    
+            // 1. Specify data table links for each table used (tsv published output from each separate sheet/table)
+            const gsTableLinks =  {
+                wasteByStream:              'https://docs.google.com/spreadsheets/d/e/2PACX-1vSimVJWCqYLTijgqeU-SPGdAFT6wpGprHgjPdpxEElWurVvl28JYr7dHGE3OCSjF4VYH2_QggJUnveO/pub?gid=0&single=true&output=tsv',
+                wasteByMaterialFlow:        'https://docs.google.com/spreadsheets/d/e/2PACX-1vSimVJWCqYLTijgqeU-SPGdAFT6wpGprHgjPdpxEElWurVvl28JYr7dHGE3OCSjF4VYH2_QggJUnveO/pub?gid=272100684&single=true&output=tsv',
+                kerbsideCollectionData:     'https://docs.google.com/spreadsheets/d/e/2PACX-1vSimVJWCqYLTijgqeU-SPGdAFT6wpGprHgjPdpxEElWurVvl28JYr7dHGE3OCSjF4VYH2_QggJUnveO/pub?gid=204435756&single=true&output=tsv',
+                kerbsideComposition:        'https://docs.google.com/spreadsheets/d/e/2PACX-1vSimVJWCqYLTijgqeU-SPGdAFT6wpGprHgjPdpxEElWurVvl28JYr7dHGE3OCSjF4VYH2_QggJUnveO/pub?gid=1848611910&single=true&output=tsv',
+                exportWasteData:            'https://docs.google.com/spreadsheets/d/e/2PACX-1vSimVJWCqYLTijgqeU-SPGdAFT6wpGprHgjPdpxEElWurVvl28JYr7dHGE3OCSjF4VYH2_QggJUnveO/pub?gid=660443265&single=true&output=tsv'
+            }
+            // 2. Asynchronous data load (with Promise.all) and D3 (Fetch API) 
+            Promise.all(
+                Object.values(gsTableLinks).map(link => d3.tsv(link))       // Pass in array of d3.tsv loaders with each link
+            ).then( rawData => {
+                // a. Parse each loaded data table and store in data.table object, using the parseTable helper 
+                rawData.forEach((tableData, i) => {  parseTable(Object.keys(gsTableLinks)[i], tableData) })
+                return data
+            }).then( async (data) => {
+
+                // 3. Initiate vis build sequence with data now loaded
+                await applyQuerySettings(settings)
+                await transformData(settings)
+                await renderVis(settings)                               // c. Render visualisation(s)
+            })
+
+            // X. Table data parsing function: trim() header white space and prase numbers with "$" and "," stripped. 
+            const parseTable = (tableName, tableData) => {
+                data.table[tableName] = tableData.map(row => {
+                    const newObj = {}
+                    Object.entries(row).forEach(([key, value]) => {
+                        switch(key.trim().toLowerCase()){
+                            case 'year':
+                                newObj[key.trim()] =  value
+                                break     
+                            default:
+                                newObj[key.trim()] = isNaN(parseFloat(value.replace(/\$|,/g, ''))) ? value : parseFloat(value.replace(/\$|,/g, '')) 
+                        }
+                    })
+                    return newObj
+                })
+            };   
+        }; // end buildFromGSheetData
+
+
+        //////////////////////////////////
+        // 1. PARSE AND WRANGLE DATA   ///
+        //////////////////////////////////
+
+        async function applyQuerySettings(settings){
+            // i. Check for query parameters and update material. A date set by the query selector is set while parsing input data 
+            settings.queryParameters = new URLSearchParams(window.location.search)
+            if (settings.queryParameters.has('fromYear')) { 
+                settings.fromYear = settings.queryParameters.get('fromYear')  
+            }
+            if (settings.queryParameters.has('toYear')) { 
+                settings.toYear = settings.queryParameters.get('toYear')  
+            }
+        };
+
+        async function transformData() {   
+            // 1. Create lists based on 'toYear'
+            data.schema.list.year  = [...new Set(data.table.wasteByMaterialFlow.map(d => d.year) )]
+            data.schema.list.material  = [...new Set(data.table.wasteByMaterialFlow.filter(d => d.year === settings.yearTo && d.level === 1 && d.source !== 'Other materials').map(d => d.source) )].sort()
+            data.schema.list.exportCountries  = [...new Set(data.table.exportWasteData.filter(d => d.year === settings.yearTo).map(d => d.Destination) )].sort()
+            data.schema.list.exportMaterials  = [...new Set( d3.merge(data.table.exportWasteData.filter(d => d.year === settings.yearTo).map(d => Object.keys(d)))) ].filter(d => d !== 'year' && d !== 'Destination' && d !== 'Total' && d !== 'exPathOffsetX' && d !== 'exPathOffsetY')
+
+            // 2. Reshape data for each year
+            data.schema.list.year.forEach(year => {
+                //////////////////////////////////////////////////////////
+                /// A. CREATE CHART DATA OBJECTS FOR EACH SLOPE CHART  ///
+                //////////////////////////////////////////////////////////
+                data.charts.diversionRateTotal[year] = {
+                    series:     {}
+                }
+                data.charts.diversionVolumeTotal[year] = {
+                    series:     {}
+                }
+                data.charts.costPerHousehold[year] = {
+                    series:     {}
+                }
+                data.charts.wastePerPerson[year] = {
+                    series:     {}
+                }
+
+                data.charts.diversionRate[year] = {
+                    byMaterial:     {}
+                }
+                data.charts.diversionVolume[year] = {
+                    byMaterial:     {},
+                    overall:        0
+                }
+                data.charts.landfillVolume[year] = {
+                    byMaterial:     {},
+                    overall:        0
+                }
+                data.charts.totalVolume[year] = {
+                    byMaterial:     {},
+                    overall:        0
+                }
+
+                /////////////////////////////////////////////
+                /// B. DIVERSION BY MATERIAL AND OVERALL  ///
+                /////////////////////////////////////////////
+                data.schema.list.material.forEach( material => {
+                    const recoveredVol = d3.sum(data.table.wasteByMaterialFlow.filter(d => d.year === year && d.source == material && d.targetClass === 'recovered').map(d => d.value))
+                    const landfillVol = d3.sum(data.table.wasteByMaterialFlow.filter(d => d.year === year && d.source == material && d.targetClass === 'landfill').map(d => d.value))
+                    const totalVol = recoveredVol + landfillVol
+
+                    data.charts.diversionRate[year].byMaterial[material] = recoveredVol / totalVol
+                    data.charts.diversionVolume[year].byMaterial[material] = recoveredVol
+                    data.charts.landfillVolume[year].byMaterial[material] = landfillVol
+                    data.charts.totalVolume[year].byMaterial[material] = totalVol
+
+                    data.charts.diversionVolume[year].overall += recoveredVol
+                    data.charts.landfillVolume[year].overall += landfillVol
+                    data.charts.totalVolume[year].overall += totalVol
+                }) 
+
+                // Calc overall diversion rate and total
+                data.charts.diversionRate[year].byMaterial['Overall diversion'] = data.charts.diversionVolume[year].overall / data.charts.totalVolume[year].overall
+                data.charts.diversionRateTotal[year].series['Diversion'] = data.charts.diversionVolume[year].overall  / data.charts.totalVolume[year].overall
+                data.charts.diversionVolumeTotal[year].series['tonnes'] = data.charts.diversionVolume[year].overall 
+
+                //////////////////////////////////
+                /// C. EXPORT BY COUNTRY DATA  ///
+                //////////////////////////////////
+                data.charts.exportAll[year] = {
+                    byCountry:          {}
+                } 
+                data.charts.export[year] = {
+                    byMaterial:         {},
+                    allMaterials:       {}
+                }
+
+                data.schema.list.exportMaterials.forEach( material => {
+                    data.charts.export[year].byMaterial[material] = {}
+                    data.schema.list.exportCountries.forEach( country => {
+
+                        const volume = data.table.exportWasteData.filter(d => d.year === year && d.Destination === country)[0][material]
+                        data.charts.export[year].byMaterial[material][country] = volume
+
+                        if(typeof data.charts.export[year].allMaterials[country] === 'undefined'){
+                            data.charts.export[year].allMaterials[country] = volume
+                        } else {
+                             data.charts.export[year].allMaterials[country] += volume
+                        }
+
+                        // Set/update All materials
+                        if( typeof data.charts.exportAll[year].byCountry[country] === 'undefined'){
+                            data.charts.exportAll[year].byCountry[country] = volume
+                        } else {
+                            data.charts.exportAll[year].byCountry[country] += volume
+                        }
+                    })
+                })
+
+                //////////////////////////////
+                /// D. COSTS PER PROPERTY  ///
+                //////////////////////////////                
+                data.charts.costPerHousehold[year].series = {
+                    Garbage:      data.table.kerbsideCollectionData.filter(d => d.year === year)[0]['Garbage_cost'] / data.table.kerbsideCollectionData.filter(d => d.year === year)[0]['Garbage_properties'],
+                    Recycling:    data.table.kerbsideCollectionData.filter(d => d.year === year)[0]['Recycling_cost'] / data.table.kerbsideCollectionData.filter(d => d.year === year)[0]['Recycling_properties'],
+                    Organics:     data.table.kerbsideCollectionData.filter(d => d.year === year)[0]['Organics_cost'] / data.table.kerbsideCollectionData.filter(d => d.year === year)[0]['Organics_properties']
+                }
+
+                ////////////////////////////
+                /// E. WASTE PER PERSON  ///
+                ////////////////////////////
+                data.charts.wastePerPerson[year].series['kg per person'] =  (data.table.kerbsideCollectionData.filter(d => d.year === year)[0]['Garbage_volume'] + data.table.kerbsideCollectionData.filter(d => d.year === year)[0]['Recycling_volume'] + data.table.kerbsideCollectionData.filter(d => d.year === year)[0]['Organics_volume']) * 1000
+                    / data.table.kerbsideCollectionData.filter(d => d.year === year)[0]['Population'] 
+            })
+
+            ////////////////////////////////////////////////
+            /// F. ADD DATA REFERENCES IN CHART SETTINGS ///
+            ////////////////////////////////////////////////
+
+            chartSettings.diversionRateTotal.data = data.charts.diversionRateTotal
+            chartSettings.diversionVolumeTotal.data = data.charts.diversionVolumeTotal
+            chartSettings.costPerHousehold.data = data.charts.costPerHousehold
+            chartSettings.wastePerPerson.data = data.charts.wastePerPerson
+
+            chartSettings.diversionRate.data = data.charts.diversionRate
+            chartSettings.diversionVolume.data = data.charts.diversionVolume
+            chartSettings.exportVolume.data = data.charts.exportAll
+        };
+
+
+        /////////////////////////////////////
+        // 2. RENDER THE SLOPE CHART VIS  ///
+        /////////////////////////////////////
+
+        async function renderVis(settings){ 
+            // 1. Setup SVG Canvas and layers
+            d3.select(`#${settings.svgID}`).attr('viewBox', `0 0  ${settings.dims.width} ${settings.dims.height} `)
+            // 2. Single slope charts
+            renderSlopeChart(chartSettings.diversionRateTotal)
+            renderSlopeChart(chartSettings.diversionVolumeTotal)
+            renderSlopeChart(chartSettings.costPerHousehold)
+            renderSlopeChart(chartSettings.wastePerPerson)
+
+            // 3. Multiple slope charts
+            renderSlopeChart(chartSettings.diversionRate)
+            renderSlopeChart(chartSettings.diversionVolume)
+            renderSlopeChart(chartSettings.exportVolume)
+
+            // 4. Page annotation
+            renderAnnotation(settings)
+        };
+
+
+        function renderSlopeChart(chartSettings){  
+            /// 1. Add chart group to canvas ///
+            const chartGroup = d3.select(`#${settings.svgID}`).append('g')
+                    .attr('id', `${helpers.slugify(chartSettings.id)}-chart`)
+                    .classed('slope-chart-group', true)
+                    .attr('transform', `translate(${chartSettings.pos.x}, ${chartSettings.pos.y})`)
+
+            // 2. Shape data for charting 
+            const chartDates = [settings.yearFrom, settings.yearTo],
+                fromData = chartSettings.data[settings.yearFrom],
+                toData = chartSettings.data[settings.yearTo],
+                chartData = Object.entries(Object.values(fromData)[0]).map( ([series, fromValue], i) => {
+                    return {series, fromValue, toValue:  Object.values(toData)[0][series]  }
+                }),
+                valuesArray = chartData.map(d => d.fromValue).concat(chartData.map(d => d.toValue)) 
+
+
+            // 3. Scales and path generator
+            const x = d3.scalePoint()
+                .domain(d3.range(chartDates.length))
+                .range([chartSettings.dims.margin.left, chartSettings.dims.width - chartSettings.dims.margin.right])
+                .padding(0.5)
+
+            const y = chartSettings.yScale
+                .domain(d3.extent(valuesArray))
+                .range([chartSettings.dims.height - chartSettings.dims.margin.bottom, chartSettings.dims.margin.top + 20])
+
+            const line = d3.line()
+                .x((d, i) => x(i))
+                .y(y)
+
+            // 4. Render chart
+                // a. Chart Titles and subtitles (over two lines)
+                if(chartSettings.labels.title){                
+                    chartGroup.append('text')
+                        .classed('chart-title', true)
+                        .text(chartSettings.labels.title)
+                        .attr("transform", `translate(${chartSettings.dims.width * 0.5}, ${20})`)
+                }
+                if(chartSettings.labels.subtitle1){   
+                    chartGroup.append('text')
+                        .classed('chart-subtitle line-1', true)
+                        .text(chartSettings.labels.subtitle1)
+                        .attr("transform", `translate(${chartSettings.dims.width * 0.5}, ${34})`)
+                }
+                if(chartSettings.labels.subtitle2){   
+                    chartGroup.append('text')
+                        .classed('chart-subtitle line-2', true)
+                        .text(chartSettings.labels.subtitle2)
+                        .attr("transform", `translate(${chartSettings.dims.width * 0.5}, ${46})`)
+                }
+                // b. Chart year 'from' and 'to' date labels
+                if(chartSettings.labels.date.top){
+                    chartGroup.selectAll('g.year-labels-top')
+                        .data(chartDates)
+                        .join("g").classed('year-labels-top', true)
+                            .attr("transform", (d, i) => `translate(${x(i)}, ${chartSettings.dims.margin.top})`)
+                            .call(g => g.append("text").classed('year-label', true).text(d => d))
+                            .call(g => g.append("line").attr("y1", 3).attr("y2", 9).attr("stroke", "currentColor"));
+                }
+                if(chartSettings.labels.date.bottom){
+                    chartGroup.selectAll('g.year-labels-bottom')
+                        .data(chartDates)
+                        .join("g").classed('year-labels-bottom', true)
+                            .attr("transform", (d, i) => `translate(${x(i)}, ${chartSettings.dims.height})`)
+                            .call(g => g.append("text").classed('year-label', true).text(d => d))
+                            .call(g => g.append("line").attr("y1", -13).attr("y2", -19).attr("stroke", "currentColor"));
+                }
+
+                // c. Chart slope path
+                chartGroup.selectAll('path')
+                    .data(chartData)
+                        .join('path')
+                        .attr('class', d => `${helpers.slugify(d.series)} slope-path `)
+                        .style('stroke-width', d => d.series !== 'Overall diversion' ? chartSettings.dims.labelSize / 16 : chartSettings.dims.labelSize / 8)
+                        .attr("d", d => line([d.fromValue, d.toValue]) )
+
+                // d. Add from year nodes
+                chartGroup.selectAll("circle.fromNode")
+                    .data(chartData)
+                        .join("circle")
+                        .attr('class', d => `${helpers.slugify(d.series)} fromNode node`)
+                        .attr("cx", x(0) )
+                        .attr("cy", d => y(d.fromValue) )
+                        .attr('r', d => d.series !== 'Overall diversion' ? chartSettings.dims.labelSize / 8 : chartSettings.dims.labelSize / 4)
+
+                // e. Add to year nodes
+                chartGroup.selectAll("circle.toNode")
+                    .data(chartData)
+                    .join("circle")
+                        .attr('class', d => `${helpers.slugify(d.series)} toNode node`)
+                        .attr("cx", x(1) )
+                        .attr("cy", d => y(d.toValue) )
+                        .attr('r', d => d.series !== 'Overall diversion' ? chartSettings.dims.labelSize / 8 : chartSettings.dims.labelSize / 4)
+
+                // f. Chart 'from' labels with spread applied
+                chartGroup.append('g').classed('fromLabel-group',true)
+                    .selectAll("g").classed('fromLabel',true)
+                    .data( () => {
+                        const labelPosArray = dodge(chartData.map(d => y(d.fromValue)),  chartSettings.dims.labelSize) 
+                        return chartData.map( (obj, i) => {
+                            obj.labelPos = labelPosArray[i]
+                            return obj
+                        })
+                    })
+                    .join("text")
+                        .attr("transform", (d, i) => `translate(${x(0) - chartSettings.dims.labelXPadding}, ${d.labelPos})`)
+                        .attr('class', d => `${helpers.slugify(d.series)} label from`)
+                        .style('font-size', chartSettings.dims.labelSize)
+                        .text( d => `${d.series} ${chartSettings.numberFormatter(d.fromValue)}`)    
+
+                // g. Chart 'to' labels with spread applied
+                chartGroup.append('g').classed('toLabel-group',true)
+                    .selectAll("g").classed('toLabel',true)
+                    .data( () => {
+                        const labelPosArray = dodge(chartData.map(d => y(d.toValue)) , chartSettings.dims.labelSize) 
+                        return chartData.map( (obj, i) => {
+                            obj.labelPos = labelPosArray[i]
+                            return obj
+                        })
+                    })
+                    .join("text")
+                    .attr("transform", (d, i) => `translate( ${x(1) + chartSettings.dims.labelXPadding}, ${d.labelPos} )`)
+                        .attr('class', d => `${helpers.slugify(d.series)} ${d.fromValue === d.toValue ? 'neutral' : (d.toValue > d.fromValue && chartSettings.labels.positiveDirection === 'up') ? 'positive' : 'negative'} label to`)
+                        .style('font-size', chartSettings.dims.labelSize)
+                        .text( d => `${chartSettings.numberFormatter(d.toValue)} ${d.series} `)    
+
+            // Label spread algorithm (c/o Mike Bostock)
+            function dodge(positions, separation = 10, maxiter = 10, maxerror = 1e-1) {
+                    positions = Array.from(positions);
+                    let n = positions.length;
+                    if (!positions.every(isFinite)) throw new Error("invalid position");
+                    if (!(n > 1)) return positions;
+                    let index = d3.range(positions.length);
+                    for (let iter = 0; iter < maxiter; ++iter) {
+                        index.sort((i, j) => d3.ascending(positions[i], positions[j]));
+                        let error = 0;
+                        for (let i = 1; i < n; ++i) {
+                            let delta = positions[index[i]] - positions[index[i - 1]];
+                            if (delta < separation) {
+                                delta = (separation - delta) / 2;
+                                error = Math.max(error, delta);
+                                positions[index[i - 1]] -= delta;
+                                positions[index[i]] += delta;
+                            }
+                        }
+                        if (error < maxerror) break;
+                    }
+                    return positions;
+                }
+        }; // end renderSlopeChart()
+
+
+        function renderAnnotation(settings){
+            const svg = d3.select(`#${settings.svgID}`)
+            const annotation = svg.append('g').attr('id', 'annotation-layer')
+            // Main visualisaiton title
+            annotation.append('text')
+                .classed('main-title', true)
+                .attr('transform', `translate(${settings.dims.margin.left}, ${settings.dims.margin.top} )`)
+                .text('Comparing performance to a year ago')
+
+        }; // end renderAnnotation
+
+        ////////////////////////////////
+        /// X. HELPER FUNCTIONS      ///
+        ////////////////////////////////
+
+        const helpers= {
+            numberFormatters: {
+                formatComma:           	d3.format(",.0f"),
+                formatComma1dec:       	d3.format(",.1f"),
+                formatComma2dec:       	d3.format(",.2f"),
+                formatInteger:         	d3.format(".0f"),   
+                formatCostInteger:     	d3.format("$,.0f"),  
+                formatCost1dec:        	d3.format("$,.1f"),  
+                formatCost2dec:        	d3.format("$,.2f"),  
+                formatPct:          	d3.format(".0%"), 
+                formatPct1dec:          d3.format(".1%")  
+            },
+            numberParsers: {
+                parseDateSlash: d3.timeParse("%d/%m/%Y")
+            },
+            slugify: function (str) {
+                str = str.replace(/^\s+|\s+$/g, '').toLowerCase(); // trim           
+                const from = "àáäâèéëêìíïîòóöôùúüûñç·/_,:;",      // remove accents, swap ñ for n, etc
+                    to   = "aaaaeeeeiiiioooouuuunc------"
+                for (var i=0, l=from.length ; i<l ; i++) {
+                    str = str.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
+                }
+                str = str.replace(/[^a-z0-9 -]/g, '') // remove invalid chars
+                    .replace(/\s+/g, '-') // collapse whitespace and replace by -
+                    .replace(/-+/g, '-'); // collapse dashes
+                return str;
+            }, 
+            wrap: function(text, width, lineHeight, centerVertical = false) {
+                text.each(function() {
+                    let text = d3.select(this),
+                        words = text.text().split(/\s+/).reverse(),
+                        word,
+                        line = [],
+                        lineNumber = 0,
+                        y = text.attr("y"),
+                        x = text.attr("x"),
+                        fontSize = parseFloat(text.style("font-size")),
+                        dy = parseFloat(text.attr("dy")),
+                        tspan = text.text(null).append("tspan").attr("x", x).attr("y", y).attr("dy", dy + "em");
+
+                    while (word = words.pop()) {
+                        line.push(word);
+                        tspan.text(line.join(" "));
+
+                        if (tspan.node().getComputedTextLength() > width) {
+                            line.pop();
+                            tspan.text(line.join(" "));
+                            line = [word];
+                            tspan = text.append("tspan")
+                                .attr("x", x)
+                                .attr("y",  y)
+                                .attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+                        }                    
+                    }            
+                    if(centerVertical){
+                        text.style("transform",  "translateY(-"+(10 * (lineNumber))+"px)")
+                    }
+                })
+            }
+        }
+
+    </script>
+</html>
+

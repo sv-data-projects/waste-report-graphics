@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Victorian waste flows by materials">
+    <meta name="author" content="Sustainability Victoria">
+    <meta name="description" content="">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        /* COLOUR PALETTES | MID-2021 BRAND STYLE GUIDE*/
+        :root {
+            /** PRIMARY SV GREEN AND SECONDARY PALLETTE **/
+            --svGreen:                      #9ACA3C;
+            /** SECONDARY PALLETTE **/
+            --secondaryGreenLight:          #D5E0A1;
+            --secondaryBottleGreen:         #174F37;
+            --secondaryBottleGreenLight:    #79B5AA;
+            --secondaryGrey:                #B1B1B0;
+            --secondaryGreyLight:           #CFCFCF;
+            --secondaryGreyLightest:        #ECECEC;
+            /** TERTIARY PALETTE **/
+            --tertiaryPurple:               #51284F;
+            --tertiaryPurpleLight:          #8276B3;
+            --tertiaryRed:                  #E04F39;
+            --tertiaryRedLight:             #F78684;
+            --tertiaryYellow:               #EFC041;
+            --tertiaryYellowLight:          #F5E065;
+            --tertiaryCard:                 #B39981;
+            --tertiaryCardLight:            #DCBFA6;
+            --tertiaryEmerald:              #009E71;
+            --tertiaryEmeraldLight:         #93CCB9;
+            --tertiaryBlue:                 #005E88;
+            --tertiaryBlueLight:            #A0D6E9;
+            /*** EXTENDED PALETTE  ***/
+            --xLightestPurple:              #A59DC8;     
+            --xOrange:                      #feb076;     
+            --xLime:                        #BBCC66;     
+            --xGreen:                       #66CCAC;     
+            --xBlueCyan:                    #94E1EC;     
+            --xMidBlue:                     #48B5EB;     
+            --xMagenta:                     #d780c3;     
+            --xCharcoal:                    #36454F; 
+            --xDarkOrange:                  #863F13; 
+            --xDarkLime:                    #77862D;     
+            --xDarkYellow:                  #A57A0E; 
+            --xDarkCard:                    #6F5843; 
+            --xDarkBlueCyan:                #177283; 
+            --xDarkMagenta:                 #73264C; 
+            --darkGrey:                     rgb(100, 100, 100);
+        }
+
+        /***************************************/
+        /*** IMPORTED FONTS  | ALL WEIGHTS  ***/
+        /***************************************/
+
+        @font-face {
+            font-family: 'DIN Next LT Pro';
+            src: local('DIN Next LT Pro Bold'), local('DIN-Next-LT-Pro-Bold'),
+                url('fonts/DINNextLTPro-Light.woff2') format('woff2'),
+                url('fonts/DINNextLTPro-Light.woff') format('woff'),
+                url('fonts/DINNextLTPro-Light.ttf') format('truetype');
+            font-weight: 300;
+            font-style: light;
+        }
+        @font-face {
+            font-family: 'DIN Next LT Pro';
+            src: local('DIN Next LT Pro Regular'), local('DIN-Next-LT-Pro-Regular'),
+                url('fonts/DINNextLTPro-Regular.woff2') format('woff2'),
+                url('fonts/DINNextLTPro-Regular.woff') format('woff'),
+                url('fonts/DINNextLTPro-Regular.ttf') format('truetype');
+            font-weight: 400;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'DIN Next LT Pro';
+            src: local('DIN Next LT Pro Medium'), local('DIN-Next-LT-Pro-Medium'),
+                url('fonts/DINNextLTPro-Medium.woff2') format('woff2'),
+                url('fonts/DINNextLTPro-Medium.woff') format('woff'),
+                url('fonts/DINNextLTPro-Medium.ttf') format('truetype');
+            font-weight: 500;
+            font-style: medium;
+        }
+        @font-face {
+            font-family: 'DIN Next LT Pro';
+            src: local('DIN Next LT Pro Heavy'), local('DIN-Next-LT-Pro-Heavy'),
+                url('fonts/DINNextLTPro-Heavy.woff2') format('woff2'),
+                url('fonts/DINNextLTPro-Heavy.woff') format('woff'),
+                url('fonts/DINNextLTPro-Heavy.ttf') format('truetype');
+            font-weight: 800;
+            font-style: heavy;
+        }
+
+        /*******************************************/
+        /*** CUSTOM SANKEY VISUALISATION STYLING ***/
+        /*******************************************/
+        body{
+            font-family: 'DIN Next LT Pro';
+            margin: 0;
+        }
+        .main-title,
+        .main-subtitle{
+            fill: #000;
+            dominant-baseline: 'hanging';
+        }
+        .main-title{
+            font-size: 30px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        .main-subtitle{
+            font-size: 14px;
+            font-weight: 400;
+        }
+
+        /************************/
+        /*** MATERIAL COLOURS ***/
+        /************************/
+        .material-icon, 
+        .material-label, 
+        rect.destination,
+        rect.product,
+        .material-data.data-label{
+            fill: #fff
+        }
+        .material-background{
+            fill-opacity: 0.2;
+            stroke-width: 1px;
+        }
+        rect.paper-and-cardboard.material,
+        path.paper-and-cardboard.landfill-icon,
+        path.paper-and-cardboard.donut-arc.diversion,
+        text.paper-and-cardboard.donut-diversion-pct{
+            fill: var(--xBlueCyan);
+        }
+        rect.paper-and-cardboard,
+        path.flow-link.paper-and-cardboard{
+            stroke: var(--xBlueCyan );
+        }
+        .material-icon.paper-and-cardboard,
+        .material-data.data-label.paper-and-cardboard,
+        .material-label.paper-and-cardboard{
+            fill: var(--xDarkBlueCyan);
+        }
+        rect.plastics.material,
+        path.plastics.landfill-icon,
+        path.plastics.donut-arc.diversion,
+        text.plastics.donut-diversion-pct{
+            fill: var(--tertiaryYellow);
+        }
+        rect.plastics,
+        path.flow-link.plastics{
+            stroke: var(--tertiaryYellow);
+        }
+        .material-icon.plastics,
+        .material-data.data-label.plastics,
+        .material-label.plastics{
+            fill: var(--xDarkYellow);
+        }
+
+        rect.metals.material,
+        path.metals.landfill-icon,
+        path.metals.donut-arc.diversion,
+        text.metals.donut-diversion-pct{
+            fill: var(--xMidBlue);
+        }
+        rect.metals,
+        path.flow-link.metals{
+            stroke: var(--xMidBlue);
+        }
+        .material-icon.metals,
+        .material-data.data-label.metals,
+        .material-label.metals{
+            fill: var(--tertiaryBlue);
+        }
+
+        rect.glass.material,
+        path.glass.landfill-icon,
+        path.glass.donut-arc.diversion,
+        text.glass.donut-diversion-pct{
+            fill: var(--xLightestPurple)
+        }
+        rect.glass,
+        path.flow-link.glass{
+            stroke: var(--xLightestPurple)
+        }
+        .material-icon.glass,
+        .material-data.data-label.glass,
+        .material-label.glass{
+            fill: var(--tertiaryPurple);
+        }
+
+        rect.organics.material,
+        path.organics.landfill-icon,
+        path.organics.donut-arc.diversion,
+        text.organics.donut-diversion-pct{
+            fill: var(--xGreen);
+        }
+        rect.organics,
+        path.flow-link.organics{
+            stroke: var(--xGreen);
+        }
+        .material-icon.organics,
+        .material-data.data-label.organics,
+        .material-label.organics{
+            fill: var(--tertiaryEmerald);
+        }
+
+        rect.aggregates-masonry-and-soil.material,
+        path.aggregates-masonry-and-soil.landfill-icon,
+        path.aggregates-masonry-and-soil.donut-arc.diversion,
+        text.aggregates-masonry-and-soil.donut-diversion-pct{
+            fill: var(--tertiaryRedLight);
+        }
+        rect.aggregates-masonry-and-soil,
+        path.flow-link.aggregates-masonry-and-soil{
+            stroke: var(--tertiaryRedLight);
+        }
+        .material-icon.aggregates-masonry-and-soil,
+        .material-data.data-label.aggregates-masonry-and-soil,
+        .material-label.aggregates-masonry-and-soil{
+            fill: var(--tertiaryRed);
+        }
+
+        rect.rubber.material,
+        path.rubber.landfill-icon,
+        path.rubber.donut-arc.diversion,
+        text.rubber.donut-diversion-pct{
+            fill: var(--xMagenta);
+        }
+        rect.rubber,
+        path.flow-link.rubber{
+            stroke: var(--xMagenta);
+        }
+        .material-icon.rubber,
+        .material-data.data-label.rubber,
+        .material-label.rubber{
+            fill: var(--xDarkMagenta);
+        }
+        .product-label,
+        .destination-label,
+        .material-label{
+            font-size: 12px;
+            font-weight: 500;
+            dominant-baseline: hanging;
+        }
+        .product-label,
+        .destination-label{
+            fill: var(--darkGrey)
+        }
+        .product-label,
+        .data-label.product-data{
+            text-anchor: middle;
+        }
+        .material-label{
+            font-size: 12px;
+        }
+        .material-data.data-label{
+            font-weight: 500;
+        }
+        .data-label{
+            font-size: 10px;
+            fill: rgba(0, 0, 0, 0.5);
+            dominant-baseline: hanging;
+        }
+        .flow-link{
+            fill:   none;
+        }
+        .donut-arc{
+            stroke: #fff;
+            stroke-width: 0.5px;
+            fill: var(--secondaryGreyLightest);
+        }
+        .donut-diversion-pct{
+            font-size: 10px;
+            font-weight: 500;
+            text-anchor: middle;
+            dominant-baseline: middle;
+        }
+    </style>
+</head>
+
+<body>
+    <div id = "vis-container">
+        <svg id ="flow-vis"></svg>
+    </div>
+
+    <script>
+        ////////////////////////////////////////////////////////////////////////////////
+        /// 0. BUILD SEQUENCE: INIT SETTINGS AND DATA OBJECTS AND LOADING => RENDER  ///
+        ////////////////////////////////////////////////////////////////////////////////
+
+        // Instantiate settings and data objects
+        const settings = { 
+            svgID:                  'flow-vis',
+            year:                   '2019-20',
+            dims: {
+                width:              780,
+                height:             1080,
+                margin: {
+                    top:            100,
+                    bottom:         10,
+                    left:           40,
+                    right:          40
+                }
+            },
+            geometry: {            
+                yGap:               10,
+                container: {
+                    width:          150
+                },
+                 nodePos:           {}
+            },           
+        }
+
+        const data = {
+            table:      {},
+            byType: {
+                material:           {},     
+                destination:        {},
+                product:            {}
+            },
+            list: {},
+            inputData: {}
+        }
+
+        // Call build function
+        buildFromGSheetData(settings)
+
+        // Load data from TSV files from GSheet
+        function buildFromGSheetData(settings) {
+            // 1. Specify data table links for each table used (tsv published output from each separate sheet/table)
+            const gsTableLinks =   {
+                byMaterialFlow:    'https://docs.google.com/spreadsheets/d/e/2PACX-1vSimVJWCqYLTijgqeU-SPGdAFT6wpGprHgjPdpxEElWurVvl28JYr7dHGE3OCSjF4VYH2_QggJUnveO/pub?gid=272100684&single=true&output=tsv',
+            }
+
+            // 2. Asynchronous data load (with Promise.all) and D3 (Fetch API) 
+            Promise.all(
+                Object.values(gsTableLinks).map(link => d3.tsv(link))       // Pass in array of d3.tsv loaders with each link
+            ).then( rawData => {
+                // a. Parse each loaded data table and store in data.tables object, using the parseTable helper 
+                rawData.forEach((tableData, i) => {  parseTable(Object.keys(gsTableLinks)[i], tableData) })
+                return data
+            }).then( async (data) => {
+                // 3. Initiate vis build sequence with data now loaded
+                await applyQuerySettings(settings)              // a. Update settings if a query string is passed in
+                await transformData(data.table.byMaterialFlow)      // b. Parse data
+                await renderVis()                               // c. Render visualisation(s)
+            })
+
+            // X. Table data parsing function: trim() header white space and prase numbers with "$" and "," stripped. 
+            const parseTable = (tableName, tableData) => {
+                data.table[tableName] = tableData.map(row => {
+                    const newObj = {}
+                    Object.entries(row).forEach(([key, value]) => {
+                        switch(key.trim().toLowerCase()){
+                            case 'year':
+                                newObj[key.trim()] =  value
+                                break     
+                            default:
+                                newObj[key.trim()] = isNaN(parseFloat(value.replace(/\$|,/g, ''))) ? value : parseFloat(value.replace(/\$|,/g, '')) 
+                        }
+                    })
+                    return newObj
+                })
+            };                 
+        };
+
+
+        ////////////////////////////////////
+        // 1. PARSE AND WRANGLE DATA     ///
+        ////////////////////////////////////
+
+        async function applyQuerySettings(settings){
+            // i. Check for query parameters and update material. A date set by the query selector is set while parsing input data 
+            settings.queryParameters = new URLSearchParams(window.location.search)
+            if (settings.queryParameters.has('year')) { 
+                settings.year = settings.queryParameters.get('year')  
+            }
+        };
+
+        async function transformData(materialData) {
+            // 1. Extract lists 
+            materialData = materialData.filter(d => d.year === settings.year && d.sankey.toLowerCase() === 'yes')
+
+            // 2. Extract lists 
+            data.list.material = [...new Set(materialData.filter(d => d.level ===1).map(d => d.source))]
+            data.list.destination = [...new Set(materialData.filter(d => d.level ===1).map(d => d.target))]
+            data.list.product = [...new Set(materialData.filter(d => d.level ===2).map(d => d.target))]
+            data.list.year = [...new Set(materialData.map(d => d.year))]
+
+            // 3a. Shape data by type:  Material > destination > end products
+            data.list.material.forEach( material => {                           // For each unique material...
+                data.byType.material[material] = {value: 0}
+                materialData
+                    .filter(d => d.level ===1 && d.source === material)         // Filter for level 1 (first material > destination) and match the material  
+                    .forEach( d => {
+                        data.byType.material[material].value += d.value         // Sum the value of output flows
+                        data.byType.material[material].class = `${helpers.slugify(d.materialClass)} material`         // Assign the specified (material) class
+                    })
+                // Add the diversion rates per material
+                materialData
+                    .filter(d => d.level ===1 && d.source === material)         // Filter for level 1 (first material > destination) and match the material  
+                    .forEach( d => {
+                        if(d.targetClass === 'recovered'){
+                            data.byType.material[material].diversion = d.value  / data.byType.material[material].value      
+                        }
+                    })
+            })
+
+            // 3b. Shape data by type:  Destination
+            data.list.destination.forEach( destination => {                     // For each unique destination...
+                materialData
+                    .filter(d => d.level === 1 && d.target === destination)      // Filter for level 1 (first material > destination) and match the destination   
+                    .forEach( d => data.byType.destination[destination] = {
+                            value: d.value,                                     // Assign the value of the input flow
+                            class:`${helpers.slugify(d.materialClass)} ${helpers.slugify(d.targetClass)} destination`,         // Assign the specified (material and target) class
+                            material: d.source,
+                            type: d.targetClass,
+                            materialClass: helpers.slugify(d.materialClass)
+                        } 
+                    )
+            })
+
+            // 3c. Shape data by type: End products
+            data.list.product.forEach( product => {                             // For each unique (end) product...
+                materialData
+                    .filter(d => d.level ===2 && d.target === product)          // Filter for level 2 (destination > end product) and match the destination  
+                    .forEach( d => data.byType.product[product] = {
+                            value: d.value,                                     // Assign the value of the input flow
+                            class:`${helpers.slugify(d.materialClass)} ${helpers.slugify(d.targetClass)} product`         // Assign the specified (material and target) class
+                        }
+                    )
+            })
+
+            // 4. Store material data
+            data.inputData.material = materialData
+        };
+
+
+        ////////////////////////////////////////
+        // 2. RENDER THE FLOW VISUALISATION  ///
+        ////////////////////////////////////////
+
+        async function renderVis(){
+            // 0. SETUP GEOMETRY FROM DATA
+            const visWidth = settings.dims.width - settings.dims.margin.left - settings.dims.margin.right,
+                visHeight = settings.dims.height - settings.dims.margin.top - settings.dims.margin.bottom
+            // Setup x position for each group of boxes
+            settings.geometry.materialX      = settings.dims.margin.left 
+            settings.geometry.destinationX   = settings.dims.margin.left +  visWidth / 2 - settings.geometry.container.width/2
+            settings.geometry.productX       = settings.dims.margin.left +  visWidth - settings.geometry.container.width
+            // Setup y positions of end product: the number of end products (and their heights + gaps) are used to scale the boxes
+            const noEndProducts = data.list.product.length
+            settings.geometry.container.height = (visHeight - (noEndProducts -1) * settings.geometry.yGap) / noEndProducts
+            // Manually assign vertical position of material and destination by 'index': these are relative positions to the 18 end product boxes (i.e. think rungs on a ladder from 0(top) to 18 (bottom)
+            const materialIndex = [1, 3.5, 5.5, 7.5, 9.5, 12, 15]
+            const destinationIndex = [0.5, 1.5, 3, 4, 5, 6, 7, 8, 9, 10, 11.5, 12.5, 14.5, 15.5]
+            // Material icons
+            const icons = {         //
+                'Aggregates, masonry and soil': 'M4.348 5.885c-2.614 0-3.923 3.161-2.074 5.01 1.848 1.848 5.009.54 5.009-2.075a2.934 2.934 0 00-2.935-2.935zm0 4.23c-1.154 0-1.731-1.395-.915-2.211.815-.816 2.21-.238 2.21.916 0 .715-.58 1.295-1.295 1.295zm12.336 6.902c.008-2.624-3.162-3.945-5.02-2.092-1.858 1.852-.546 5.026 2.078 5.026a2.934 2.934 0 002.942-2.934zm-4.237 0c-.008-1.166 1.4-1.754 2.225-.93.823.824.235 2.232-.93 2.225-.715 0-1.295-.58-1.295-1.295zm-17.656-3.28a.82.82 0 011.4-.579.82.82 0 11-1.4.58zm5.189 1.165a.82.82 0 011.399-.58.82.82 0 11-1.4.58zm6.13 5.049a.82.82 0 01-.579-1.4.82.82 0 11.58 1.4zm2.394-4.984a.82.82 0 01-.58-1.399.82.82 0 11.58 1.4zm-11.098 2.46a.82.82 0 01.58 1.399.82.82 0 11-.58-1.4zM24.76 20.59L8.086 3.915a5.738 5.738 0 00-8.102 0l-.257.256c-.063-.43-.14-.86-.245-1.281l-.11-.44a1.478 1.478 0 00-1.789-1.074l-3.206.8-4.262-17.092A9.01 9.01 0 00-6.5-18.317a2.47 2.47 0 00.118-2.192 2.439 2.439 0 00-1.642-1.411 2.505 2.505 0 00-2.78 1.222 4.102 4.102 0 01-5.753 1.435 2.504 2.504 0 00-3.029.225 2.435 2.435 0 00-.788 2.017 2.47 2.47 0 001.133 1.88 9.003 9.003 0 004.583 1.408l4.263 17.099-3.207.8a1.475 1.475 0 00-1.075 1.788l.11.44A13.098 13.099 0 00-13.22 9.74a5.201 5.201 0 00-1.896 1.206l-9.644 9.644a.82.82 0 00.58 1.399h48.36a.82.82 0 00.58-1.4zM-18.741-17.16a.797.797 0 01.26-.668.866.866 0 011.042-.053 5.74 5.74 0 008.06-2.01.853.853 0 01.944-.442.796.796 0 01.545.468.838.838 0 01-.042.746 7.381 7.381 0 01-10.423 2.599.84.84 0 01-.386-.64zm5.748 3.33c.27-.041.54-.082.808-.149.266-.066.527-.15.784-.24l4.187 16.79-1.59.397zm.015 19.826l-.07-.28 10.87-2.71.07.28a11.503 11.504 0 01.328 2.39l-3.73 3.729-.77-3.088a.82.82 0 00-1.592.397l1.009 4.043-.516.516-.329-.328a5.22 5.22 0 00-3.783-1.528 11.463 11.464 0 01-1.487-3.42zm-.979 6.108a3.604 3.604 0 015.09 0l.328.328-7.92 7.917h-5.743zm-.184 8.245L1.143 5.073a4.097 4.097 0 015.784.001L22.202 20.35z',
+                'Glass':                        'M7.292 20.833H-3.125a1.041 1.041 0 01-1.042-1.041V-3.125a1.041 1.041 0 011.042-1.042H7.208a1.04 1.04 0 01.737.305 1.338 1.338 0 01.388.82v22.834a1.041 1.041 0 01-1.041 1.041zm-9.375-2.083H6.25V-2.083h-8.333zm4.166-37.5h-4.166a1.042 1.042 0 010-2.083h4.166a1.042 1.042 0 010 2.083zM5.134 25h-9.779a3.693 3.693 0 01-3.688-3.689V-2.083a10.398 10.398 0 012.725-5.699 29.42 29.42 0 002.386-3.433l.097-.162v-10.816c0-2.605 1.546-2.807 2.02-2.807h2.21a2.023 2.023 0 012.02 2.02v11.624l.226.374a24.995 24.995 0 002.46 3.357A9.369 9.369 0 018.24-3.27a6.513 6.513 0 01.093 1.187V21.8A3.203 3.203 0 015.134 25zM-1.01-22.92c.025.065-.032.288-.032.727v11.106a1.047 1.047 0 01-.15.538l-.246.41a31.309 31.309 0 01-2.557 3.675 8.426 8.426 0 00-2.255 4.38v23.395a1.607 1.607 0 001.605 1.606h9.78A1.117 1.117 0 006.25 21.8V-2.083a4.655 4.655 0 00-.065-.849A7.868 7.868 0 004.23-6.268a27.113 27.113 0 01-2.661-3.636l-.377-.622a1.039 1.039 0 01-.15-.539V-22.98z',
+                'Organics':                     'M24.693-19.657a1.337 1.337 0 00-.948-.483 83.169 83.169 0 00-4.71-.117c-15.562 0-21.91 3.082-24.496 5.668C-11.4-8.652-10.327-.008-9.81 2.69a40.338 40.338 0 00-2.227 3.037 23.104 23.104 0 01-1.711-1.71 5.294 5.294 0 001.983-2.616c1.165-3.316-.7-7.518-1.85-9.276-1.257-1.923-1.535-6.977-1.535-8.763a1.338 1.338 0 00-2.19-1.033c-6.961 5.733-8.963 14.066-6.876 18.81 1.204 2.736 3.343 4.243 6.021 4.243.733 0 1.38-.114 1.876-.24a25.112 25.112 0 002.859 2.904c-3.35 5.946-3.721 10.486-3.745 10.834a1.336 1.336 0 001.337 1.426 1.34 1.34 0 001.333-1.242c.003-.036.298-3.716 2.894-8.702A36.17 36.17 0 01-7.883 4.62c2.387.435 4.698.668 6.87.668 22.703 0 25.972-23.684 26.002-23.923a1.328 1.328 0 00-.296-1.021zM-18.194 2.707c-1.62 0-2.788-.866-3.571-2.646-1.733-3.94.543-9.694 4.077-13.676.197 2.336.675 5.433 1.834 7.206 1.005 1.538 2.32 4.777 1.564 6.923a2.649 2.649 0 01-1.11 1.392c-.78-1.164-1.442-2.474-1.74-3.86a1.337 1.337 0 10-2.618.565c.317 1.472.938 2.85 1.687 4.09-.041.002-.08.006-.123.006zM18.35-8.121C13.26.283 5.065 3.807-5.848 2.247-3.098-.72.57-3.832 5.454-6.711a1.337 1.337 0 10-1.359-2.305C-.792-6.136-4.553-3.036-7.458.014c-.268-3.308 0-8.822 3.89-12.71 3.103-3.105 11.342-4.884 22.604-4.884 1.215 0 2.256.022 3.032.047-.431 1.974-1.47 5.7-3.718 9.412z',
+                'Plastics':                     'M-3.906-25a1.944 1.944 0 00-1.94 1.939v3.854c0 .61.332 1.1.774 1.454l-5.183 4.622a.928.928 0 00-.308.69v5.674c0 1.238.666 2.28 1.606 2.948-.952.813-1.607 1.974-1.607 3.321 0 1.461.766 2.703 1.86 3.511-1.093.808-1.86 2.049-1.86 3.509s.766 2.703 1.86 3.51c-1.094.809-1.86 2.051-1.86 3.512 0 1.46.767 2.7 1.86 3.508-1.094.809-1.86 2.05-1.86 3.511A4.446 4.446 0 00-6.127 25H6.126a4.446 4.446 0 004.437-4.437c0-1.46-.765-2.702-1.86-3.51 1.094-.809 1.86-2.05 1.86-3.51s-.766-2.702-1.86-3.51c1.094-.808 1.86-2.05 1.86-3.511 0-1.46-.766-2.7-1.86-3.509 1.095-.808 1.86-2.05 1.86-3.51 0-1.348-.655-2.509-1.607-3.322.94-.668 1.607-1.71 1.607-2.948v-5.673a.928.928 0 00-.309-.69l-5.183-4.623c.442-.354.774-.845.774-1.454v-3.854A1.944 1.944 0 003.906-25zm0 1.852h7.812c.05 0 .087.036.087.087v3.854c0 .05-.036.089-.087.089h-7.812a.085.085 0 01-.087-.09v-3.853c0-.051.036-.087.087-.087zm1.074 5.881h5.664l5.88 5.242v5.258c0 1.013-.82 1.833-1.833 1.833H-6.88a1.832 1.832 0 01-1.833-1.833v-5.258zM-6.127-3.083H6.126a2.585 2.585 0 110 5.17H-6.127a2.585 2.585 0 110-5.17zm0 7.022H6.126a2.583 2.583 0 110 5.168H-6.127a2.585 2.585 0 110-5.168zm0 7.02H6.126a2.585 2.585 0 110 5.168H-6.127a2.583 2.583 0 110-5.168zm0 7.02H6.126a2.585 2.585 0 110 5.17H-6.127a2.585 2.585 0 110-5.17z',
+                'Metals':                       'M-9.375-9.943c0 .471.38.852.852.852H8.523a.851.851 0 100-1.704H-8.523a.851.851 0 00-.852.852zm17.898-8.239H3.835l1.137-3.977C5.415-23.66 4.83-25 3.267-25H1.96c-1.562 0-2.528.568-3.096 2.273l-1.705 4.545h-5.682c0 2.273-3.977 6.25-3.977 6.25v31.818S-9.09 23.011-9.09 25H9.09c0-1.989 3.41-5.114 3.41-5.114v-31.818s-3.977-4.04-3.977-6.25zM2.13-23.295c1.704 0 1.136 1.136.568 2.272H-.142c.568-1.704 1.136-2.272 2.273-2.272zM.994-19.318c.762 0 1.233.477 1.279 1.136h-3.551c.431-.659 1.511-1.136 2.272-1.136zm6.404 42.045H-7.398l-1.693-2.272H9.091c-.551.693-1.313 1.465-1.693 2.272zm-17.625-3.409v-30.682c1.136-1.136 2.84-2.84 3.409-4.545H6.818c.568 1.704 2.313 3.358 3.41 4.545v30.682L9.09 18.75H-9.091z',
+                'Paper and cardboard':          'M-.281-12.63H6.98c.563 0 1.023-.46 1.023-1.023s-.46-1.023-1.023-1.023H-.28c-.563 0-1.023.46-1.023 1.023 0 .562.41 1.022 1.023 1.022zm0-3.631H6.98c.563 0 1.023-.46 1.023-1.023s-.46-1.023-1.023-1.023H-.28c-.563 0-1.023.46-1.023 1.023 0 .562.41 1.023 1.023 1.023zM5.753 7.824c0-.563-.46-1.023-1.023-1.023h-20.096c-.563 0-1.023.46-1.023 1.023 0 .562.46 1.023 1.023 1.023H4.73c.563 0 1.023-.46 1.023-1.023zm-21.12-3.17H4.73c.563 0 1.023-.46 1.023-1.023s-.46-1.023-1.023-1.023h-20.096c-.563 0-1.023.46-1.023 1.023 0 .562.46 1.022 1.023 1.022zm0-4.194H4.73C5.293.46 5.753 0 5.753-.562c0-.563-.46-1.023-1.023-1.023h-20.096c-.563 0-1.023.46-1.023 1.023 0 .562.46 1.022 1.023 1.022zm0-4.193H4.73c.563 0 1.023-.46 1.023-1.023 0-.562-.46-1.022-1.023-1.022h-20.096c-.563 0-1.023.46-1.023 1.022 0 .563.46 1.023 1.023 1.023zm0-4.193h8.08c.563 0 1.023-.46 1.023-1.023v-8.08c0-.562-.46-1.022-1.023-1.022h-8.08c-.562 0-1.022.46-1.022 1.023v8.08c0 .562.46 1.022 1.023 1.022zm1.023-8.08h6.034v6.034h-6.034zm1.79 38.506h31.807c.562 0 1.023-.46 1.023-1.023v-37.38c0-.563-.46-1.023-1.023-1.023h-5.727v-4.551c0-.563-.46-1.023-1.023-1.023h-31.756c-.562 0-1.023.46-1.023 1.023v37.38c0 .563.46 1.023 1.023 1.023h5.676v4.551c0 .563.41 1.023 1.023 1.023zM18.18-14.88v35.335h-29.71v-3.529h24.085c.563 0 1.023-.46 1.023-1.023V-14.88zm-36.409-5.575h29.761v35.336H-18.23z',
+                'Rubber':                       'M0-25c-13.79 0-25 11.21-25 25s11.21 25 25 25S25 13.79 25 0 13.79-25 0-25zm0 48.263C-12.79 23.263-23.263 12.79-23.263 0c0-12.79 10.474-23.263 23.263-23.263 12.79 0 23.263 10.42 23.263 23.263C23.263 12.79 12.79 23.263 0 23.263zM0-17.42c-9.579 0-17.421 7.79-17.421 17.421 0 9.579 7.79 17.421 17.421 17.421 9.579 0 17.421-7.79 17.421-17.421C17.421-9.579 9.58-17.421 0-17.421zm0 33.053c-8.632 0-15.632-7-15.632-15.632s7-15.632 15.632-15.632S15.632-8.632 15.632 0 8.632 15.632 0 15.632zm0-30.21c-8.053 0-14.579 6.525-14.579 14.578 0 8.053 6.526 14.579 14.579 14.579S14.579 8.053 14.579 0 8.053-14.579 0-14.579zm0 27.42c-7.053 0-12.842-5.737-12.842-12.842 0-7.053 5.737-12.842 12.842-12.842 7.053 0 12.842 5.737 12.842 12.842 0 7.053-5.79 12.842-12.842 12.842z',
+                'Landfill':                     'M15.323 2.42h1.612v1.612h-1.612zm8.064-14.517H25v1.613h-1.613zM8.871 10.483h1.613v1.614H8.87zm14.28-8.634l-1.14 1.14.472.473a3.11 3.11 0 01.904 2.183 3.11 3.11 0 01-.904 2.183l-.473.473 1.14 1.14.473-.472A4.732 4.732 0 0025 5.645a4.732 4.732 0 00-1.377-3.323zm-4.603-4.847c0 1.629.635 3.16 1.787 4.313l.869.868 1.14-1.14-.869-.87a4.457 4.457 0 01-1.314-3.171c0-1.405.671-2.747 1.795-3.59l1.109-.831-.968-1.29-1.11.83a6.13 6.13 0 00-2.439 4.88zm-1.431-6.01l1.109-.83-.968-1.291-1.109.831a6.13 6.13 0 00-2.44 4.88c0 1.63.635 3.16 1.787 4.313l.87.87 1.14-1.14-.87-.87a4.46 4.46 0 01-1.313-3.173c0-1.405.67-2.747 1.794-3.59zm1.668-2.852l1.14 1.14.473-.473a4.667 4.667 0 001.376-3.323 4.667 4.667 0 00-1.376-3.324l-.473-.472-1.14 1.14.472.473c.583.583.904 1.359.904 2.183 0 .824-.32 1.6-.904 2.183zm-6.67-9.525a10.078 10.078 0 016.008-2.002c1.124 0 2.038.914 2.038 2.039a1.19 1.19 0 01-1.187 1.187 1.18 1.18 0 01-1.062-.657l-.255-.51-1.442.722.255.51a2.784 2.784 0 002.504 1.548c1.544 0 2.8-1.257 2.8-2.8A3.655 3.655 0 0018.123-25a11.7 11.7 0 00-6.976 2.325l-.34.256.967 1.29zm.15 7.799l-10.07.56a3.18 3.18 0 00-2.07 5.42l.918.919 1.14-1.14-.918-.919a1.567 1.567 0 011.02-2.67l10.07-.56a3.143 3.143 0 00.588-6.184 1.115 1.115 0 01-.846-1.084v-.917h-1.613v.917c0 1.255.85 2.344 2.068 2.649a1.528 1.528 0 01-.286 3.009zM-21.027-3.52a2.1 2.1 0 00-.747 1.598v.616A2.113 2.113 0 00-18.72.584l.17-.086v.308h1.614V.498l.17.085a2.113 2.113 0 003.056-1.888v-.616a2.113 2.113 0 00-2.112-2.111c-.068 0-.134.017-.2.023l-3.012-6.022 7.329-3.67 3.937 7.252a3.7 3.7 0 00-.77.825 5.314 5.314 0 00-3.96 2.351l-.27.407 1.341.894.271-.406a3.707 3.707 0 013.09-1.654h.499l.222-.446a2.102 2.102 0 011.89-1.167h.615v-1.613h-.616c-.295 0-.582.037-.86.102l-3.971-7.315a1.618 1.618 0 00-2.158-.678l-10.045 5.046a1.635 1.635 0 00-.726 2.186zm1.587 2.66c-.315.158-.721-.094-.721-.446v-.616c0-.352.406-.605.721-.446l.892.446v.616zm4.117-1.062v.616c0 .352-.404.605-.721.446l-.891-.446v-.616l.89-.446c.317-.159.722.094.722.446zm-5.152-7.387l2.638 5.276h-.711v.308l-.17-.085a2.114 2.114 0 00-.75-.2l-2.297-4.654zM2.504-2.865l1.443-.722a3.704 3.704 0 00-3.33-2.058H.458A3.7 3.7 0 00-2.61-7.258h-.616v1.613h.616A2.1 2.1 0 01-.722-4.478l.224.446H.616a2.1 2.1 0 011.888 1.167zM-7.258.806V-.806h-.138a6.272 6.272 0 00-4.464 1.849l1.14 1.14A4.669 4.669 0 01-7.396.806zm4.839 3.226h1.613v1.613H-2.42zm-8.065 1.613h1.613v1.613h-1.613zm3.226 14.516h1.613v1.613h-1.613zm6.452-6.451H.806v1.613H-.806zm-4.34-27.42c.325 0 .652-.077.944-.222l.17-.086v.308h1.613v-.308l.17.085a2.113 2.113 0 003.056-1.888v-.616a2.113 2.113 0 00-3.056-1.889l-.17.086v-.308h-1.613v.308l-.17-.085a2.113 2.113 0 00-3.056 1.888v.616c0 1.165.947 2.111 2.111 2.111zm3.618-3.173c.317-.157.722.094.722.446v.616c0 .352-.405.606-.722.446l-.891-.446v-.616zm-4.117.446c0-.352.407-.603.722-.446l.89.446v.616l-.89.446c-.316.159-.722-.094-.722-.446zM6.622 3.502l-.085.17 1.443.722.085-.171A7.68 7.68 0 008.87.806H7.258c0 .931-.22 1.863-.636 2.696zm4.49-5.334L11.7-4.07c.217-.829-.265-1.684-1.098-1.949l-1.115-.354a1.678 1.678 0 00-1.998.805L6.27-3.244C4.006-2.614 2.102-1.213.878.73L.7 1.015C.602.975.506.932.406.898L.255.848l-.511 1.529.151.05a4.343 4.343 0 012.663 2.51 3.673 3.673 0 003.426 2.321c.4 0 .792-.064 1.166-.189l1.065-.354a2.1 2.1 0 011.312 0l1.508.502.51-1.53-.152-.05.22-.629a8.662 8.662 0 00-.5-6.84zM7.706 5.184l-1.065.355A2.067 2.067 0 014.057 4.34a5.953 5.953 0 00-1.943-2.545l.13-.206C3.306-.097 4.997-1.29 7.006-1.769l.356-.084 1.555-2.964c.005-.009.04-.03.082-.017l1.141.356-.745 2.84.28.533a6.954 6.954 0 01.416 5.58l-.232.665a3.706 3.706 0 00-2.154.044zm.55 16.59h.616v-1.613h-.616c-1.42 0-2.696.79-3.33 2.06l1.442.72a2.099 2.099 0 011.888-1.167zm-6.543-1.613h1.041l.237-.236a4.67 4.67 0 013.324-1.377h.944v-1.613h-.944a6.27 6.27 0 00-4.216 1.613h-.386a5.057 5.057 0 00-4.914 3.837l1.565.39a3.447 3.447 0 013.35-2.614zm15.65 0h-.1c-.12-.113-.25-.213-.373-.322.083-.165.162-.33.24-.499l4.14-1.656-.6-1.498-2.766 1.107c.162-.54.291-1.09.393-1.645l2.972-1.19-.6-1.497-2.033.814 3.971-6.95-4.864 1.215-4.864-1.216 4.02 7.034-.022.265-1.79-1.79-1.14 1.14 2.612 2.612c-.06.25-.126.499-.2.746l-1.27-1.272-1.141 1.14 1.795 1.795c-.052.116-.102.233-.157.348a11.737 11.737 0 00-6.437-1.907H8.87v1.613h.277c2.726 0 5.29 1.062 7.217 2.99l.237.236h.76a5 5 0 013.694 1.613h-41.94a5.674 5.674 0 013.949-1.613h.333l.76-.759a2.963 2.963 0 013.364-.546l.827.414.722-1.443-.827-.413a4.568 4.568 0 00-1.004-.36 7.29 7.29 0 014.695-1.732h.807v-1.612h-.807c-.39 0-.779.033-1.162.084a6.512 6.512 0 013.136-3.395l-.722-1.443a8.172 8.172 0 00-1.913 1.34l-.367-.367A9.12 9.12 0 00-15.54 8.87h-1.783l.353-2.018a2.365 2.365 0 00-.526-1.93 2.515 2.515 0 00-1.934-.89h-.17c-1.07 0-2.019.659-2.362 1.642l-.327.937-.995.317C-24.31 7.255-25 8.179-25 9.226c0 1.116.78 2.08 1.897 2.347l.875.208a9.157 9.157 0 00.145 9.165l.53.884c-.44.361-.842.772-1.189 1.235L-24.194 25h48.08l-.584-1.167a6.607 6.607 0 00-5.94-3.672zm.38-10.459l1.588-.397-1.588 2.779-1.588-2.78zm-41.13-.476c0-.343.239-.648.593-.76l1.764-.562.592-1.697c.117-.337.454-.562.839-.562h.17c.276 0 .53.115.7.315.086.104.222.32.17.617l-.422 2.421-2.1 1.4-1.647-.393c-.388-.093-.658-.413-.658-.78zm2.688 10.89a7.536 7.536 0 01.192-8.062l.122-.183 2.082-1.387h2.765a7.507 7.507 0 015.306 2.198l.438.437a8.208 8.208 0 00-1.268 2.731 8.898 8.898 0 00-4 2.903 4.485 4.485 0 00-1.92 1.121l-.294.295a7.27 7.27 0 00-2.923.779z',
+            }
+
+            // 1. SPECIFY LAYOUT GROUPS: Layers appended in rendering order
+            const svg = d3.select(`#${settings.svgID}`).attr('viewBox', `0 0 ${settings.dims.width} ${settings.dims.height}`),
+                materialFlowsGroup = svg.append('g').classed('flow-group', true),
+                materialGroup = svg.append('g').classed('material-group', true),
+                destinationGroup = svg.append('g').classed('destination-group', true),
+                productGroup = svg.append('g').classed('product-group', true),
+                annotationGroup = svg.append('g').classed('annotation-group', true)
+
+            // 2. ADD MATERIALS BOXES: Done prior to links as box locations are used for link connector points
+            data.list.material.forEach( (material, i) => {
+                const yPosIndex = materialIndex[i],
+                    yPos = settings.dims.margin.top + yPosIndex * (settings.geometry.yGap + settings.geometry.container.height),
+                    xPos = settings.geometry.materialX,
+                    group =  materialGroup.append('g').classed('material-item-group', true).attr('transform', `translate(${xPos}, ${yPos})`)
+                // Record the node position to locate flow end points
+                settings.geometry.nodePos[material] = {
+                    x:  xPos + settings.geometry.container.width - settings.geometry.container.height/2, 
+                    y: yPos + settings.geometry.container.height / 2
+                }    
+
+                group.append('rect')
+                    .classed(`material-background-base`, true)
+                    .attr('width', settings.geometry.container.width)
+                    .attr('height', settings.geometry.container.height)
+                    .attr('rx', settings.geometry.container.height/2)
+                    .attr('ry', settings.geometry.container.height/2)
+                    .style('fill', '#fff')
+
+                group.append('rect')
+                    .classed(`material-background ${helpers.slugify(material)}  ${data.byType.material[material].class}`, true)
+                    .attr('width', settings.geometry.container.width)
+                    .attr('height', settings.geometry.container.height)
+                    .attr('rx', settings.geometry.container.height/2)
+                    .attr('ry', settings.geometry.container.height/2)
+
+                group.append('path')
+                    .classed(`material-icon ${helpers.slugify(material)} ${data.byType.material[material].class}`, true)
+                    .attr('d', icons[material])
+                    .style('transform', `translate(${settings.geometry.container.height/2}px, ${settings.geometry.container.height/2}px) scale(${settings.geometry.container.height / 50 * 0.7})`)
+
+                const label = group.append('g').attr('id', `label-group-${helpers.slugify(material)}`)
+                label.append('text')
+                    .attr('id', `material-label-${helpers.slugify(material)}`)
+                    .classed(`material-label ${helpers.slugify(material)} ${data.byType.material[material].class}`, true)
+                    .attr('x', settings.geometry.container.height * 1.15)
+                    .attr('y', 2)
+                    .attr('dy', 0)
+                    .text(material)
+                    .call(helpers.wrap, settings.geometry.container.width - settings.geometry.container.height * 1.25, 1)
+
+                label.append('text')
+                    .classed(`material-data data-label ${helpers.slugify(material)} ${data.byType.material[material].class}`, true)
+                    .attr('x', settings.geometry.container.height * 1.15)
+                    .attr('y', () => {
+                        const bbox = document.getElementById(`material-label-${helpers.slugify(material)}`).getBBox()
+                        return  4 + bbox.height
+                    })
+                    .text(`${helpers.numberFormatters.formatComma(data.byType.material[material].value)} tonnes`)
+
+                const labelBBox = document.getElementById(`label-group-${helpers.slugify(material)}`).getBBox()
+                label.style('transform', `translate(${-8}px, ${settings.geometry.container.height /2 - labelBBox.height/2}px)`)
+            })
+
+            data.list.destination.forEach( (destination, i) => {
+                const yPosIndex = destinationIndex[i],
+                    yPos = settings.dims.margin.top + yPosIndex * (settings.geometry.yGap + settings.geometry.container.height),
+                    xPos = settings.geometry.destinationX,
+                    group =  destinationGroup.append('g').classed('destination-item-group', true).attr('transform', `translate(${xPos}, ${yPos})`)
+                 // Record the node position to locate flow end points
+                settings.geometry.nodePos[destination] = {
+                    x: xPos + settings.geometry.container.width / 2 , 
+                    y: yPos + settings.geometry.container.height / 2
+                }    
+                group.append('rect')
+                    .classed(`destination-background ${helpers.slugify(destination)} ${data.byType.destination[destination].class}`, true)
+                    .attr('width', settings.geometry.container.width)
+                    .attr('height', settings.geometry.container.height)
+                    .attr('rx', settings.geometry.container.height/2)
+                    .attr('ry', settings.geometry.container.height/2)
+
+                group.append('rect')
+                    .classed(`destination-background-fill ${helpers.slugify(destination)} ${data.byType.destination[destination].class}`, true)
+                    .attr('width', settings.geometry.container.width)
+                    .attr('height', settings.geometry.container.height)
+                    .attr('rx', settings.geometry.container.height/2)
+                    .attr('ry', settings.geometry.container.height/2)
+
+                // Attach a donut chart for diversion/recovered, or a landfill icon
+                if(data.byType.destination[destination].type === 'recovered'){
+                    const material = data.byType.destination[destination].material
+                    renderDonut(group, {x: settings.geometry.container.height /2, y: settings.geometry.container.height / 2}, {r: settings.geometry.container.height * 0.4}, {pct: data.byType.material[material].diversion, materialClass:  data.byType.destination[destination].materialClass} )
+                } else {
+                    group.append('path')
+                        .classed(`landfill-icon ${helpers.slugify(destination)} ${data.byType.destination[destination].class}`, true)
+                        .attr('d', icons.Landfill)
+                        .style('transform', `translate(${settings.geometry.container.height/2}px, ${settings.geometry.container.height/2}px) scale(${settings.geometry.container.height / 50 * 0.6})`)
+                }
+
+                const label = group.append('g').attr('id', `destination-group-${helpers.slugify(destination)}`)
+                label.append('text')
+                    .attr('id', `destination-label-${helpers.slugify(destination)}`)
+                    .classed(`destination-label ${helpers.slugify(destination)} ${data.byType.destination[destination].class}`, true)
+                    .attr('x', settings.geometry.container.height * 1.15)
+                    .attr('y', 0)
+                    .attr('dy', 0)
+                    .text(destination.slice(0 , destination.indexOf(' ')))
+                    .call(helpers.wrap, settings.geometry.container.width - settings.geometry.container.height * 1.75, 1.1)
+
+                label.append('text')
+                    .classed(`destination-data data-label ${helpers.slugify(destination)} ${data.byType.destination[destination].class}`, true)
+                    .attr('x',  settings.geometry.container.height * 1.15)
+                    .attr('y', () => {
+                        const bbox = document.getElementById(`destination-label-${helpers.slugify(destination)}`).getBBox()
+                        return  2 + bbox.height
+                    })
+                    .text(`${helpers.numberFormatters.formatComma(data.byType.destination[destination].value)} tonnes`)
+
+                const labelBBox = document.getElementById(`destination-group-${helpers.slugify(destination)}`).getBBox()
+                label.style('transform', `translate(${0}px, ${settings.geometry.container.height /2 - labelBBox.height/2}px)`)
+
+            })
+
+            data.list.product.forEach( (product, i) => {
+                const yPos = settings.dims.margin.top + i * (settings.geometry.yGap + settings.geometry.container.height),
+                    xPos = settings.geometry.productX,
+                    group =  productGroup.append('g').classed('product-item-group', true).attr('transform', `translate(${xPos}, ${yPos})`)
+                // Record the node position to locate flow end points
+                settings.geometry.nodePos[product] = {
+                    x: xPos, 
+                    y: yPos + settings.geometry.container.height / 2
+                }    
+                group.append('rect')
+                    .classed(`product-background ${helpers.slugify(product)} ${data.byType.product[product].class}`, true)
+                    .attr('width', settings.geometry.container.width)
+                    .attr('height', settings.geometry.container.height)
+                    .attr('rx', settings.geometry.container.height/2)
+                    .attr('ry', settings.geometry.container.height/2)
+                const label = group.append('g').attr('id', `product-group-${helpers.slugify(product)}`)
+                label.append('text')
+                    .attr('id', `product-label-${helpers.slugify(product)}`)
+                    .classed(`product-label ${helpers.slugify(product)} ${data.byType.product[product].class}`, true)
+                    .attr('x', settings.geometry.container.width/2)
+                    .attr('y', 0)
+                    .attr('dy', 0)
+                    .text(product)
+                    .call(helpers.wrap, settings.geometry.container.width - settings.geometry.container.height, 1.1)
+
+                label.append('text')
+                    .classed(`product-data data-label ${helpers.slugify(product)} ${data.byType.product[product].class}`, true)
+                    .attr('x', settings.geometry.container.width/2)
+                    .attr('y', () => {
+                        const bbox = document.getElementById(`product-label-${helpers.slugify(product)}`).getBBox()
+                        return  2 + bbox.height
+                    })
+                    .text(`${helpers.numberFormatters.formatComma(data.byType.product[product].value)} tonnes`)
+
+                const labelBBox = document.getElementById(`product-group-${helpers.slugify(product)}`).getBBox()
+                label.style('transform', `translate(${0}px, ${settings.geometry.container.height /2 - labelBBox.height/2 + 4}px)`)
+            })
+
+
+            // 3. ADD FLOWS 
+                // a. Filter flow data
+                const materialData = data.inputData.material.filter(d => d.year === settings.year && !isNaN(d.level))       
+                // b. Link shape generator
+                const link = d3.linkHorizontal()        // Bezier link generator
+                    .source(d => d.source)              // Accepting object {source: [x,y],
+                    .target(d => d.target)              // and               target [x,y] }
+                // c. Scale for flow width
+                const flowScale = d3.scaleLinear()
+                        .domain(d3.extent(data.inputData.material.map(d => d.value)))
+                        .range([1, 20])
+                // d. Adjust node positions: starting offset 
+                const offsets = {}
+                data.list.material.forEach( d => offsets[d] = 0)
+                data.list.destination.forEach( d => offsets[d] = 0)
+                materialData.forEach(obj => {
+                    const sourceTotal = d3.sum(materialData.filter(e => e.source === obj.source).map(d => d.value)),
+                        noTargets = materialData.filter(e => e.source === obj.source).length,
+                        sourceWidth = flowScale(sourceTotal)
+                    offsets[obj.source] = - flowScale(sourceTotal) / 2
+                })
+                materialData.forEach(obj => {
+                    const flowWidth = flowScale(obj.value)
+                    obj.dy = offsets[obj.source] + flowWidth / 2
+                    offsets[obj.source] += flowWidth
+                })
+
+                materialFlowsGroup.selectAll('.flow-link')
+                    .data(materialData)
+                        .enter()                       
+                        .append('path')
+                        .attr('class', d => `flow-link ${d.materialClass} ${d.targetClass}`)                    
+                        .style('stroke-width', d => flowScale(d.value))
+                        .style('stroke-dasharray', d =>  d.targetClass === 'recovered' ? null : `${flowScale(d.value)*0.25} ${flowScale(d.value)*0.5}`)
+                        .attr('d', d => {
+                            const source = [settings.geometry.nodePos[d.source].x, settings.geometry.nodePos[d.source].y + d.dy],
+                                target = [settings.geometry.nodePos[d.target].x, settings.geometry.nodePos[d.target].y]
+                            return link({source, target})
+                        })
+
+            // 4. ADD ANNOTATIONS
+            annotationGroup.append('text').classed('main-title', true)
+                .text('Key waste flows in Victoria')
+                .attr('transform', `translate(${30}, ${50})`)
+            annotationGroup.append('text').classed('main-subtitle', true)
+                .text('Tonnes of collected waste to destination and recycled products in '+settings.year)
+                .attr('transform', `translate(${30}, ${70})`)
+
+            // Function to render diversion donut chart
+            function renderDonut(container, coords, dims, data ){
+                // Setup shape generator and data
+                const arc = d3.arc().innerRadius(dims.r * 0.67).outerRadius(dims.r - 1),
+                    pie = d3.pie().padAngle(0.005)
+                        .sort(null)
+                        .value(d => d.value),
+                    chartData = pie([
+                        {value: data.pct,    class: 'diversion '+data.materialClass},
+                        {value: 1- data.pct, class: 'landfill'}
+                    ])
+
+                const donutGroup = container.append('g')
+                donutGroup.append('g').classed('arc-group', true)
+                    .selectAll("path.donut-arc")
+                    .data(chartData)
+                    .join("path").attr('class', d => `${d.data.class} donut-arc`)            
+                        .attr("d", arc)
+                        .style("transform", `translate(${coords.x}px, ${coords.x}px) scale(-1, 1)` )
+                
+                donutGroup.append('text')
+                    .attr('class', `${data.materialClass} donut-diversion-pct`)  
+                    .text(helpers.numberFormatters.formatPct(data.pct))
+                    .style("transform", `translate(${coords.x}px, ${coords.x}px)` )
+            };
+
+        }; // end renderMap()
+
+
+        /////////////////////////////
+        /// X. HELPER FUNCTIONS   ///
+        /////////////////////////////
+
+        const helpers= {
+            numberFormatters: {
+                formatComma:           	d3.format(",.0f"),
+                formatComma1dec:       	d3.format(",.1f"),
+                formatComma2dec:       	d3.format(",.2f"),
+                formatInteger:         	d3.format(".0f"),   
+                formatCostInteger:     	d3.format("$,.0f"),  
+                formatCost1dec:        	d3.format("$,.1f"),  
+                formatPct:          	d3.format(".0%"), 
+                formatPct1dec:          d3.format(".1%")  
+            },
+            numberParsers: {
+                parseDateSlash: d3.timeParse("%d/%m/%Y")
+            },
+            slugify: function (str) {
+                str = str.replace(/^\s+|\s+$/g, '').toLowerCase(); // trim           
+                const from = "àáäâèéëêìíïîòóöôùúüûñç·/_,:;",      // remove accents, swap ñ for n, etc
+                    to   = "aaaaeeeeiiiioooouuuunc------"
+                for (let i=0, l=from.length ; i<l ; i++) {
+                    str = str.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
+                }
+                str = str.replace(/[^a-z0-9 -]/g, '') // remove invalid chars
+                    .replace(/\s+/g, '-') // collapse whitespace and replace by -
+                    .replace(/-+/g, '-'); // collapse dashes
+                return str;
+            }, 
+            wrap: function(text, width, lineHeight) {
+                text.each(function() {
+                    let text = d3.select(this),
+                        words = text.text().split(/\s+/).reverse(),
+                        word,
+                        line = [],
+                        lineNumber = 0,
+                        y = text.attr("y"),
+                        x = text.attr("x"),
+                        fontSize = parseFloat(text.style("font-size")),
+                        dy = parseFloat(text.attr("dy")),
+                        tspan = text.text(null).append("tspan").attr("x", x).attr("y", y).attr("dy", dy + "em");
+
+                    while (word = words.pop()) {
+                        line.push(word);
+                        tspan.text(line.join(" "));
+                        if (tspan.node().getComputedTextLength() > width) {
+                            line.pop();
+                            tspan.text(line.join(" "));
+                            line = [word];
+                            tspan = text.append("tspan")
+                                .attr("x", x)
+                                .attr("y",  y)
+                                .attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+                        }                    
+                    }            
+                })
+            },
+        }
+
+    </script>
+</body>
+
+</html>

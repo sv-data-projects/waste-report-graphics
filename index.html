@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="">
+        <meta name="author" content="Sustainability Victoria">
+        <link rel="stylesheet" href="./css/core.css">
+        <style>
+            body{
+                font-family: 'DIN Next LT Pro';
+                margin: 7.5vw 10vw;
+            }
+            h1{
+                font-size: 2.5rem;
+                text-transform: uppercase;
+                color: var(--secondaryBottleGreenLight);
+            }
+            p, ul{
+                font-weight: 300;
+                color: rgb(40, 40, 40)
+            }
+            .vis-list-type{
+                font-weight: 500;
+                font-size: 1.25rem;
+                margin-top: 2rem;
+                text-transform: uppercase;
+                color: var(--secondaryBottleGreenLight);
+            }
+            
+        </style>
+    </head>
+
+    <body>
+        <h1>SV Annual report graphics index</h1>
+        <div>
+            <p>This page contains links to SVG based data visualisation being drafted for the upcoming 2019/20 
+                <a href = 'https://www.sustainability.vic.gov.au/research-data-and-insights/waste-data/waste-annual-reports-and-data' target="_blank">Victorian Local Government Annual Waste Services Report</a>
+                and <a href = 'https://www.sustainability.vic.gov.au/research-data-and-insights/waste-data/waste-annual-reports-and-data/2018-to-2019' target="_blank">Victorian Recycling Industry Annual report</a>.
+            </p>
+            <p>All graphics are in draft and have initially been designed for embedded in the print reports. 
+                However all graphics are 'programmed' and digital-first, meaning that are connected to data and be easily extended for web-based rendering and use.
+            </p>
+            <p>The linked dataset supporting these visualisations can be found and updated <a href="https://docs.google.com/spreadsheets/d/1V5HL7zCHGETUCDT8-3ZiDm9XncmOTEo9WDSP1Xe3wd0/edit#gid=0" target="_blank">here</a>. 
+                The GitHub repository (i.e. code) for these visualisations and apps can be found <a href = "https://github.com/littlesketches/sv-stuff" target = "_blank"> here</a> (note: this will be moved to a SV data team repo shortly). 
+                The aim for each of these visualisation is that they can be reused with updated datasets and supporting more interactive and animated features in the future. This is the rationale for rendering these visualisation directly from data and in the browser.
+            </p>
+            <p>Most graphics are made in SVG, with a handful using HTML elements. 
+                Accordingly, the suggested method for exporting is to use the web browsers print/save to PDF function to export a high quality vector graphic. 
+                Chrome is recommended (and tested), with settings for minimum or no margins or headers/footers. 
+                Some (HTML-based) graphics may require the 'background graphics' option to be checked to render as displayed on screen (i.e. where background CSS is used)
+            </p>
+            <p>No interactive has yet been attached to these graphics, however those listed with a &#x262f; symbol have a 'dark mode' that can be toggled by pressing the 'shift' key while viewing the graphic
+        </div>
+
+        <div>
+            <div class ="vis-list-type">Data graphics and illustrations</div> 
+            <ul>
+                <li><a href ="waste-vic-flow-infographic.html">Victorian waste flows graphic (full page)</a></li>
+                <li><a href ="waste-vic-flow-summary-graphic.html">Victorian waste flows summary graphic (half page) &#x262f;</a></li>
+                <li><a href ="kerbside-flow-infographic.html">Victorian kerbside waste flows graphic (full page)</a></li>
+                <li><a href ="kerbside-summary-infographic.html">Victorian kerbside waste flows graphic summary (half page)</a></li>
+                <li><a href ="kerbside-bin-composition.html">Kerbside bin composition call out graphic</a></li>
+            </ul>    
+
+            <div  class ="vis-list-type">Data visualisations</div> 
+            <ul>
+                <li><a href ="waste-vic-flow-sankey.html">Victorian waste flows (sankey)</a></li>
+                <li><a href ="waste-diversion-by-material.html?layout=chart-only">Waste by material radial chart only &#x262f;'</a></li>
+                <li><a href ="waste-diversion-by-material.html?layout=portrait">Waste by material radial chart with stacked table &#x262f;'</a></li>
+                <li><a href ="waste-diversion-by-material.html?layout=landscape">Waste by material radial chart with table on left&#x262f;</a></li>
+                <li><a href ="waste-trends-summary-table.html">Waste trends summary tables</a></li>
+                <li><a href ="waste-metrics-slopegraphs.html">Waste trends slope chart set (unfinished)</a></li>
+            </ul>    
+
+            <div class ="vis-list-type">Map based data graphics</div> 
+            <ul>
+                <li><a href ="waste-export-map.html">Recovered resources exports map</a></li>
+                <li><a href ="wrrg-map.html">Recovered resources WRRG map</a></li>
+                <li><a href ="wrrg-map.html?colourScale=categorical">Recovered resources WRRG map with colour coded WRRGs</a></li>
+                <li><a href ="wrrg-map.html?showGlass=false">Recovered resources WRRG map (excl. glass)</a></li>
+                <li><a href ="wrrg-map.html?showGlass=false&colourScale=categorical">Recovered resources WRRG map (excl. glass) with colour-coded WRRGs</a></li>
+            </ul>   
+
+            <div  class ="vis-list-type">Experiments that are mostly incomplete ideas and use static data)</div> 
+            <ul>
+                <li><a href ="waste-breakdown-experiment-circle-packing.html">Interactive circle packing</a></li>
+                <li><a href ="waste-breakdown-experiment-bin-shaped-voronoi.html">Bin shaped voronoi</a></li>
+                <li><a href ="waste-breakdown-experiment-circular-voronoi.html">Circular voronoi</a></li>
+                <li><a href ="waste-breakdown-experiment-radial-donut.html"> Radial donut chart</a></li>
+            </ul>   
+
+        </div>
+
+    </body>
+
+</html>

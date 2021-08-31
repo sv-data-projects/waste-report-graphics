@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="Waste trends summary tables">
+        <meta name="author" content="Sustainability Victoria">
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+        <link rel="stylesheet" href="./css/core.css">
+        <style>
+
+            /***********************************************************/
+            /***********************************************************/
+            /****                                                   ****/
+            /**** VICTORRINA WRRG WASTE DATA MAP  | CUSTOM CSS      ****/
+            /**** -----------------------------------------------   ****/
+            /**** - CSS Variables and loaded fonts from core.css    ****/
+            /****                                                   ****/
+            /***********************************************************/
+            /***********************************************************/
+
+
+            /*******************************************/
+            /***  PAGE LAYOUT | HEADLINE + MATERIAL ***/
+            /******************************************/
+            body{
+                font-family: 'DIN Next LT Pro';
+                margin: 0;                          /* Full bleed presentation */
+            } 
+
+            /* Main grid with 3 vertical content blocks */
+            main.main-container{
+                display: grid;
+                grid-template-columns: 2vw 1fr 3vw;   
+                grid-template-rows: 2vw auto auto auto auto;   
+            }
+            .title-container{
+                grid-area: 2 / 2 / 3 / 3;
+                border-bottom: 2px solid #000;
+            }
+            .headline-figures-container{
+                grid-area: 3 / 2 / 4 / 3;
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr  ; 
+                grid-template-rows: 1fr 1fr ; 
+                column-gap: 2vw; 
+                row-gap: 3.5vw; 
+                margin-top: 2vw;
+            }
+            .divider-block{
+                grid-area: 4 / 2 / 5 / 3;
+                width: 100%;
+                height: 2vw;
+                margin-top: 0vw;
+                border-bottom: 1px solid gray;
+            }
+            .headline-tables-container{
+                grid-area: 5 / 2 / 6 / 3;
+                grid-template-rows: auto auto; 
+                row-gap: 2vw; 
+            }
+            /* Headline figure 'label' container */
+            .headline-figure-label-container{
+                display: grid;
+                grid-template-columns: 1.5fr 1fr ;
+            }
+            /* Materials trend tables container (2 col grid by X rows ) */
+            .materials-tables-container{
+                display: grid;
+                grid-template-columns: 1fr 1fr; 
+                column-gap: 5.5vw; 
+            }
+            /* Materials trend tables grid layout */
+            .material-summary-table{
+                margin-bottom: 3.75vh
+            }
+            .material-summary-table-headers {                
+                display: grid;
+                grid-template-columns: 2fr 1fr 1fr 1fr 2fr;
+                grid-area: 1 / 1 / 2/ 2;
+                padding: 0.5vw 0vw;
+            }
+            .material-summary-table-headers{
+                grid-area: 2 / 1 / 3 / 2;
+            }
+            .material-summary-table-performance{
+                grid-area: 4 / 1 / 5 / 2;
+                display: grid;
+                grid-template-columns: 2fr 1fr 1fr 1fr 2fr; 
+                grid-template-rows: 50% 25% 25%; 
+            }
+            .material-summary-table-volumes{
+                display: grid;
+                grid-template-columns: 2fr 1fr 1fr 1fr;
+                grid-area: 1 / 1 / 2 / 5;         
+                border-bottom: #000 1px dotted;         
+            }
+            .material-summary-table-trend-container{
+                grid-area: 1 / 5 / 5 / 6;
+                display: grid;
+            }
+                .material-summary-table-performance-label-container{
+                    grid-area: 2 / 1 / 4 / 2;
+                    display: grid;
+                    grid-template-columns: 1fr 1.35fr; 
+                    grid-template-rows: 1fr 1fr; 
+                }
+                .performance-label-change{
+                    grid-area: 1 / 1 / 3 / 2;
+                }
+                .performance-label-1yr{
+                    grid-area: 1 / 2 / 2 / 3;
+                }
+                .performance-label-5yr{
+                    grid-area: 2 / 2 / 3 / 3;
+                }
+                .performance-label-1yr,
+                .performance-label-5yr{
+                    justify-content: end;
+                }
+                .material-summary-table-performance-1yr-container,
+                .material-summary-table-performance-5yr-container{
+                    display: grid;
+                    grid-template-columns: 1fr 1fr 1fr; 
+                }
+                .material-summary-table-performance-1yr-container{
+                    grid-area: 2 / 2 / 3 / 5;
+                }
+                .material-summary-table-performance-5yr-container{
+                    grid-area: 3 / 2 / 4 / 5;
+                }
+
+
+            /******************************************/
+            /***  TYPOGRAPHY | HEADLINE + MATERIAL ***/
+            /*****************************************/
+
+            /* Headline Typography */
+            .main-title,
+            .section-title{
+                font-size: 3.25vw;
+                font-weight: 500;
+                fill: #000;
+                mix-blend-mode: multiply;
+                text-transform: uppercase;
+                margin-block-end: 0.5vw;
+            }
+            .headline-label,
+            .headline-unit{
+                font-weight: 500;
+                line-height: 1;
+            }
+            .headline-label{
+                height: 4vw;
+                font-size: 1.75vw;
+                padding-bottom: 0.5vw;
+                text-align: center;
+                text-transform: uppercase;
+                align-items: center;
+                display: grid;
+            }
+            .headline-figure{
+                font-weight: 800;
+                font-size: 8vw;
+                line-height: 1;
+                text-align: right;
+                letter-spacing: -1.25px;
+                margin-bottom: -1.5vw;
+            }
+            .headline-unit{
+                font-size: 2.5vw;
+                padding: 1.5vw 0 0 0.5vw;
+            }
+            .headline-unit.pct{
+                font-size: 2.5vw;
+                padding: 0.5vw 0 0 0.5vw;
+            }
+            .headline-change{
+                text-align: center;
+                font-size: 1.75vw;
+            }
+            .headline-sparkline-container{
+                padding-top: 0vw;
+            }
+
+            /* Materials tables Typography */
+            .annotation{
+                font-size: 1.1vw;
+                padding-bottom: 2vw;
+            }
+            .material-summary-label{
+                font-size: 1.75vw;
+                font-weight: 500;
+                text-transform: uppercase;
+                width: fit-content;
+            }
+            .material-summary-label-bar{
+                width: calc(100% - 1.5vw);
+                height: 1vw;
+                margin: 0 1.5vw 0 1.5vw;
+            }
+            .material-summary-label-container{
+                display: grid;
+                height: auto;
+                align-items: center;
+                display: grid;
+                grid-template-columns: fit-content(70%) auto;                
+            }
+            .performance-label,
+            .performance-label-1yr,
+            .performance-label-5yr, 
+            .material-summary-table-header,
+            .material-summary-table-data{
+                font-size: 1.1vw;
+            }
+            .material-summary-table-header,
+            .material-summary-table-data{
+                display: grid;
+                justify-content:end;
+                align-content: center;
+                text-align: right;
+                padding-left: 0.5vw;
+            }
+            .performance-label{
+                display: grid;
+                align-items: center;
+            }
+            .material-summary-table-header.label,
+            .material-summary-table-header.year{
+                padding-left: 0rem;
+                text-align: left;
+                justify-content: start;
+            }
+            .material-summary-table-header.trend{
+                text-align: center;
+            }
+
+            /***********************************/
+            /**** HEADLINE METRICS COLOURS  ***/
+            /**********************************/
+
+            #total-waste-container{
+                color: #000;
+            }
+            #total-waste-container .sparkline{
+                stroke: #000;
+            }
+            #total-waste-container  .marker{
+                fill: #000;
+            }
+            #diversion-rate-container{
+                color: var(--xCharcoal);
+            }
+            #diversion-rate-container .sparkline{
+                stroke: var(--xCharcoal);
+            }
+            #diversion-rate-container .marker{
+                fill: var(--xCharcoal);
+            }
+            #landfill-waste-container{
+                color: var(--tertiaryCard);
+            }
+            #landfill-waste-container .headline-label{
+                color: var(--xDarkCard);
+            }
+            #landfill-waste-container .sparkline{
+                stroke: var(--tertiaryCard);
+            }
+            #landfill-waste-container  .marker{
+                fill: var(--tertiaryCard);
+            }
+            #total-recovery-container{
+                color: var(--xCharcoal);
+            }
+            #total-recovery-container .sparkline{
+                stroke: var(--xCharcoal);
+            }
+            #total-recovery-container .marker{
+                fill: var(--xCharcoal);
+            }
+            #local-recovery-container{
+                color: var(--secondaryBottleGreen);
+            }
+            #local-recovery-container .sparkline{
+                stroke: var(--secondaryBottleGreen);
+            }
+            #local-recovery-container .marker{
+                fill: var(--secondaryBottleGreen);
+            }
+            #export-container{
+                color: var(--secondaryBottleGreenLight);
+            }
+            #export-container .headline-label{
+                color: var(--xMidBottleGreen);
+            }
+            #export-container .sparkline{
+                stroke: var(--secondaryBottleGreenLight);
+            }
+            #export-container .marker{
+                fill: var(--secondaryBottleGreenLight);
+            }
+
+            /***************************/
+            /**** MATERIALS COLOURS  ***/
+            /***************************/
+            .materials-tables-container{
+                color: var(--xCharcoal)
+            }
+            .material-summary-label-bar.building-and-demolition-materials,
+            .material-summary-label-bar.aggregates-masonry-and-soil{
+                background: repeating-linear-gradient(
+                    45deg, transparent, transparent 0.25vw,
+                    var(--tertiaryRedLight) 0.25vw,
+                    var(--tertiaryRedLight) 0.5vw
+                );
+            }
+            .material-summary-table-performance.building-and-demolition-materials,
+            .material-summary-table-performance.aggregates-masonry-and-soil{
+                border-top:var(--tertiaryRedLight) 0.2vw solid;
+                border-bottom:var(--tertiaryRedLight) 0.2vw solid;
+            }
+            .material-summary-table-volumes.building-and-demolition-materials,
+            .material-summary-table-volumes.aggregates-masonry-and-soil{
+                border-bottom:var(--tertiaryRedLight) 0.125vw dotted;
+            }
+            .material-summary-label.building-and-demolition-materials,
+            .material-summary-label.aggregates-masonry-and-soil{
+                color: var(--tertiaryRed);
+            }
+            #building-and-demolition-materials-sparkline .sparkline,
+            #aggregates-masonry-and-soil-sparkline .sparkline{
+                stroke: var(--tertiaryRedLight);
+            }
+            #building-and-demolition-materials-sparkline .marker,
+            #aggregates-masonry-and-soil-sparkline .marker{
+                fill: var(--tertiaryRedLight);
+            }
+            .material-summary-label-bar.glass{
+                background: repeating-linear-gradient(
+                    45deg, transparent, transparent 0.25vw,
+                    var(--tertiaryPurpleLight) 0.25vw,
+                    var(--tertiaryPurpleLight) 0.5vw
+                );
+            }
+            .material-summary-table-performance.glass{
+                border-top:var(--tertiaryPurpleLight) 0.2vw solid;
+                border-bottom:var(--tertiaryPurpleLight) 0.2vw solid;
+            }
+            .material-summary-table-volumes.glass{
+                border-bottom:var(--tertiaryPurpleLight) 0.125vw dotted;
+            }
+            .material-summary-label.glass{
+                color: var(--tertiaryPurple)
+            }
+            #glass-sparkline .sparkline{
+                stroke: var(--tertiaryPurpleLight);
+            }
+            #glass-sparkline .marker{
+                fill: var(--tertiaryPurpleLight);
+            }
+
+            .material-summary-label-bar.plastics{
+                background: repeating-linear-gradient(
+                    45deg, transparent, transparent 0.25vw,
+                    var(--tertiaryYellow) 0.25vw,
+                    var(--tertiaryYellow) 0.5vw
+                );
+            }
+            .material-summary-table-performance.plastics{
+                border-top:var(--tertiaryYellow) 0.2vw solid;
+                border-bottom:var(--tertiaryYellow) 0.2vw solid;
+            }
+            .material-summary-table-volumes.plastics{
+                border-bottom:var(--tertiaryYellow) 0.125vw dotted;
+            }
+            .material-summary-label.plastics{
+                color: var(--xDarkYellow)
+            }
+            #plastics-sparkline .sparkline{
+                stroke: var(--tertiaryYellow);
+            }
+            #plastics-sparkline .marker{
+                fill: var(--tertiaryYellow);
+            }
+
+            .material-summary-label-bar.paper-and-cardboard{
+                background: repeating-linear-gradient(
+                    45deg, transparent, transparent 0.25vw,
+                    var(--xBlueCyan) 0.25vw,
+                    var(--xBlueCyan) 0.5vw
+                );
+            }
+            .material-summary-table-performance.paper-and-cardboard{
+                border-top:var(--xBlueCyan) 0.2vw solid;
+                border-bottom:var(--xBlueCyan) 0.2vw solid;
+            }
+            .material-summary-table-volumes.paper-and-cardboard{
+                border-bottom:var(--xBlueCyan) 0.125vw dotted;
+            }
+            .material-summary-label.paper-and-cardboard{
+                color: var(--xDarkBlueCyan)
+            }
+            #paper-and-cardboard-sparkline .sparkline{
+                stroke: var(--xBlueCyan);
+            }
+            #paper-and-cardboard-sparkline .marker{
+                fill: var(--xBlueCyan);
+            }
+
+            .material-summary-label-bar.organics{
+                background: repeating-linear-gradient(
+                    45deg, transparent, transparent 0.25vw,
+                    var(--xGreen) 0.25vw,
+                    var(--xGreen) 0.5vw
+                );
+            }
+            .material-summary-table-performance.organics{
+                border-top:var(--xGreen) 0.2vw solid;
+                border-bottom:var(--xGreen) 0.2vw solid;
+            }
+            .material-summary-table-volumes.organics{
+                border-bottom:var(--xGreen) 0.125vw dotted;
+            }
+            .material-summary-label.organics{
+                color: var(--tertiaryEmerald)
+            }
+            #organics-sparkline .sparkline{
+                stroke: var(--xGreen);
+            }
+            #organics-sparkline .marker{
+                fill: var(--xGreen);
+            }
+
+            .material-summary-label-bar.metals{
+                background: repeating-linear-gradient(
+                    45deg, transparent, transparent 0.25vw,
+                    var(--xMidBlue) 0.25vw,
+                    var(--xMidBlue) 0.5vw
+                );
+            }
+            .material-summary-table-performance.metals{
+                border-top:var(--xMidBlue) 0.2vw solid;
+                border-bottom:var(--xMidBlue) 0.2vw solid;
+            }
+            .material-summary-table-volumes.metals{
+                border-bottom:var(--xMidBlue) 0.125vw dotted;
+            }
+            .material-summary-label.metals{
+                color: var(--tertiaryBlue)
+            }
+            #metals-sparkline .sparkline{
+                stroke: var(--xMidBlue);
+            }
+            #metals-sparkline .marker{
+                fill: var(--xMidBlue);
+            }
+            .material-summary-label-bar.rubber{
+                background: repeating-linear-gradient(
+                    45deg, transparent,  transparent 0.25vw,
+                    var(--xMagenta) 0.25vw,
+                    var(--xMagenta) 0.5vw
+                );
+            }
+            .material-summary-table-performance.rubber{
+                border-top:var(--xMagenta) 0.2vw solid;
+                border-bottom:var(--xMagenta) 0.2vw solid;
+            }
+            .material-summary-table-volumes.rubber{
+                border-bottom:var(--xMagenta) 0.125vw dotted;
+            }
+            .material-summary-label.rubber{
+                color: var(--xDarkMagenta)
+            }
+            #rubber-sparkline .sparkline{
+                stroke: var(--xMagenta);
+            }
+            #rubber-sparkline .marker{
+                fill: var(--xMagenta);
+            }
+
+            .material-summary-label-bar.textiles{
+                background: repeating-linear-gradient(
+                    45deg, transparent, transparent 0.25vw,
+                    var(--xOrange) 0.25vw,
+                    var(--xOrange) 0.5vw
+                );
+            }
+            .material-summary-table-performance.textiles{
+                border-top:var(--xOrange) 0.2vw solid;
+                border-bottom:var(--xOrange) 0.2vw solid;
+            }
+            .material-summary-table-volumes.textiles{
+                border-bottom:var(--xOrange) 0.125vw dotted;
+            }
+            .material-summary-label.textiles{
+                color: var(--xDarkOrange)
+            }
+            #textiles-sparkline .sparkline{
+                stroke: var(--xOrange);
+            }
+            #textiles-sparkline .marker{
+                fill: var(--xOrange);
+            }
+
+            /*********************/
+            /**** SPARKLINES  ***/
+            /*********************/
+            .sparkline{
+                fill: none;
+                stroke-width: 2.5px;
+                stroke: #000;
+            }
+            .headline-figures-container .sparkline{
+                stroke-width: 1.5px;
+            }
+            .sparkline-start-point,
+            .sparkline-year-ago-point{
+                r: 3
+            }
+            .sparkline-end-point{
+                r: 5
+            }
+            .sparkline-shading-1yr{
+                opacity: 0.05
+            }
+            .sparkline-annotation{
+                fill: var(--xCharcoal)
+            }
+            .sparkline-annotation{
+                font-size: 8px;
+                font-weight: 300;
+            }
+            .sparkline-annotation.large{
+                font-size: 12px;
+                font-weight: 500;
+            }
+        </style>
+    </head>
+
+    <body>
+        <main class ='main-container'>
+            <!-- Main title -->
+            <div class = 'title-container'>
+                <h1 class = 'main-title'></h1>
+            </div>
+            <!-- Headline figures -->
+            <div class = 'headline-figures-container'>
+                <div id = "total-waste-container" class = 'headline-figure-container'>
+                    <div class = 'headline-label'>Total waste managed</div>
+                    <div class = 'headline-figure-label-container'>
+                        <div class = 'headline-figure'></div>
+                        <div class = 'headline-unit'>million tonnes</div>
+                    </div>
+                    <div class = 'headline-sparkline-container'>
+                        <svg id = "total-waste-sparkline" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"></svg>
+                    </div>
+                </div>
+                <div id = "diversion-rate-container"  class = 'headline-figure-container'>
+                    <div class = 'headline-label'>Diversion rate</div>
+                    <div class = 'headline-figure-label-container'>
+                        <div class = 'headline-figure'></div>
+                        <div class = 'headline-unit pct'>%</div>
+                    </div>
+                    <div class = 'headline-sparkline-container'>
+                        <svg id = "diversion-rate-sparkline" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"></svg>
+                    </div>
+                </div>
+                <div id = "landfill-waste-container" class = 'headline-figure-container'>
+                    <div class = 'headline-label'>Waste to landfill</div>
+                    <div class = 'headline-figure-label-container'>
+                        <div class = 'headline-figure'></div>
+                        <div class = 'headline-unit'>million tonnes</div>
+                    </div>
+                    <div class = 'headline-sparkline-container'>
+                        <svg id = "total-landfill-sparkline"  class = 'svg-spakline-main' xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"></svg>
+                    </div>
+                </div>
+
+                <div id = "total-recovery-container" class = 'headline-figure-container'>
+                    <div class = 'headline-label'>Total recovered for reprocessing</div>
+                    <div class = 'headline-figure-label-container'>
+                        <div class = 'headline-figure'></div>
+                        <div class = 'headline-unit'>million tonnes</div>
+                    </div>
+                    <div class = 'headline-sparkline-container'>
+                        <svg id = "total-recovery-sparkline" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"></svg>
+                    </div>
+                </div>
+                <div id = "local-recovery-container"  class = 'headline-figure-container'>
+                    <div class = 'headline-label'>Reprocessed in Victoria</div>
+                    <div class = 'headline-figure-label-container'>
+                        <div class = 'headline-figure'></div>
+                        <div class = 'headline-unit'>million tonnes</div>
+                    </div>
+                    <div class = 'headline-sparkline-container'>
+                        <svg id = "local-recovery-sparkline" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"></svg>
+                    </div>
+                </div>
+                <div id = "export-container" class = 'headline-figure-container'>
+                    <div class = 'headline-label'>Exported for reprocessing</div>
+                    <div class = 'headline-figure-label-container'>
+                        <div class = 'headline-figure'></div>
+                        <div class = 'headline-unit'>million tonnes</div>
+                    </div>
+                    <div class = 'headline-sparkline-container'>
+                        <svg id = "export-sparkline"  class = 'svg-spakline-main' xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"></svg>
+                    </div>
+                </div>
+
+
+            </div>
+            <!-- Divider -->
+            <div class = 'divider-block'></div>
+            <!-- Trend tables-->
+            <div class = 'headline-tables-container'>
+                <h3 class = 'section-title'>Trends by materials recovered for reprocessing</h3>
+                <div class = 'annotation'>A breakdown for each recovered materials by recovered materials for local reprocessing (Local recovery) and materials exported for reprocessed (Export).</div>
+                <div class = 'materials-tables-container'></div>
+            </div>
+        </main>        
+    </body>
+
+    <script>
+
+        /////////////////////////////////////////////////////////////////////////////////
+        /// 0. BUILD SEQUENCE: INIT SETTINGS AND DATA OBJECTS AND LOADING => RENDER  ///
+        ////////////////////////////////////////////////////////////////////////////////
+
+        // Instantiate settings and data objects
+        const settings = {
+            year:                   '2019-20', 
+            dims: {
+                major_sparkline: {
+                    width: 200,
+                    height: 60,
+                    margin: { top: 10, right: 10, bottom: 5, left: 10 }
+                },
+                minor_sparkline: {
+                    width: 200,
+                    height: 100,
+                    margin: { top: 15, right: 5, bottom: 15, left: 25 }
+                },
+            }
+        }
+
+        const data = {          // Initiate data object that populated by the parseData() function, 
+            table:     {},
+            schema: {
+                list:  {}
+            }
+        }
+
+        // Call build function
+        buildFromGSheetData(settings)
+
+        // Load data from TSV files from GSheet
+        function buildFromGSheetData(config){  
+            d3.select('.main-container').style('opacity', 0)        // Set for fade in
+
+            // 1. Specify data table links for each table used (tsv published output from each separate sheet/table)
+            const gsTableLinks =  {
+                wasteByMaterialDestination:                  'https://docs.google.com/spreadsheets/d/e/2PACX-1vSimVJWCqYLTijgqeU-SPGdAFT6wpGprHgjPdpxEElWurVvl28JYr7dHGE3OCSjF4VYH2_QggJUnveO/pub?gid=393823608&single=true&output=tsv'
+            }
+
+            // 2. Asynchronous data load (with Promise.all) and D3 (Fetch API) 
+            Promise.all(
+                Object.values(gsTableLinks).map(link => d3.tsv(link))       // Pass in array of d3.tsv loaders with each link
+            ).then( rawData => {
+                // a. Parse each loaded data table and store in data.table object, using the parseTable helper 
+                rawData.forEach((tableData, i) => {  parseTable(Object.keys(gsTableLinks)[i], tableData) })
+                return data
+
+            }).then( async (data) => {
+                // 3. Initiate vis build sequence with data now loaded
+                await applyQuerySettings(config)            // a. Apply query string settings
+                await transformData(data.table.wasteByMaterialDestination)                           // b.  Transform and shape data
+                await renderVis(data.table.wasteByMaterialDestination, config)  
+            })
+
+            // X. Table data parsing function: trim() header white space and prase numbers with "$" and "," stripped. 
+            const parseTable = (tableName, tableData) => {
+                data.table[tableName] = tableData.map(row => {
+                    const newObj = {}
+                    Object.entries(row).forEach(([key, value]) => {
+                        switch(key.trim().toLowerCase()){
+                            case 'year':
+                                newObj[key.trim()] =  value
+                                break     
+                            default:
+                                newObj[key.trim()] = isNaN(parseFloat(value.replace(/\$|,/g, ''))) ? value : parseFloat(value.replace(/\$|,/g, '')) 
+                        }
+                    })
+                    return newObj
+                })
+            };
+        }; // end buildFromGSheetData()
+
+
+        //////////////////////////////////
+        // 1. PARSE AND WRANGLE DATA   ///
+        //////////////////////////////////
+
+        async function applyQuerySettings(settings){
+            // i. Check for query parameters and update material. A date set by the query selector is set while parsing input data 
+            settings.queryParameters = new URLSearchParams(window.location.search)
+            if (settings.queryParameters.has('year')) { 
+                settings.year = settings.queryParameters.get('year')  
+            }
+        };
+
+        async function transformData(dataTable) {   
+            // 1. Create lists based on 'year'
+            const yearData = dataTable.filter(d => d.year === settings.year)[0]
+            data.schema.list.year         = [...new Set(dataTable.map(d => d.year) )]
+            data.schema.list.material     = [...new Set(Object.keys(yearData).filter(d => d.toLocaleLowerCase() !== 'year').map(d => d.slice(0, d.indexOf('_'))) )]
+            data.schema.list.destination  = [...new Set(Object.keys(yearData).filter(d => d.toLocaleLowerCase() !== 'year').map(d => d.slice(d.indexOf('_') + 1 )) )]
+
+            // 2. Reverse years from last to most recent
+            dataTable = dataTable.reverse()
+        };
+
+
+        /////////////////////////////////////
+        // 2. RENDER THE SUMMARY PAGE VIS ///
+        /////////////////////////////////////
+
+        async function renderVis(dataTable, settings){ 
+            d3.select('.main-title').html(`Victorian waste management trends to  ${settings.year}`)
+            // 1. Build the headline containers
+            // a. Get data
+            const yearData =   dataTable.filter(d => d.year === settings.year)[0],
+                financialYear = 2001 + (+settings.year.slice(5)),
+                wasteManaged_mil =  d3.sum(Object.values(yearData).filter(d => !isNaN(d))) /1000000,
+                landfilled_mil =  d3.sum(Object.entries(yearData).filter( ([key, value]) => key.slice(key.indexOf('_') + 1) === data.schema.list.destination[0]).map(d => d[1]) ) / 1000000,
+                localRecovery_mil =  d3.sum(Object.entries(yearData).filter( ([key, value]) => key.slice(key.indexOf('_') + 1) === data.schema.list.destination[1]).map(d => d[1]) ) / 1000000,
+                export_mil =  d3.sum(Object.entries(yearData).filter( ([key, value]) => key.slice(key.indexOf('_') + 1) === data.schema.list.destination[2]).map(d => d[1]) ) / 1000000
+                totalRecovery_mil =  localRecovery_mil + export_mil,
+                diversionRate = totalRecovery_mil / wasteManaged_mil 
+
+            const lastYearLabel = data.schema.list.year[1],
+                lastYearData = dataTable.filter(d => d.year === lastYearLabel)[0],
+                lastYearWasteManaged_mil =  d3.sum(Object.values(lastYearData).filter(d => !isNaN(d))) /1000000,
+                lastYearLandfilled_mil =  d3.sum(Object.entries(lastYearData).filter( ([key, value]) => key.slice(key.indexOf('_') + 1) === data.schema.list.destination[0]).map(d => d[1]) ) / 1000000,
+                lastYearLocalRecovery_mil =  d3.sum(Object.entries(lastYearData).filter( ([key, value]) => key.slice(key.indexOf('_') + 1) === data.schema.list.destination[1]).map(d => d[1]) ) / 1000000,
+                lastYearExport_mil =  d3.sum(Object.entries(lastYearData).filter( ([key, value]) => key.slice(key.indexOf('_') + 1) === data.schema.list.destination[2]).map(d => d[1]) ) / 1000000
+                lastYearTotalRecovery_mil =  lastYearLocalRecovery_mil + lastYearExport_mil,
+                lastYearDiversionRate = lastYearTotalRecovery_mil / lastYearWasteManaged_mil 
+
+            const wasteManagedChange = wasteManaged_mil / lastYearWasteManaged_mil - 1,
+                wasteManagedLabel = `${helpers.numberFormatters.formatPct1dec(Math.abs(wasteManagedChange))} ${wasteManagedChange > 0 ? 'more' : 'less'}  than ${lastYearLabel}`,
+                landfillChange = landfilled_mil / lastYearLandfilled_mil - 1,
+                landfillLabel = `${helpers.numberFormatters.formatPct1dec(Math.abs(landfillChange))} ${landfillChange > 0 ? 'more' : 'less'}  than ${lastYearLabel}`,
+                recoveryChange = totalRecovery_mil / lastYearTotalRecovery_mil - 1,
+                recoveryLabel = `${helpers.numberFormatters.formatPct1dec(Math.abs(recoveryChange))} ${recoveryChange > 0 ? 'more' : 'less'}  than ${lastYearLabel}`,
+                localRecoveryChange = localRecovery_mil / lastYearLocalRecovery_mil - 1,
+                localRecoveryLabel = `${helpers.numberFormatters.formatPct1dec(Math.abs(localRecoveryChange))} ${localRecoveryChange > 0 ? 'more' : 'less'}  than ${lastYearLabel}`,
+                exportChange = export_mil / lastYearExport_mil - 1,
+                exportLabel = `${helpers.numberFormatters.formatPct1dec(Math.abs(exportChange))} ${exportChange > 0 ? 'more' : 'less'}  than ${lastYearLabel}`,
+                diversionRateLabel = `${helpers.numberFormatters.formatPct1dec(Math.abs(diversionRate - lastYearDiversionRate))} ${diversionRate > lastYearDiversionRate ? 'more' : 'less'}  than ${lastYearLabel}`
+
+            const fiveYearLabel = data.schema.list.year[4],
+                fiveYearData = dataTable.filter(d => d.year === fiveYearLabel)[0]
+
+            // b. Fill out metrics in DOM
+            d3.select('#total-waste-container .headline-figure').html(helpers.numberFormatters.formatComma1dec(wasteManaged_mil))
+            d3.select('#diversion-rate-container .headline-figure').html(helpers.numberFormatters.formatComma(totalRecovery_mil / wasteManaged_mil * 100))
+            d3.select('#landfill-waste-container .headline-figure').html(helpers.numberFormatters.formatComma1dec(landfilled_mil))
+            d3.select('#total-recovery-container .headline-figure').html(helpers.numberFormatters.formatComma1dec(totalRecovery_mil))
+            d3.select('#local-recovery-container .headline-figure').html(helpers.numberFormatters.formatComma1dec(localRecovery_mil))
+            d3.select('#export-container .headline-figure').html(helpers.numberFormatters.formatComma1dec(export_mil))
+
+            // c. Add headline sparklines
+            const managedWasteData = dataTable.map(dataObj => d3.sum(Object.values(dataObj).filter(d => !isNaN(d))) /1000000)
+                landfilledData =  dataTable.map(dataObj =>  d3.sum(Object.entries(dataObj).filter( ([key, value]) => key.slice(key.indexOf('_') + 1) === data.schema.list.destination[0]).map(d => d[1]) ) / 1000000 ),
+                recoveryData =  managedWasteData.map((d, i) => d - landfilledData[i] ),
+                localRecoveryData =  dataTable.map(dataObj =>  d3.sum(Object.entries(dataObj).filter( ([key, value]) => key.slice(key.indexOf('_') + 1) === data.schema.list.destination[1]).map(d => d[1]) ) / 1000000 ),
+                exportData =  dataTable.map(dataObj =>  d3.sum(Object.entries(dataObj).filter( ([key, value]) => key.slice(key.indexOf('_') + 1) === data.schema.list.destination[2]).map(d => d[1]) ) / 1000000 ),
+                diversionRateData =  managedWasteData.map( (d,i) => (d - landfilledData[i]) / d)
+
+            renderSparkline(`total-waste-sparkline`, managedWasteData, settings.dims.major_sparkline, true)
+            renderSparkline(`total-landfill-sparkline`, landfilledData, settings.dims.major_sparkline, true)
+            renderSparkline(`diversion-rate-sparkline`, diversionRateData, settings.dims.major_sparkline, true)
+            renderSparkline(`total-recovery-sparkline`, recoveryData, settings.dims.major_sparkline, true)
+            renderSparkline(`local-recovery-sparkline`, localRecoveryData, settings.dims.major_sparkline, true)
+            renderSparkline(`export-sparkline`, exportData, settings.dims.major_sparkline, true)
+
+            // 3. Build DOM for each material
+            const recoveredData = data.schema.list.material.filter(d => d !== 'Other materials'),
+                materialTableContainer = d3.select('.materials-tables-container')
+
+            recoveredData.forEach(material => {
+                // a. Get data for current year, last year and five years ago
+                const yearLandfill = yearData[`${material}_${data.schema.list.destination[0]}`],
+                    yearLocalRecovery = yearData[`${material}_${data.schema.list.destination[1]}`],
+                    yearExport = yearData[`${material}_${data.schema.list.destination[2]}`],
+                    yearTotalRecovery = yearLocalRecovery + yearExport
+
+                const lastYearLandfill = lastYearData[`${material}_${data.schema.list.destination[0]}`],
+                    lastYearLocalRecovery = lastYearData[`${material}_${data.schema.list.destination[1]}`],
+                    lastYearExport = lastYearData[`${material}_${data.schema.list.destination[2]}`],
+                    lastYearTotalRecovery = lastYearLocalRecovery + lastYearExport
+
+                const fiveYearLandfill = fiveYearData[`${material}_${data.schema.list.destination[0]}`],
+                    fiveYearLocalRecovery = fiveYearData[`${material}_${data.schema.list.destination[1]}`],
+                    fiveYearExport = fiveYearData[`${material}_${data.schema.list.destination[2]}`],
+                    fiveYearTotalRecovery = fiveYearLocalRecovery + fiveYearExport
+
+                // b. Calculate performance data 
+                const landfillVsLastYearPct     = lastYearLandfill === 0        ? 'na' : `${(yearLandfill       >= lastYearLandfill      ? '+' : '-')}${helpers.numberFormatters.formatPct1dec(Math.abs(yearLandfill / lastYearLandfill - 1))}`,
+                    localRecoveryVsLastYearPct  = lastYearLocalRecovery === 0   ? 'na' : `${(yearLocalRecovery  >= lastYearLocalRecovery ? '+' : '-')}${helpers.numberFormatters.formatPct1dec(Math.abs(yearLocalRecovery / lastYearLocalRecovery - 1))}`,
+                    exportVsLastYearPct         = lastYearExport === 0          ? 'na' : `${(yearExport         >= lastYearExport        ? '+' : '-')}${helpers.numberFormatters.formatPct1dec(Math.abs(yearExport / lastYearExport - 1))}`,
+                    totalRecoveryVsLastYearPct  = lastYearTotalRecovery === 0   ? 'na' : `${(yearTotalRecovery  >= lastYearTotalRecovery ? '+' : '-')}${helpers.numberFormatters.formatPct1dec(Math.abs(yearTotalRecovery / lastYearTotalRecovery - 1))}`
+
+                const landfillVsFiveYearPct     = fiveYearLandfill === 0        ? 'na' : `${(yearLandfill       >= fiveYearLandfill      ? '+' : '-')}${helpers.numberFormatters.formatPct1dec(Math.abs(yearLandfill / fiveYearLandfill - 1))}`,
+                    localRecoveryVsFiveYearPct  = lastYearLocalRecovery === 0   ? 'na' : `${(yearLocalRecovery  >= fiveYearLocalRecovery ? '+' : '-')}${helpers.numberFormatters.formatPct1dec(Math.abs(yearLocalRecovery / fiveYearLocalRecovery - 1))}`,
+                    exportVsFiveYearPct         = lastYearExport === 0          ? 'na' : `${(yearExport         >= fiveYearExport        ? '+' : '-')}${helpers.numberFormatters.formatPct1dec(Math.abs(yearExport / fiveYearExport - 1))}`,
+                    totalRecoveryVsFiveYearPct  = fiveYearTotalRecovery === 0   ? 'na' : `${(yearTotalRecovery  >= fiveYearTotalRecovery ? '+' : '-')}${helpers.numberFormatters.formatPct1dec(Math.abs(yearTotalRecovery / fiveYearTotalRecovery - 1))}`
+
+                // c. Build DOM
+                const materialContainer = materialTableContainer.append('div')
+                    .classed(`material-summary-container ${helpers.slugify(material)}`, true)
+
+                const materialLabel = materialContainer.append('div')
+                    .classed(`material-summary-label-container ${helpers.slugify(material)}`, true)
+
+                materialLabel.append('div')
+                    .classed(`material-summary-label ${helpers.slugify(material)}`, true)
+                    .html(material)
+
+                materialLabel.append('div')
+                    .classed(`material-summary-label-bar ${helpers.slugify(material)}`, true)
+
+                const tableContainer = materialContainer.append('div')
+                    .classed('material-summary-table', true)
+
+                const headerContainer = tableContainer.append('div')
+                    .classed(`material-summary-table-headers  ${helpers.slugify(material)}`, true)
+
+                headerContainer.append('div').classed('material-summary-table-header label', true).html('Annual volume and performance data')
+                headerContainer.append('div').classed('material-summary-table-header local-recovery', true).html("Local recovery")
+                headerContainer.append('div').classed('material-summary-table-header export', true).html("Export")
+                headerContainer.append('div').classed('material-summary-table-header total', true).html("Total recovery")
+                headerContainer.append('div').classed('material-summary-table-header trend', true).html("5 year trend for total recovery")
+
+                const performanceTable = tableContainer.append('div').classed(`material-summary-table-performance ${helpers.slugify(material)}`, true)
+
+                const volumesContainer = performanceTable.append('div').classed(`material-summary-table-volumes ${helpers.slugify(material)}`, true),
+                    perLabelsContainer = performanceTable.append('div').classed('material-summary-table-performance-label-container', true),
+                    oneYearContainer = performanceTable.append('div').classed('material-summary-table-performance-1yr-container', true),
+                    fiveYearContainer = performanceTable.append('div').classed('material-summary-table-performance-5yr-container', true),
+                    sparklineContainer = performanceTable.append('div').classed('material-summary-table-trend-container', true)
+
+                volumesContainer.append('div').classed('material-summary-table-header year', true).html(`${settings.year} volume (tonnes)` )
+                volumesContainer.append('div').classed('material-summary-table-data local-recovery', true).html(helpers.numberFormatters.formatComma(yearLocalRecovery))
+                volumesContainer.append('div').classed('material-summary-table-data export', true).html(helpers.numberFormatters.formatComma(yearExport))
+                volumesContainer.append('div').classed('material-summary-table-data total', true).html(helpers.numberFormatters.formatComma(yearTotalRecovery))
+
+                perLabelsContainer.append('div').classed('performance-label-change performance-label', true).html('% change')
+                perLabelsContainer.append('div').classed('performance-label-1yr performance-label', true).html('vs last year')
+                perLabelsContainer.append('div').classed('performance-label-5yr performance-label', true).html('vs 5 years ago')
+
+                oneYearContainer.append('div').classed('material-summary-table-data local-recovery', true).html(localRecoveryVsLastYearPct)
+                oneYearContainer.append('div').classed('material-summary-table-data export', true).html(exportVsLastYearPct)
+                oneYearContainer.append('div').classed('material-summary-table-data total', true).html(totalRecoveryVsLastYearPct)
+
+                fiveYearContainer.append('div').classed('material-summary-table-data local-recovery', true).html(localRecoveryVsFiveYearPct)
+                fiveYearContainer.append('div').classed('material-summary-table-data export', true).html(exportVsFiveYearPct)
+                fiveYearContainer.append('div').classed('material-summary-table-data total', true).html(totalRecoveryVsFiveYearPct)
+
+                // d. Add material sparkline
+                const sparklineSVG =  sparklineContainer.append('svg').attr('id', `${helpers.slugify(material)}-sparkline`)
+                const sparkData  = dataTable.map(d => d[`${material}_${data.schema.list.destination[1]}`] + d[`${material}_${data.schema.list.destination[2]}`])
+                renderSparkline(`${helpers.slugify(material)}-sparkline`, sparkData, settings.dims.minor_sparkline)
+            })
+
+            // 4. Fade in vis
+            d3.select('.main-container').transition().duration(2000).style('opacity', null)  
+        };
+
+        /////////////////////////////////
+        /// X. SPARKLINE CHART METHOD ///
+        /////////////////////////////////
+
+        const renderSparkline = function(svgID, data, dims, annotate = false){
+            d3.select(`#${svgID} *`).remove()
+            // a. SVG and chart dimensions (note: width and height are scaled to the container dimensions => use for setting chart aspect ratio. CSS used for setting stroke and market styling)
+            dims.chartHeight = dims.height - dims.margin.top - dims.margin.bottom       // Chart dimensions include the margin
+            dims.chartWidth = dims.width - dims.margin.left - dims.margin.right
+            // b. Setup SVG element for dimensions 
+            const svg = d3.select('#'+svgID)
+                    .attr('viewBox', `0 0 ${dims.width} ${dims.height}`),   
+                bg = svg.append('g') 
+                    // Setting the viewBox allows the SVg element to scale to its HTML continer size 
+                chart = svg.append('g')    
+                    .attr('transform', `translate(${dims.margin.left} , ${dims.margin.top} )`);     // Group element for the chart 
+            // b. Setup x and y scales.  
+            const yDomain =  settings.yDomain === 'includeZero' ? d3.max(data) > 0 ? [0, d3.max(data)] : [d3.min(data, 0)]                             // If settings.y0 is specified as true, extend the domain to zero on the y xis (for both positive and negative series)
+                        : settings.yDomain === 'indexed' ? [-d3.max(data.map(d => Math.abs(d)))  , d3.max(data.map(d => Math.abs(d))) ]          // If indexed then set an even with teh "absolute max: as extent =? this ensures a sparkline startign in "vertical center" with equal  
+                            : d3.extent(data),                                                              // Or else use the y data extent (min and max) to set the domain (this emphasises the 'trend' at the expense of showing changes relative to zero)         
+                xScale = d3.scaleLinear().domain([0, data.length-1]).range([dims.margin.left, dims.chartWidth - dims.margin.right ]),
+                yScale = d3.scaleLinear().domain(yDomain).range([dims.chartHeight - dims.margin.top, dims.margin.bottom]);
+
+            // c.Setup the 'shape generator' function for a line: this takes data points (inputs) and creates an SVG path string for that data, using the scales 
+            const line = d3.line()
+                .x((d, i) => xScale(i))
+                .y(d => yScale(d));
+            // d. Render sparkline path and start/end markers; and one year ago
+            chart.append('path').classed('sparkline', true)                                 // Append an SVG path for the sparkline
+                .datum(data)                                                                // ..using the supplied data array
+                .attr('d', line);                                                           // ..and line generator
+            chart.append('circle').classed('sparkline-start-point marker', true)                   // Append circle marker at the start of the line
+                .attr('cx', xScale(0))
+                .attr('cy', yScale(data[0]))
+            chart.append('circle').classed('sparkline-end-point marker', true)                    // Append circle marker at the end of the line
+                .attr('cx', xScale(data.length - 1))
+                .attr('cy', yScale(data[data.length - 1]))
+            chart.append('circle').classed('sparkline-year-ago-point marker', true)                    // Append circle marker at the end of the line
+                .attr('cx', xScale(data.length - 2))
+                .attr('cy', yScale(data[data.length - 2]))
+
+
+            // e. Annotatation for headline charts
+            if(annotate){
+                const latestData = data[data.length -1],
+                    lastYearData = data[data.length -2],
+                    fiveYearData = data[data.length - 5],
+                    labelSign = latestData >= lastYearData ? 'more than' : 'less than',
+                    labelY = yScale(latestData) < dims.chartHeight * 0.5 ? dims.height * 0.625 : dims.height * 0.2
+
+                bg.append('text')
+                    .classed('sparkline-annotation', true)
+                    .attr('x', dims.margin.left + xScale(0))
+                    .attr('y', dims.height - dims.margin.bottom)
+                    .text('Five year trendline')
+
+                bg.append('text')
+                    .classed('sparkline-annotation large', true)
+                    .attr('x', dims.margin.left + xScale(3) + 2)
+                    .attr('y', labelY)
+                    .text(helpers.numberFormatters.formatPct1dec(Math.abs(latestData/lastYearData -1)))
+                bg.append('text')
+                    .classed('sparkline-annotation', true)
+                    .attr('x', dims.margin.left + xScale(3) + 2)
+                    .attr('y', labelY+ 9)
+                    .text(labelSign)
+                bg.append('text')
+                    .classed('sparkline-annotation', true)
+                    .attr('x', dims.margin.left + xScale(3) + 2)
+                    .attr('y', labelY + 18)
+                    .text('last year')
+
+                bg.append('rect')
+                    .classed('sparkline-shading-1yr', true)
+                    .attr('x', xScale(3) + dims.margin.left )
+                    .attr('y', 0)
+                    .attr('width', xScale(1) - dims.margin.left)
+                    .attr('height', dims.height) 
+            }
+
+
+        }; // end renderSparkline
+
+        ////////////////////////////////
+        /// X. HELPER FUNCTIONS      ///
+        ////////////////////////////////
+
+        const helpers= {
+            numberFormatters: {
+                formatComma:           	d3.format(",.0f"),
+                formatComma1dec:       	d3.format(",.1f"),
+                formatComma2dec:       	d3.format(",.2f"),
+                formatInteger:         	d3.format(".0f"),   
+                formatCostInteger:     	d3.format("$,.0f"),  
+                formatCost1dec:        	d3.format("$,.1f"),  
+                formatCost2dec:        	d3.format("$,.2f"),  
+                formatPct:          	d3.format(".0%"), 
+                formatPct1dec:          d3.format(".1%")  
+            },
+            slugify: function (str) {
+                str = str.replace(/^\s+|\s+$/g, '').toLowerCase(); // trim           
+                const from = "àáäâèéëêìíïîòóöôùúüûñç·/_,:;",      // remove accents, swap ñ for n, etc
+                    to   = "aaaaeeeeiiiioooouuuunc------"
+                for (var i=0, l=from.length ; i<l ; i++) {
+                    str = str.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
+                }
+                str = str.replace(/[^a-z0-9 -]/g, '') // remove invalid chars
+                    .replace(/\s+/g, '-') // collapse whitespace and replace by -
+                    .replace(/-+/g, '-'); // collapse dashes
+                return str;
+            } 
+        }
+
+    </script>
+</html>
+
