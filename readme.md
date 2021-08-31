@@ -232,4 +232,4 @@ Some visualisations can be tweaked and customised further:
 
 ## Interactive waste report graphics
 Section TBA: this will cover any animation or customised interaction options for web-first graphics (currently being considered)
-# waste-report-graphics
+
