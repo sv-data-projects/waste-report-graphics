@@ -366,7 +366,7 @@
                     .attr('y', infoPaneMargin.top + 10)
                     .attr('dy', 0)
                     .text('Export destinations ranked by volume')
-                    .call(helpers.wrap, infoPaneWidth - infoPaneMargin.left - infoPaneMargin.right, 1.1)
+                    .call(helpers.wrap, infoPaneWidth - infoPaneMargin.left - infoPaneMargin.right * 2, 1.1)
                 
                 infoPane.append('text').classed('info-page-subheader', true)
                     .attr('x', infoPaneMargin.left)
