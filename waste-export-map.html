@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Victorian recovered material export map">
     <meta name="author" content="Sustainability Victoria">
+    <link rel="stylesheet" href="./css/core.css">
     <script src="https://d3js.org/d3.v7.min.js"></script>
+
     <style>
             body{
             font-family: 'DIN Next LT Pro';
@@ -96,8 +98,7 @@
             font-size: 12px;
         }
         .export-connector{
-            stroke-width: 1;
-            stroke: var(--secondaryBottleGreenLight);
+            stroke: var(--secondaryBottleGreen);
             mix-blend-mode: multiply;
             fill: none;
         }
@@ -148,6 +149,7 @@
         const settings = { 
             svgID:                  'map',
             year:                   '2019-20',              
+            showSparklines:         true,              
             dims: {
                 width:              1080,
                 height:             720,
@@ -230,15 +232,18 @@
             if (settings.queryParameters.has('year')) { 
                 settings.year = settings.queryParameters.get('year')  
             }
+            if (settings.queryParameters.has('showSparklines')) { 
+                settings.showSparklines = settings.queryParameters.get('showSparklines')  
+            }
         };
 
         // Parse input data for export volumes by country
         async function transformData(exportData){
             // 1. Extract lists 
             const yearData = exportData.filter(d => d.year === settings.year)
-            data.schema.list.country = [...new Set(yearData.sort((a, b) => (a.Total < b.Total) ? 1 : -1).map(d => d.Destination).filter(d => d !== 'Others'))]            // Sort ensures list is ranked by total
-            data.schema.list.country.push('Others')               // 'Others' back  to end of array'                                                 
-            data.schema.list.materials = Object.keys(yearData[0]).filter(d => d !== "year" && d !== "Destination" && d !== 'Total' && d !== 'exPathOffsetX' && d !== 'exPathOffsetY'  && d !== 'endOffsetX' && d !== 'endOffsetY')      // Materials are in order of how they are in the raw data (i.e. change column order in data to re-order in vis)
+            data.schema.list.country = [...new Set(yearData.sort((a, b) => (a.Total < b.Total) ? 1 : -1).map(d => d.Destination).filter(d => d !== 'All other countries'))]            // Sort ensures list is ranked by total
+            data.schema.list.country.push('All other countries')               // 'Others' back  to end of array'                                                 
+            data.schema.list.materials = Object.keys(yearData[0]).filter(d => d !== "year" && d !== "Destination" && d !== 'Total' && d !== 'exPathOffsetX' && d !== 'exPathOffsetY'  && d !== 'endOffsetX' && d !== 'endOffsetY' && d !== 'endLabelOffsetX' && d !== 'endLabelOffsetY')      // Materials are in order of how they are in the raw data (i.e. change column order in data to re-order in vis)
 
             // 2. Shape data by export country
             data.schema.list.country.forEach(country => {
@@ -310,8 +315,7 @@
                 vic_cx =  vicBBox.x + vicBBox.width/2,
                 vic_cy =  vicBBox.y + vicBBox.height/2
 
-            data.schema.list.country.filter(d => d !== 'Others').forEach( country => {
-console.log(country, data.byExportCountry[country].endOffsetX, data.byExportCountry[country].endOffsetY)
+            data.schema.list.country.filter(d => d !== 'All other countries').forEach( country => {
                 const countryBBox = d3.select(`#${helpers.slugify(country)}`).node().getBBox(),
                     country_cx = countryBBox.x + countryBBox.width / 2 + data.byExportCountry[country].endOffsetX,
                     country_cy = countryBBox.y + countryBBox.height/ 2 + data.byExportCountry[country].endOffsetY,
@@ -329,11 +333,12 @@ console.log(country, data.byExportCountry[country].endOffsetX, data.byExportCoun
                 // b. Add country label and pct
                 countryLabels.append('text')
                     .classed(`country-label ${helpers.slugify(country)}`, true)
-                    .attr('transform', `translate(${country_cx}, ${country_cy -7})`)
+                    .attr('transform', `translate(${country_cx + data.byExportCountry[country].endLabelOffsetX}, ${country_cy -7 + data.byExportCountry[country].endLabelOffsetY})`)
                     .text(country)
+
                 countryLabels.append('text')
                     .classed(`country-label-pct ${helpers.slugify(country)}`, true)
-                    .attr('transform', `translate(${country_cx}, ${country_cy + 6 })`)
+                    .attr('transform', `translate(${country_cx + data.byExportCountry[country].endLabelOffsetX}, ${country_cy + 6 + data.byExportCountry[country].endLabelOffsetY})`)
                     .text(helpers.numberFormatters.formatPct1dec(data.byExportCountry[country].Total / totalExports))
 
                 // c. Add Export path from Vic
@@ -360,7 +365,7 @@ console.log(country, data.byExportCountry[country].endOffsetX, data.byExportCoun
                     .attr('x', infoPaneMargin.left)
                     .attr('y', infoPaneMargin.top + 10)
                     .attr('dy', 0)
-                    .text('Top ten export countries')
+                    .text('Export destinations ranked by volume')
                     .call(helpers.wrap, infoPaneWidth - infoPaneMargin.left - infoPaneMargin.right, 1.1)
                 
                 infoPane.append('text').classed('info-page-subheader', true)
@@ -391,20 +396,20 @@ console.log(country, data.byExportCountry[country].endOffsetX, data.byExportCoun
                     const countryGroup = infoPane.append('g')
                         .attr('transform', `translate(${infoPaneMargin.left}, ${countryGroupYpos})`)
                     countryGroup.append('text').classed('country-list-name', true)
-                        .text(`${i +1}. ${country}`)
+                        .text( i < data.schema.list.country.length ? `${i +1}. ${country}` : `${country}` )
 
                     const countryTotalVol = data.byExportCountry[country].Total
                     countryGroup.append('text').classed('country-total-vol', true)
                         .attr('x', countyGroupWidth )
                         .text(`${helpers.numberFormatters.formatComma(countryTotalVol)}`)
-                    countryGroup.append('rect').classed(`total-bar ${helpers.slugify(country)}`, true)
+                    countryGroup.append('rect').classed(`total-bar bar ${helpers.slugify(country)}`, true)
                         .attr('x', 0)
                         .attr('y', 3)
                         .attr('height', 1.5)
                         .attr('width', countryBarScale(countryTotalVol))
 
                     // Add materials
-                    if(i < 5 || country === 'Others'){
+                    if(i < 5 || country === 'All other countries'){
                         let materialsCounter = 0                
                         data.schema.list.materials.forEach((material, i) => {
                             const materialMax =  d3.max(data.inputData.export.map(d => d[material]))
@@ -419,7 +424,7 @@ console.log(country, data.byExportCountry[country].endOffsetX, data.byExportCoun
                                     .attr('x', countyGroupWidth )
                                     .attr('y', 15 + materialsCounter * materialYSpace)
                                     .text(`${helpers.numberFormatters.formatComma(countryMateriaVol)}`)
-                                countryGroup.append('rect').classed(`material-bar ${helpers.slugify(material)}`, true)
+                                countryGroup.append('rect').classed(`material-bar bar ${helpers.slugify(material)}`, true)
                                     .attr('x', 0)
                                     .attr('y', 17 + materialsCounter * materialYSpace)
                                     .attr('height', 0.6)
@@ -469,7 +474,7 @@ console.log(country, data.byExportCountry[country].endOffsetX, data.byExportCoun
                     .attr('x', 0)
                     .attr('y', 90 + i * materialYSpace)
                     .text(material)
-                totalGroup.append('rect').classed(`total-material-bar ${helpers.slugify(material)}`, true)
+                totalGroup.append('rect').classed(`total-material-bar bar ${helpers.slugify(material)}`, true)
                     .attr('x', 0)
                     .attr('y', 93 + i * materialYSpace)
                     .attr('height', 2)
@@ -479,6 +484,12 @@ console.log(country, data.byExportCountry[country].endOffsetX, data.byExportCoun
                     .attr('y', 90 + i * materialYSpace)
                     .text(`${helpers.numberFormatters.formatComma(materiaVol)} tonnes`)                    
             })
+
+            // Toggle bars
+            if(!settings.showSparklines){
+                d3.selectAll('.bar').attr('display', 'none')
+            }
+
     }; // end renderMap()
 
 
