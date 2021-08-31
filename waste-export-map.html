@@ -233,7 +233,7 @@
                 settings.year = settings.queryParameters.get('year')  
             }
             if (settings.queryParameters.has('showSparklines')) { 
-                settings.showSparklines = settings.queryParameters.get('showSparklines')  
+                settings.showSparklines = settings.queryParameters.get('showSparklines') === 'false' ? false : true 
             }
         };
 
