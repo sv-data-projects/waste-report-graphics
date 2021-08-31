@@ -44,7 +44,7 @@ List TBA
 
 **User guidance**
 &nbsp;
-- [**Waste report graphics: visualisation options](#waste-report-graphics-visualisation-options)
+- [**Waste report graphics: visualisation options**](#waste-report-graphics-visualisation-options)
     - [Using query strings for setting visualisation options](#using-query-strings-for-setting-visualisation-options)
     - [Waste report graphics and their options](#waste-report-graphics-and-their-options)
     - [Further customisation of waste report graphics](#further-customisation-of-waste-report-graphics)
