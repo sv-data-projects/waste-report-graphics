@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="Progress vs RV targets">
+        <meta name="author" content="Sustainability Victoria">
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+        <link rel="stylesheet" href="./css/core.css">
+        <style>
+
+            /***********************************************************/
+            /***********************************************************/
+            /****                                                   ****/
+            /**** PROGRESS VS RV TARGETS DIAGRAMS  | CUSTOM CSS     ****/
+            /**** -----------------------------------------------   ****/
+            /**** - CSS Variables and loaded fonts from core.css    ****/
+            /****                                                   ****/
+            /***********************************************************/
+            /***********************************************************/
+
+
+            /*******************************************/
+            /***  PAGE LAYOUT | HEADLINE + MATERIAL ***/
+            /******************************************/
+            body{
+                font-family: 'DIN Next LT Pro';
+                margin: 0;                          /* Full bleed presentation */
+            } 
+
+            /******************************************/
+            /***  TYPOGRAPHY | HEADLINE + MATERIAL ***/
+            /*****************************************/
+
+            /* Headline Typography */
+            .main-title{
+                font-size: 3.25vw;
+                font-weight: 500;
+                fill: #000;
+                mix-blend-mode: multiply;
+                text-transform: uppercase;
+                padding: 0 2vw;
+            }
+
+            .progress-graphic-container{
+                display: grid;
+                grid-template-columns: 1fr 2fr 2fr 1fr;
+                grid-template-rows: auto;
+                grid-column-gap: 2vw;
+            }
+                .left-container{
+                    grid-area: 1 / 3 / 2 / 4;
+                }
+                .right-container{
+                    grid-area: 1 / 2 / 2 / 3;
+                }
+                    .target-label{
+                        font-size: 2.5vw;
+                        font-weight: 600;
+                        color: var(--secondaryBottleGreen);
+                        padding-bottom: 1vw;
+                    }
+                    .target-text{
+                        font-size: 1.75vw;
+                        color: var(--secondaryBottleGreen);
+                        padding: 2vw 0vw 1vw;
+                    }
+                    .target-definition{
+                        grid-area: 3 / 2 / 4 / 3;
+                        font-size: 1vw;
+                        color: var(--xCharcoal);
+                        padding-top: 1vw;
+                        border-top: dotted var(--xCharcoal) 0.5px;
+                    }
+
+            /* SVG styling */
+            .outline-circle{
+                fill: transparent;
+                stroke: #000;
+                stroke-width: 3px;
+            }
+            .targets-circular-label{
+                font-size: 14px;
+                font-weight: 500;
+                fill: var(--secondaryGrey);
+                text-transform: uppercase;
+            }
+            .label.header{
+                font-size: 18px;    
+                font-weight: 500;
+                text-anchor: middle;
+                fill: var(--secondaryBottleGreen);
+            }
+            .sparkline{
+                fill: none;
+                stroke-width: 1.5px;
+                stroke: var(--svGreen);
+                stroke-dasharray: 3px 3px;
+            }
+            .marker.baseline{
+                fill: #fff;
+                stroke: #000;
+                stroke-width: 1px;
+                r: 4;
+            }
+            .marker.current{
+                fill: var(--secondaryBottleGreenLight);
+                r: 4;
+            }
+
+            .marker.target.outer,
+            .marker.target.spacer,
+            .marker.target.center{
+                fill: var(--svGreen);
+                stroke: none;
+            }
+            .marker.target.outer{
+                r: 10;
+            }
+            .marker.target.spacer{
+                fill: #fff;
+                r: 7;
+            }
+            .marker.target.center{
+                r: 4;
+            }
+
+            .label.baseline,
+            .label.target{
+                text-anchor: middle;
+            }
+            .label.baseline,
+            .label.target{
+                font-size: 12px;
+                font-weight: 500;
+                fill: #000;
+            }
+            .label.baseline.unit,
+            .label.target.unit{
+                font-size: 10px;
+                font-weight: 300
+            }
+            .label.current{
+                font-size: 10px;
+                text-shadow: #fff 4px 4px 2px;
+            }
+            .current{
+                fill: var(--secondaryBottleGreenLight);
+            }
+            .target{
+                fill: var(--svGreen);
+            }
+        </style>
+    </head>
+
+    <body>
+        <main class ='main-container' style='opacity: 0'>
+            <!-- Main title -->
+            <div class = 'title-container'>
+                <h1 class = 'main-title'></h1>
+            </div>
+            <!-- Container for target progress graphics -->
+            <div class = 'progress-graphics-container'></div>
+        </main>        
+    </body>
+
+    <script>
+
+        /////////////////////////////////////////////////////////////////////////////////
+        /// 0. BUILD SEQUENCE: INIT SETTINGS AND DATA OBJECTS AND LOADING => RENDER  ///
+        ////////////////////////////////////////////////////////////////////////////////
+
+        // Instantiate settings and data objects
+        const settings = {
+            year:   {},
+            finYear: {},
+            dims: { 
+                height: 360,
+                width: 360,
+                showY0: false
+            },
+            display:{
+                targets:        'all',      // Show 'all' targets by default or single target by index
+                alternating:     true      // Show alternating labels
+            }
+        }
+
+        const data = {          // Initiate data object that populated by the parseData() function, 
+            table:     {},
+            schema: {
+                list:  {},
+                targets: {},
+            }
+        }
+
+        // Call build function
+        buildFromGSheetData(settings)
+
+        // Load data from TSV files from GSheet
+        function buildFromGSheetData(config){  
+            // d3.select('.main-container').style('opacity', 0)        // Set for fade in
+
+            // 1. Specify data table links for each table used (tsv published output from each separate sheet/table)
+            const gsTableLinks =  {
+                rvTargetsData:        'https://docs.google.com/spreadsheets/d/e/2PACX-1vSimVJWCqYLTijgqeU-SPGdAFT6wpGprHgjPdpxEElWurVvl28JYr7dHGE3OCSjF4VYH2_QggJUnveO/pub?gid=394576976&single=true&output=tsv'
+            }
+
+            // 2. Asynchronous data load (with Promise.all) and D3 (Fetch API) 
+            Promise.all(
+                Object.values(gsTableLinks).map(link => d3.tsv(link))       // Pass in array of d3.tsv loaders with each link
+            ).then( rawData => {
+                // a. Parse each loaded data table and store in data.table object, using the parseTable helper 
+                rawData.forEach((tableData, i) => {  parseTable(Object.keys(gsTableLinks)[i], tableData) })
+                return data
+
+            }).then( async (data) => {
+                // 3. Initiate vis build sequence with data now loaded
+                await applyQuerySettings(config)                        // a. Apply query string settings
+                await transformData(data.table.rvTargetsData)               // b.  Transform and shape data
+                await renderVis(data.table.rvTargetsData, config)  
+            })
+
+            // X. Table data parsing function: trim() header white space and prase numbers with "$" and "," stripped. 
+            const parseTable = (tableName, tableData) => {
+                data.table[tableName] = tableData.map(row => {
+                    const newObj = {}
+                    Object.entries(row).forEach(([key, value]) => {
+                        switch(key.trim().toLowerCase()){
+                            case 'year':
+                                newObj[key.trim()] =  value
+                                break     
+                            default:
+                                newObj[key.trim()] = isNaN(parseFloat(value.replace(/\$|,/g, ''))) ? value : parseFloat(value.replace(/\$|,/g, '')) 
+                        }
+                    })
+                    return newObj
+                })
+            };
+        }; // end buildFromGSheetData()
+
+
+        //////////////////////////////////
+        // 1. PARSE AND WRANGLE DATA   ///
+        //////////////////////////////////
+
+        async function applyQuerySettings(settings){
+            // i. Check for query parameters and update material. A date set by the query selector is set while parsing input data 
+            settings.queryParameters = new URLSearchParams(window.location.search)
+            if (settings.queryParameters.has('target')) { 
+                settings.display.targets = +settings.queryParameters.get('target')  
+            }
+            if (settings.queryParameters.has('alternate')) { 
+                settings.display.alternating = settings.queryParameters.get('alternate')  === 'false' ? false : true
+            }
+        };
+
+        async function transformData(dataTable) {   
+            // 1. Create lists and meta info objects
+            const milestoneHeaders = Object.keys(dataTable[0]).filter(d => d.indexOf('_') > 0)
+            data.schema.targets = milestoneHeaders.map(d => {      // return an object to hold and define useful meta info
+                const label = d.slice(0, d.indexOf('_')),
+                    finYear = d.slice(d.indexOf('_') + 1),  
+                    year    = 2000 + (+d.slice(d.indexOf('-')+1)),
+                    definition = d.Definition
+                settings.year[label] = year
+                settings.finYear[label] = finYear
+                return { label, finYear, year}
+            })
+
+            data.schema.list.labels         = data.schema.targets.map(d => d.label)
+            data.schema.list.milestoneFYs   = data.schema.targets.map(d => d.finYear)
+            data.schema.list.years          = data.schema.targets.map(d => d.year)
+
+            // 1. Create charting data
+            data.charts = dataTable.map((obj, i) => {
+                const dataArray = []
+                data.schema.list.years.forEach(year => {
+                    const milestoneKeys =  Object.keys(obj).filter(d => !isNaN(+d.slice(d.indexOf('-')+1))),
+                        matchedKeyIndex = milestoneKeys.map( d => 2000 + (+d.slice(d.indexOf('-')+1))).indexOf(year),
+                        matchedKey = milestoneKeys[matchedKeyIndex]
+                    dataArray.push({
+                        year:       year,
+                        value:      obj[matchedKey]
+                    })
+                }) 
+                return  dataArray
+            })
+        };
+
+
+        /////////////////////////////////////
+        // 2. RENDER THE SUMMARY PAGE VIS ///
+        /////////////////////////////////////
+
+        async function renderVis(dataTable, settings){ 
+            // 1. Set title and reference
+            if(settings.display.targets === 'all'){
+                d3.select('.main-title').html(`${settings.year.Baseline}-${settings.year.Baseline+1 - 2000} Progress toward Recycling Victoria Targets`)
+            }
+            const container = d3.select('.progress-graphics-container')
+
+            // 2. Setup vis scales
+            const targetsData = settings.display.targets === 'all' ? dataTable : dataTable.slice(settings.display.targets, settings.display.targets+ 1)
+
+            targetsData.forEach((obj, i) => {
+                const meta = data.schema.targets[i],        
+                    chartData = data.charts[i]
+                // a. Setup DOM
+                const targetContainer = container.append('div').classed('progress-graphic-container', true),
+                    infoContainer = targetContainer.append('div').classed(`${i%2 === 0 && settings.display.alternating ? 'left-container' : 'right-container'}`, true),
+                    svgContainer = targetContainer.append('div').classed(`${i%2 === 1  || !settings.display.alternating ? 'left-container' : 'right-container'}`, true)
+
+                infoContainer.append('div').classed('target-label', true)
+                    // .html(obj.Label)
+                infoContainer.append('div').classed('target-text', true)
+                    .html(obj.Target)
+                infoContainer.append('div').classed('target-definition', true)
+                    .html(obj.Definition)
+
+
+                // b. Add "Performance " graphic
+                const svg = svgContainer.append('svg').attr('id', `vis-target-${i+ 1}`)
+                        .attr('viewBox', `0 0 ${settings.dims.width} ${settings.dims.height}`)
+                        .attr('width', `100%`)
+                const defs = svg.append('defs')
+                const radius = settings.dims.height * 0.425
+
+                // Append a circular border
+                const visBG = svg.append('g')
+                visBG.append('circle').classed('outline-circle', true)
+                    .attr('cx', settings.dims.width * 0.5)
+                    .attr('cy', settings.dims.height * 0.5)
+                    .attr('r', radius)
+
+                // Append circular label 
+                const labelRadius = radius * 1.05
+                const targetUp = chartData[chartData.length - 1].value > chartData[0].value ? true  : false
+                const circularLabelPath = `M${0} ${0}  A${labelRadius}, ${labelRadius}, 0, 0, 1, ${0}, ${labelRadius * 2}
+                    A${labelRadius}, ${labelRadius}, 1, 0, 1, ${0}, ${0}`
+
+                defs.append('path').attr('id', `${helpers.slugify(obj.Label)}-label-path`)
+                    .attr('transform', `translate(${settings.dims.width * 0.5}, ${settings.dims.height * 0.5 - labelRadius})`)
+                    .attr('d', circularLabelPath)
+
+                visBG.append('text').classed('targets-circular-label', true)
+                    .append('textPath').attr("href", `#${helpers.slugify(obj.Label)}-label-path`)
+                    .html(`Tracking <tspan class ="current">progress</tspan> towards <tspan class ="target">targets</tspan>`)	
+                    .attr('text-anchor', targetUp ? 'end' : 'start')
+                    .attr('startOffset', targetUp ? '95%' : '5%')
+
+                // Append a sparkline
+                    // b. Setup SVG element for dimensions 
+                    const chartMarginX = settings.dims.width * 0.35,
+                        chartMarginY = settings.dims.width * 0.35,
+                        chartWidth =   settings.dims.width - chartMarginX * 2, 
+                        chartHeight =   settings.dims.height - chartMarginY * 2
+
+                    const chart = svg.append('g').attr('transform', `translate(${0} , ${0} )`);     // Group element for the chart 
+
+                    // b. Setup x and y scales.  
+                    const yDomain =  settings.dims.showY0 ? d3.max(chartData.map(d => d.value)) > 0 ? [0, d3.max(chartData.map(d => d.value))] : [d3.min(chartData.map(d => d.value), 0)]                             // If settings.y0 is specified as true, extend the domain to zero on the y xis (for both positive and negative series)
+                                    : d3.extent(chartData.map(d => d.value)),                                                              // Or else use the y data extent (min and max) to set the domain (this emphasises the 'trend' at the expense of showing changes relative to zero)         
+                        xScale = d3.scaleLinear()
+                                    .domain(d3.extent(chartData.map(d => d.year)))
+                                    .range([chartMarginX, chartMarginX + chartWidth]),
+                        yScale = d3.scaleLinear().domain(yDomain)
+                                    .range([settings.dims.height - chartMarginY, chartMarginY]);
+
+                    // c. Setup the 'shape generator' function for a line: this takes data points (inputs) and creates an SVG path string for that data, using the scales 
+                    const line = d3.line()
+                        .x((d, i) => xScale(d.year))
+                        .y(d => yScale(d.value));
+                    const numberFormatter = obj.UnitType ==='pct' ? helpers.numberFormatters.formatPct 
+                        : obj.UnitType ==='float2' ? helpers.numberFormatters.formatComma2dec 
+                            : helpers.numberFormatters.formatInteger
+                        unit = obj.Unit === "pct" ? '' : obj.Unit
+
+                    // d. Render trajectory path
+                    chart.append('path').classed('sparkline', true)                                 // Append an SVG path for the sparkline
+                        .datum(chartData.filter(d => d.year !== settings.year.Current && d.value !== 'na'))                                                                // ..using the supplied data array
+                        .attr('d', line);             
+
+                    // e. Render markers                                           
+                    chart.append('circle').classed('baseline marker', true)            // Append circle marker at the start of the line
+                        .attr('cx', xScale(chartData[0].year))
+                        .attr('cy', yScale(chartData[0].value))
+                    chart.append('circle').classed('current marker', true)                // Append circle marker at current year
+                        .attr('cx', xScale(chartData[1].year))
+                        .attr('cy', yScale(chartData[1].value))
+                    chart.append('circle').classed('target marker outer', true)              // Append circle marker at the end of the line
+                        .attr('cx', xScale(chartData[chartData.length - 1].year))
+                        .attr('cy', yScale(chartData[chartData.length - 1].value))
+                    chart.append('circle').classed('target marker spacer', true)              // Append circle marker at the end of the line
+                        .attr('cx', xScale(chartData[chartData.length - 1].year))
+                        .attr('cy', yScale(chartData[chartData.length - 1].value))
+                    chart.append('circle').classed('target marker center', true)              // Append circle marker at the end of the line
+                        .attr('cx', xScale(chartData[chartData.length - 1].year))
+                        .attr('cy', yScale(chartData[chartData.length - 1].value))
+
+                    // f. Render labels    
+                    chart.append('text').classed('label header', true)
+                        .attr('x', settings.dims.width * 0.5)
+                        .attr('y', settings.dims.width * 0.225)
+                        .attr('dy', 0)
+                        .text(obj.Label)
+                        .call(helpers.wrap, settings.dims.width * 0.45, 1.1)
+
+                    chart.append('text').classed('label baseline', true)
+                        .attr('x', xScale(chartData[0].year) - 40)
+                        .attr('y', yScale(chartData[0].value) - 12)
+                        .text('Baseline')
+                    chart.append('text').classed('label baseline unit', true)
+                        .attr('x', xScale(chartData[0].year) - 40)
+                        .attr('y', yScale(chartData[0].value) + 0)
+                        .attr('dy', 0)
+                        .text(`${numberFormatter(chartData[0].value)} ${unit} in ${settings.finYear.Baseline}` )
+                        .call(helpers.wrap, settings.dims.width * 0.15, 1.1)
+
+                    chart.append('text').classed('label target', true)
+                        .attr('x', xScale(chartData[chartData.length - 1].year) + 40)
+                        .attr('y', yScale(chartData[chartData.length - 1].value) - 6)
+                        .text(`Targeting` )
+                    chart.append('text').classed('label target unit', true)
+                        .attr('x', xScale(chartData[chartData.length - 1].year) + 40)
+                        .attr('y', yScale(chartData[chartData.length - 1].value) + 6 )
+                        .attr('dy', 0)
+                        .text(`${numberFormatter(chartData[chartData.length - 1].value)}  ${unit} by ${settings.finYear.Target}` )
+                        .call(helpers.wrap, settings.dims.width * 0.15, 1.1)
+
+                    chart.append('text').classed('label current', true)
+                        .attr('x', xScale(chartData[1].year) + 8)
+                        .attr('y', yScale(chartData[1].value) + 3 )
+                        .attr('dy', 0)
+                        .text(`${numberFormatter(chartData[1].value)} ${unit} in ${settings.finYear.Current}`)
+                        .call(helpers.wrap, settings.dims.width * 0.25, 1.1)
+            })
+
+
+
+            // 4. Fade in vis
+            d3.select('.main-container').transition().duration(2000).style('opacity', null)  
+        };
+
+        ////////////////////////////////
+        /// X. HELPER FUNCTIONS      ///
+        ////////////////////////////////
+
+        const helpers= {
+            numberFormatters: {
+                formatComma:           	d3.format(",.0f"),
+                formatComma1dec:       	d3.format(",.1f"),
+                formatComma2dec:       	d3.format(",.2f"),
+                formatInteger:         	d3.format(".0f"),   
+                formatCostInteger:     	d3.format("$,.0f"),  
+                formatCost1dec:        	d3.format("$,.1f"),  
+                formatCost2dec:        	d3.format("$,.2f"),  
+                formatPct:          	d3.format(".0%"), 
+                formatPct1dec:          d3.format(".1%")  
+            },
+            slugify: function (str) {
+                str = str.replace(/^\s+|\s+$/g, '').toLowerCase(); // trim           
+                const from = "àáäâèéëêìíïîòóöôùúüûñç·/_,:;",      // remove accents, swap ñ for n, etc
+                    to   = "aaaaeeeeiiiioooouuuunc------"
+                for (var i=0, l=from.length ; i<l ; i++) {
+                    str = str.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
+                }
+                str = str.replace(/[^a-z0-9 -]/g, '') // remove invalid chars
+                    .replace(/\s+/g, '-') // collapse whitespace and replace by -
+                    .replace(/-+/g, '-'); // collapse dashes
+                return str;
+            },
+            wrap: function(text, width, lineHeight, centerVertical = false) {
+                text.each(function() {
+                    let text = d3.select(this),
+                        words = text.text().split(/\s+/).reverse(),
+                        word,
+                        line = [],
+                        lineNumber = 0,
+                        y = text.attr("y"),
+                        x = text.attr("x"),
+                        fontSize = parseFloat(text.style("font-size")),
+                        dy = parseFloat(text.attr("dy")),
+                        tspan = text.text(null).append("tspan").attr("x", x).attr("y", y).attr("dy", dy + "em");
+
+                    while (word = words.pop()) {
+                        line.push(word);
+                        tspan.text(line.join(" "));
+
+                        if (tspan.node().getComputedTextLength() > width) {
+                            line.pop();
+                            tspan.text(line.join(" "));
+                            line = [word];
+                            tspan = text.append("tspan")
+                                .attr("x", x)
+                                .attr("y",  y)
+                                .attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+                        }                    
+                    }            
+                    if(centerVertical){
+                        text.style("transform",  "translateY(-"+(10 * (lineNumber))+"px)")
+                    }
+                })
+            }
+        }
+
+    </script>
+</html>
+
