@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="Kerbside collections trends summary tables">
+        <meta name="author" content="Sustainability Victoria">
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+        <link rel="stylesheet" href="./css/core.css">
+        <style>
+
+            /***********************************************************/
+            /***********************************************************/
+            /****                                                   ****/
+            /**** VICTORRINA WRRG WASTE DATA MAP  | CUSTOM CSS      ****/
+            /**** -----------------------------------------------   ****/
+            /**** - CSS Variables and loaded fonts from core.css    ****/
+            /****                                                   ****/
+            /***********************************************************/
+            /***********************************************************/
+
+
+            /*******************************************/
+            /***  PAGE LAYOUT | HEADLINE + MATERIAL ***/
+            /******************************************/
+            body{
+                font-family: 'DIN Next LT Pro';
+                margin: 0;                          /* Full bleed presentation */
+            } 
+
+            /* Main grid with 3 vertical content blocks */
+            main.main-container{
+                display: grid;
+                grid-template-columns: 2vw 1fr 3vw;   
+                grid-template-rows: 2vw auto auto auto auto;   
+            }
+            .title-container{
+                grid-area: 2 / 2 / 3 / 3;
+                border-bottom: 2px solid #000;
+            }
+            .headline-figures-container{
+                grid-area: 3 / 2 / 4 / 3;
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr  ; 
+                grid-template-rows: 1fr auto 1fr ; 
+                column-gap: 2vw; 
+                row-gap: 0vw; 
+                margin-top: 2vw;
+            }
+            .divider-block{
+                grid-area: 4 / 2 / 5 / 3;
+                width: 100%;
+                height: 2vw;
+                margin-top: 0vw;
+                border-bottom: 1px solid gray;
+            }
+            .headline-tables-container{
+                grid-area: 5 / 2 / 6 / 3;
+                grid-template-rows: auto auto; 
+                row-gap: 2vw; 
+            }
+            /* Headline figure 'label' container */
+            .headline-figure-label-container{
+                display: grid;
+                grid-template-columns: 1.5fr 1fr ;
+            }
+            .headline-figure-label-container.cost{
+                grid-template-columns: auto auto 0.65fr ;
+            }
+            /* Diversion footnote */
+            .diversion-footnote{
+                font-size: 0.8vw;
+                font-weight: 300;
+                color: var(--secondaryGrey);
+                padding: 0 3vw 1vw;
+            }
+
+            /* Services trend tables container (2 col grid by X rows ) */
+            .services-tables-container{
+                display: grid;
+                grid-template-columns: 1fr; 
+                padding-top: 0.5vw;
+            }
+
+            /* Services trend tables grid layout */
+            .service-summary-table{
+                margin-bottom: 2.75vh;
+                display: grid;
+                grid-template-columns: 1fr 3fr;
+            }
+            .service-summary-table-row{
+                display: grid;
+                grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr;
+                grid-template-rows: 1fr 1fr;
+                padding-top: 0.25vw;
+                border-bottom: 0.5px #000 dotted;
+            }
+            .service-summary-table-header-container{
+                grid-area: 1 / 2 / 2 / 3; 
+                grid-template-rows: 1fr;
+                display: grid;
+                align-items: center;
+                border-bottom: 1px #000 solid;
+                font-weight: 500;
+            }
+            .service-summary-table-volume-container{
+                grid-area: 2 / 2 / 3 / 3; 
+            }
+            .service-summary-table-cost-container {
+                grid-area: 3 / 2 / 4 / 3; 
+            }
+            .service-summary-table-recovery-container {
+                grid-area: 4 / 2 / 5 / 3; 
+            }
+            .service-summary-table-diversion-container {
+                grid-area: 5 / 2 / 6 / 3; 
+            }
+            .service-summary-table-volume-per-household-container {
+                grid-area: 6 / 2 / 7 / 3; 
+            }
+            .service-summary-table-cost-per-household-container {
+                grid-area: 7 / 2 / 8 / 3; 
+            }
+            .service-bin-icon-container{
+                grid-area: 1 / 1 / 8 / 2; 
+                display: grid;
+                align-items: end;
+            }
+
+            .metric-label{            grid-area: 1 / 1 / 3 / 2;
+                display: grid;
+                /* justify-content: center; */
+                align-content: center;
+            }
+            .sparkline-container{     grid-area: 1 / 2 / 3 / 3;
+                display: grid;
+                justify-content: center;
+                align-content: center;
+                padding-left: 4vw;
+            }
+            .year-data{               grid-area: 1 / 3 / 2 / 4; }
+            .lastYear-data{           grid-area: 1 / 4 / 2 / 5; }
+            .fiveYear-data{           grid-area: 1 / 5 / 2 / 6; }
+            .performance-label{       grid-area: 2 / 3 / 3 / 4; }
+            .lastYear-vs-data{        grid-area: 2 / 4 / 3 / 5; }
+            .fiveYear-vs-data{        grid-area: 2 / 5 / 3 / 6; }
+            .minor-sparkline{
+                height: 3.25vw;
+            }
+
+            .service-summary-table-volumes{
+                display: grid;
+                grid-template-columns: 2fr 1fr 1fr 1fr;
+                grid-area: 1 / 1 / 2 / 5;         
+                border-bottom: #000 1px dotted;         
+            }
+            .service-summary-table-trend-container{
+                grid-area: 1 / 5 / 5 / 6;
+                display: grid;
+            }
+                .service-summary-table-performance-label-container{
+                    grid-area: 2 / 1 / 4 / 2;
+                    display: grid;
+                    grid-template-columns: 1fr 1.35fr; 
+                    grid-template-rows: 1fr 1fr; 
+                }
+                .performance-label-change{
+                    grid-area: 1 / 1 / 3 / 2;
+                }
+                .performance-label-1yr{
+                    grid-area: 1 / 2 / 2 / 3;
+                }
+                .performance-label-5yr{
+                    grid-area: 2 / 2 / 3 / 3;
+                }
+                .performance-label-1yr,
+                .performance-label-5yr{
+                    justify-content: end;
+                }
+                .service-summary-table-performance-1yr-container,
+                .service-summary-table-performance-5yr-container{
+                    display: grid;
+                    grid-template-columns: 1fr 1fr 1fr; 
+                }
+                .service-summary-table-performance-1yr-container{
+                    grid-area: 2 / 2 / 3 / 5;
+                }
+                .service-summary-table-performance-5yr-container{
+                    grid-area: 3 / 2 / 4 / 5;
+                }
+
+
+            /******************************************/
+            /***  TYPOGRAPHY | HEADLINE + MATERIAL ***/
+            /*****************************************/
+
+            /* Headline Typography */
+            .main-title,
+            .sub-title,
+            .section-title{
+                font-size: 3.25vw;
+                font-weight: 500;
+                fill: #000;
+                mix-blend-mode: multiply;
+                text-transform: uppercase;
+                margin-block-end: 0.5vw;
+                line-height: 0.8;
+            }
+            .sub-title{
+                font-size: 1.75vw;
+            }
+            .headline-label,
+            .headline-unit{
+                font-weight: 500;
+                line-height: 1;
+            }
+            .headline-label{
+                height: 4vw;
+                font-size: 1.75vw;
+                padding-bottom: 0.5vw;
+                text-align: center;
+                text-transform: uppercase;
+                align-items: center;
+                display: grid;
+            }
+            .headline-figure{
+                font-weight: 800;
+                font-size: 8vw;
+                line-height: 1;
+                text-align: right;
+                letter-spacing: -1.25px;
+                margin-bottom: -1.5vw;
+                margin-left: -2vw;
+            }
+            .headline-unit{
+                font-size: 2.5vw;
+                padding: 1.5vw 0 0 0.5vw;
+            }
+            .headline-unit.cost{
+                text-align: right;
+            }
+            .headline-unit.cost,
+            .headline-unit.pct{
+                font-size: 2.5vw;
+                padding: 0.5vw 0 0 0.5vw;
+            }
+            .headline-change{
+                text-align: center;
+                font-size: 1.75vw;
+            }
+            .headline-sparkline-container{
+                padding-top: 0vw;
+            }
+            /* Materials tables Typography */
+            .annotation{
+                font-size: 1.25vw;
+                padding-bottom: 2vw;
+            }
+            .service-summary-label{
+                font-size: 1.75vw;
+                font-weight: 500;
+                text-transform: uppercase;
+                width: fit-content;
+            }
+            .service-summary-label-bar{
+                width: calc(100% - 1.5vw);
+                height: 1vw;
+                margin: 0 1.5vw 0 1.5vw;
+            }
+            .service-summary-label-container{
+                display: grid;
+                height: auto;
+                align-items: center;
+                display: grid;
+                grid-template-columns: fit-content(70%) auto;                
+            }
+            .performance-label,
+            .performance-label-1yr,
+            .performance-label-5yr, 
+            .service-summary-table-header,
+            .service-summary-table-data{
+                font-size: 1.1vw;
+            }
+            .service-summary-table-header{
+                padding-right: 0vw;
+            }
+            .trend-header{
+                text-align: center;
+                padding-left: 4vw;
+            }
+            .year-header,
+            .lastYear-header,
+            .fiveYear-header{
+                text-align: right;
+            }
+            .service-summary-table-data{
+                display: grid;
+                justify-content:end;
+                align-content: center;
+                text-align: right;
+                padding-left: 0.5vw;
+            }
+            .performance-label{
+                display: grid;
+                align-items: center;
+            }
+            .pct-change{
+                color: var(--xCharcoal);
+                font-style: italic;
+            }
+            .service-summary-table-header.label{
+
+            }
+            .service-summary-table-header.year,
+            .service-summary-table-header.lastYear,
+            .service-summary-table-header.fiveYear{
+                padding-left: 0rem;
+                text-align: right;
+                justify-content: start;
+            }
+            .service-summary-table-header.trend{
+                text-align: center;
+            }
+
+            /***********************************/
+            /**** HEADLINE METRICS COLOURS  ***/
+            /**********************************/
+
+            #total-waste-container{
+                color: var(--xCharcoal);
+            }
+            #total-waste-container .sparkline{
+                stroke: var(--xCharcoal);
+            }
+            #total-waste-container .marker{
+                fill: var(--xCharcoal);
+            }
+            #waste-per-household-container{
+                color: var(--xCharcoal);
+            }
+            #waste-per-household-container .sparkline{
+                stroke: var(--xCharcoal);
+            }
+            #waste-per-household-container .marker{
+                fill: var(--xCharcoal);
+            }
+
+            #diversion-rate-container{
+                color: var(--secondaryBottleGreen);
+            }
+            #diversion-rate-container .sparkline{
+                stroke: var(--secondaryBottleGreen);
+            }
+            #diversion-rate-container .marker{
+                fill: var(--secondaryBottleGreen);
+            }
+            #total-recovery-container{
+                color: var(--secondaryBottleGreen);
+            }
+            #total-recovery-container .sparkline{
+                stroke: var(--secondaryBottleGreen);
+            }
+            #total-recovery-container .marker{
+                fill: var(--secondaryBottleGreen);
+            }
+
+            #total-cost-container{
+                color: var(--tertiaryBlue);
+            }
+            #total-cost-container .sparkline{
+                stroke: var(--tertiaryBlue);
+            }
+            #total-cost-container .marker{
+                fill: var(--tertiaryBlue);
+            }
+            #cost-per-household-container{
+                color: var(--tertiaryBlue);
+            }
+            #cost-per-household-container .sparkline{
+                stroke: var(--tertiaryBlue);
+            }
+            #cost-per-household-container .marker{
+                fill: var(--tertiaryBlue);
+            }
+
+            /***************************/
+            /**** MATERIALS COLOURS  ***/
+            /***************************/
+            .materials-tables-container{
+                color: var(--xCharcoal)
+            }
+            .service-summary-label-bar.garbage{
+                background: repeating-linear-gradient(
+                    45deg, transparent, transparent 0.25vw,
+                    var(--tertiaryRedLight) 0.25vw,
+                    var(--tertiaryRedLight) 0.5vw
+                );
+            }
+            .service-summary-table-performance.garbage{
+                border-top:var(--tertiaryRedLight) 0.2vw solid;
+                border-bottom:var(--tertiaryRedLight) 0.2vw solid;
+            }
+            .service-summary-table-volumes.garbage{
+                border-bottom:var(--tertiaryRedLight) 0.125vw dotted;
+            }
+            .service-summary-label.garbage{
+                color: var(--tertiaryRed);
+            }
+            #garbage .sparkline{
+                stroke: var(--tertiaryRedLight);
+            }
+            #garbage .marker,
+            .garbage-lid{
+                fill: var(--tertiaryRedLight);
+            }
+
+            .service-summary-label-bar.recyclables{
+                background: repeating-linear-gradient(
+                    45deg, transparent, transparent 0.25vw,
+                    var(--tertiaryYellow) 0.25vw,
+                    var(--tertiaryYellow) 0.5vw
+                );
+            }
+            .service-summary-table-performance.recyclables{
+                border-top:var(--tertiaryYellow) 0.2vw solid;
+                border-bottom:var(--tertiaryYellow) 0.2vw solid;
+            }
+            .service-summary-table-volumes.recyclables{
+                border-bottom:var(--tertiaryYellow) 0.125vw dotted;
+            }
+            .service-summary-label.recyclables{
+                color: var(--xDarkYellow)
+            }
+            #recyclables-sparkline .sparkline{
+                stroke: var(--tertiaryYellow);
+            }
+            #recyclables-sparkline .marker,
+            .recyclables-lid{
+                fill: var(--tertiaryYellow);
+            }
+
+            .service-summary-label-bar.organics{
+                background: repeating-linear-gradient(
+                    45deg, transparent, transparent 0.25vw,
+                    var(--xGreen) 0.25vw,
+                    var(--xGreen) 0.5vw
+                );
+            }
+            .service-summary-table-performance.organics{
+                border-top:var(--xGreen) 0.2vw solid;
+                border-bottom:var(--xGreen) 0.2vw solid;
+            }
+            .service-summary-table-volumes.organics{
+                border-bottom:var(--xGreen) 0.125vw dotted;
+            }
+            .service-summary-label.organics{
+                color: var(--tertiaryEmerald)
+            }
+            #organics-sparkline .sparkline{
+                stroke: var(--xGreen);
+            }
+            #organics-sparkline .marker,
+            .organics-lid{
+                fill: var(--xGreen);
+            }
+
+
+            /*********************/
+            /**** SPARKLINES  ***/
+            /*********************/
+            .sparkline{
+                fill: none;
+                stroke-width: 1.5px;
+                stroke: #000;
+            }
+            .headline-figures-container .sparkline{
+                stroke-width: 1.5px;
+            }
+            .sparkline-start-point,
+            .sparkline-year-ago-point{
+                r: 3
+            }
+            .sparkline-end-point{
+                r: 5
+            }
+            .sparkline-shading-1yr{
+                opacity: 0.05
+            }
+            .sparkline-annotation{
+                fill: var(--xCharcoal)
+            }
+            .sparkline-annotation{
+                font-size: 8px;
+                font-weight: 300;
+            }
+            .sparkline-annotation.large{
+                font-size: 12px;
+                font-weight: 500;
+            }
+        </style>
+    </head>
+
+    <body>
+        <main class ='main-container'>
+            <!-- Main title -->
+            <div class = 'title-container'>
+                <h1 class = 'main-title'></h1>
+            </div>
+            <!-- Headline figures -->
+            <div class = 'headline-figures-container'>
+                <div id = "total-waste-container" class = 'headline-figure-container'>
+                    <div class = 'headline-label'>Total waste collected</div>
+                    <div class = 'headline-figure-label-container'>
+                        <div class = 'headline-figure'></div>
+                        <div class = 'headline-unit'>million tonnes</div>
+                    </div>
+                    <div class = 'headline-sparkline-container'>
+                        <svg id = "total-waste-sparkline" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"></svg>
+                    </div>
+                </div>
+                <div id = "total-recovery-container"  class = 'headline-figure-container'>
+                    <div class = 'headline-label'>Total waste recovered</div>
+                    <div class = 'headline-figure-label-container'>
+                        <div class = 'headline-figure'></div>
+                        <div class = 'headline-unit'>million tonnes</div>
+                    </div>
+                    <div class = 'headline-sparkline-container'>
+                        <svg id = "total-recovery-sparkline" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"></svg>
+                    </div>
+                </div>
+                <div id = "diversion-rate-container"  class = 'headline-figure-container'>
+                    <div class = 'headline-label'>Diversion rate</div>
+                    <div class = 'headline-figure-label-container'>
+                        <div class = 'headline-figure'></div>
+                        <div class = 'headline-unit pct'>%</div>
+                    </div>
+                    <div class = 'headline-sparkline-container'>
+                        <svg id = "diversion-rate-sparkline" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"></svg>
+                    </div>
+                </div>
+                <div></div>
+                <div></div>
+                <div class="diversion-footnote">Diversion rate shown is the proportion (by volume), of recyclables and organics vs total waste collected</div>
+                <div id = "waste-per-household-container" class = 'headline-figure-container'>
+                    <div class = 'headline-label'>Waste per household</div>
+                    <div class = 'headline-figure-label-container'>
+                        <div class = 'headline-figure'></div>
+                        <div class = 'headline-unit'>kg per household</div>
+                    </div>
+                    <div class = 'headline-sparkline-container'>
+                        <svg id = "waste-per-household-sparkline" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"></svg>
+                    </div>
+                </div>
+                <div id = "total-cost-container" class = 'headline-figure-container'>
+                    <div class = 'headline-label'>Total cost of waste services</div>
+                    <div class = 'headline-figure-label-container cost'>
+                        <div class = 'headline-unit cost'>$</div>
+                        <div class = 'headline-figure'></div>
+                        <div class = 'headline-unit'>million spent</div>
+                    </div>
+                    <div class = 'headline-sparkline-container'>
+                        <svg id = "total-cost-sparkline"  class = 'svg-spakline-main' xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"></svg>
+                    </div>
+                </div>
+
+                <div id = "cost-per-household-container"  class = 'headline-figure-container'>
+                    <div class = 'headline-label cost'>Cost per household</div>
+                    <div class = 'headline-figure-label-container cost'>
+                        <div class = 'headline-unit cost'>$</div>
+                        <div class = 'headline-figure'></div>
+                        <div class = 'headline-unit'>per household</div>
+                    </div>
+                    <div class = 'headline-sparkline-container'>
+                        <svg id = "cost-per-household-sparkline" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"></svg>
+                    </div>
+                </div>
+            </div>
+            <!-- Divider -->
+            <div class = 'divider-block'></div>
+            <!-- Trend tables-->
+            <div class = 'headline-tables-container'>
+                <h3 class = 'section-title'>Trends by waste collection service</h3>
+                <!-- <div class = 'annotation'>A breakdown for each waste rials by recovered materials for local reprocessing (Local recovery) and materials exported for reprocessed (Export).</div> -->
+                <div class = 'services-tables-container'></div>
+            </div>
+        </main>        
+    </body>
+
+    <script>
+
+        /////////////////////////////////////////////////////////////////////////////////
+        /// 0. BUILD SEQUENCE: INIT SETTINGS AND DATA OBJECTS AND LOADING => RENDER  ///
+        ////////////////////////////////////////////////////////////////////////////////
+
+        // Instantiate settings and data objects
+        const settings = {
+            year:                   '2019-20', 
+            dims: {
+                major_sparkline: {
+                    width: 200,
+                    height: 60,
+                    margin: { top: 10, right: 10, bottom: 5, left: 10 }
+                },
+                minor_sparkline: {
+                    width: 225,
+                    height: 100,
+                    margin: { top: 5, right: 5, bottom: 5, left: 5 }
+                },
+            }
+        }
+
+        const data = {          // Initiate data object that populated by the parseData() function, 
+            table:     {},
+            schema: {
+                list:  {}
+            }
+        }
+
+        // Call build function
+        buildFromGSheetData(settings)
+
+        // Load data from TSV files from GSheet
+        function buildFromGSheetData(config){  
+            // d3.select('.main-container').style('opacity', 0)        // Set for fade in
+
+            // 1. Specify data table links for each table used (tsv published output from each separate sheet/table)
+            const gsTableLinks =  {
+                kerbsideCollectionData5yr:                  'https://docs.google.com/spreadsheets/d/e/2PACX-1vSimVJWCqYLTijgqeU-SPGdAFT6wpGprHgjPdpxEElWurVvl28JYr7dHGE3OCSjF4VYH2_QggJUnveO/pub?gid=558277010&single=true&output=tsv'
+            }
+
+            // 2. Asynchronous data load (with Promise.all) and D3 (Fetch API) 
+            Promise.all(
+                Object.values(gsTableLinks).map(link => d3.tsv(link))       // Pass in array of d3.tsv loaders with each link
+            ).then( rawData => {
+                // a. Parse each loaded data table and store in data.table object, using the parseTable helper 
+                rawData.forEach((tableData, i) => {  parseTable(Object.keys(gsTableLinks)[i], tableData) })
+                return data
+
+            }).then( async (data) => {
+                // 3. Initiate vis build sequence with data now loaded
+                await applyQuerySettings(config)            // a. Apply query string settings
+                await transformData(data.table.kerbsideCollectionData5yr)                           // b.  Transform and shape data
+                await renderVis(data.table.kerbsideCollectionData5yr, config)  
+            })
+
+            // X. Table data parsing function: trim() header white space and prase numbers with "$" and "," stripped. 
+            const parseTable = (tableName, tableData) => {
+                data.table[tableName] = tableData.map(row => {
+                    const newObj = {}
+                    Object.entries(row).forEach(([key, value]) => {
+                        switch(key.trim().toLowerCase()){
+                            case 'year':
+                                newObj[key.trim()] =  value
+                                break     
+                            default:
+                                newObj[key.trim()] = isNaN(parseFloat(value.replace(/\$|,/g, ''))) ? value : parseFloat(value.replace(/\$|,/g, '')) 
+                        }
+                    })
+                    return newObj
+                })
+            };
+        }; // end buildFromGSheetData()
+
+
+        //////////////////////////////////
+        // 1. PARSE AND WRANGLE DATA   ///
+        //////////////////////////////////
+
+        async function applyQuerySettings(settings){
+            // i. Check for query parameters and update material. A date set by the query selector is set while parsing input data 
+            settings.queryParameters = new URLSearchParams(window.location.search)
+            if (settings.queryParameters.has('year')) { 
+                settings.year = settings.queryParameters.get('year')  
+            }
+        };
+
+        async function transformData(dataTable) {   
+            // 1. Create lists based on 'year'
+            const yearData = dataTable.filter(d => d.year === settings.year)[0]
+            data.schema.list.year       = [...new Set(dataTable.map(d => d.year) )]
+            data.schema.list.service    = [...new Set(Object.keys(yearData).filter(d => d.toLocaleLowerCase() !== 'year').map(d => d.slice(0, d.indexOf('_'))) )].filter(d => d !== 'Total')
+            data.schema.list.metric     = [...new Set(Object.keys(yearData).filter(d => d.toLocaleLowerCase() !== 'year').map(d => d.slice(d.indexOf('_') + 1 )) )]
+
+            // 2. Reverse years from last to most recent
+            dataTable = dataTable.reverse()
+        };
+
+
+        /////////////////////////////////////
+        // 2. RENDER THE SUMMARY PAGE VIS ///
+        /////////////////////////////////////
+
+        async function renderVis(dataTable, settings){ 
+            d3.select('.main-title').html(`Victorian local government waste services <br><span class='sub-title'>trends to  ${settings.year}</span>`)
+            // 1. Build the headline containers
+            // a. Get data
+            const yearData = dataTable.filter(d => d.year === settings.year)[0],
+                financialYear = 2001 + (+settings.year.slice(5))
+            const totalWaste_mil     = yearData[`Total_${data.schema.list.metric[0]}`]/1000000,
+                totalRecovery_mil    = yearData[`Total_${data.schema.list.metric[1]}`]/1000000,
+                wastePerHousehold_kg = yearData[`Total_${data.schema.list.metric[2]}`],
+                totalCost_mil        = yearData[`Total_${data.schema.list.metric[3]}`]/1000000,
+                costPerHousehold     = yearData[`Total_${data.schema.list.metric[4]}`],
+                diversionRate        = totalRecovery_mil / totalWaste_mil 
+
+            const lastYearLabel              = data.schema.list.year[1],
+                lastYearData                 = dataTable.filter(d => d.year === lastYearLabel)[0],
+                lastYearTotalWaste_mil       = lastYearData[`Total_${data.schema.list.metric[0]}`]/1000000,
+                lastYearTotalRecovery_mil    = lastYearData[`Total_${data.schema.list.metric[1]}`]/1000000,
+                lastYearWastePerHousehold_kg = lastYearData[`Total_${data.schema.list.metric[2]}`],
+                lastYearTotalCost_mil        = lastYearData[`Total_${data.schema.list.metric[3]}`]/1000000,
+                lastYearCostPerHousehold     = lastYearData[`Total_${data.schema.list.metric[4]}`],
+                lastYearDiversionRate        = lastYearTotalRecovery_mil / lastYearTotalWaste_mil 
+
+            const totalWasteChange          = totalWaste_mil / lastYearTotalWaste_mil - 1,
+                wasteManagedLabel           = `${helpers.numberFormatters.formatPct1dec(Math.abs(totalWasteChange))} ${totalWasteChange > 0 ? 'more' : 'less'}  than ${lastYearLabel}`,
+                recoveryChange              = totalRecovery_mil / lastYearTotalRecovery_mil - 1,
+                recoveryLabel               = `${helpers.numberFormatters.formatPct1dec(Math.abs(recoveryChange))} ${recoveryChange > 0 ? 'more' : 'less'}  than ${lastYearLabel}`,
+                wastePerHousehold_kgChange  = wastePerHousehold_kg / lastYearWastePerHousehold_kg - 1,
+                wastePerHousehold_kgLabel   = `${helpers.numberFormatters.formatPct1dec(Math.abs(wastePerHousehold_kgChange))} ${wastePerHousehold_kgChange > 0 ? 'more' : 'less'}  than ${lastYearLabel}`,
+                totalCostChange             = totalCost_mil / lastYearTotalCost_mil - 1,
+                totalCostLabel              = `${helpers.numberFormatters.formatPct1dec(Math.abs(totalCostChange))} ${totalCostChange > 0 ? 'more' : 'less'}  than ${lastYearLabel}`,
+                costPerHouseholdChange      = costPerHousehold / lastYearCostPerHousehold - 1,
+                costPerHouseholdLabel       = `${helpers.numberFormatters.formatPct1dec(Math.abs(costPerHouseholdChange))} ${costPerHouseholdChange > 0 ? 'more' : 'less'}  than ${lastYearLabel}`,
+                diversionRateLabel          = `${helpers.numberFormatters.formatPct1dec(Math.abs(diversionRate - lastYearDiversionRate))} ${diversionRate > lastYearDiversionRate ? 'more' : 'less'}  than ${lastYearLabel}`
+
+            const fiveYearLabel = data.schema.list.year[4],
+                fiveYearData = dataTable.filter(d => d.year === fiveYearLabel)[0],
+                fiveYearTotalWaste_mil       = fiveYearData[`Total_${data.schema.list.metric[0]}`]/1000000
+
+            // b. Fill out metrics in DOM
+            d3.select('#total-waste-container .headline-figure').html(helpers.numberFormatters.formatComma2dec(totalWaste_mil))
+            d3.select('#total-recovery-container .headline-figure').html(helpers.numberFormatters.formatComma2dec(totalRecovery_mil))
+            d3.select('#diversion-rate-container .headline-figure').html(helpers.numberFormatters.formatComma1dec(diversionRate * 100))
+            d3.select('#total-cost-container .headline-figure').html(helpers.numberFormatters.formatInteger(totalCost_mil))
+            d3.select('#waste-per-household-container .headline-figure').html(helpers.numberFormatters.formatInteger(wastePerHousehold_kg))
+            d3.select('#cost-per-household-container .headline-figure').html(helpers.numberFormatters.formatInteger(costPerHousehold))
+
+            // c. Add headline sparklines
+            dataTable = dataTable.slice(0,5)
+            const totalWasteData         = dataTable.map( d => d[`Total_${data.schema.list.metric[0]}`] ),
+                totalRecoveryData        = dataTable.map( d => d[`Total_${data.schema.list.metric[1]}`] ),
+                wastePerHouseholdData    = dataTable.map( d => d[`Total_${data.schema.list.metric[2]}`] ),
+                totalCostData            = dataTable.map( d => d[`Total_${data.schema.list.metric[3]}`] ),
+                costPerHouseholdData     = dataTable.map( d => d[`Total_${data.schema.list.metric[4]}`] ),
+                diversionRateData       =  totalWasteData.map( (d,i) => totalRecoveryData[i] / d)
+
+            renderSparkline(`total-waste-sparkline`, totalWasteData, settings.dims.major_sparkline, true, 0.2)
+            renderSparkline(`total-recovery-sparkline`, totalRecoveryData, settings.dims.major_sparkline, true, 0.2)
+            renderSparkline(`diversion-rate-sparkline`, diversionRateData, settings.dims.major_sparkline, true, 0.2, 'pct')
+            renderSparkline(`total-cost-sparkline`, totalCostData, settings.dims.major_sparkline, true, 0.65)
+            renderSparkline(`waste-per-household-sparkline`, wastePerHouseholdData, settings.dims.major_sparkline, true, 0.5)
+            renderSparkline(`cost-per-household-sparkline`, costPerHouseholdData, settings.dims.major_sparkline, true, 0.65)
+
+            // 3. Build DOM for each material
+            const recoveredData = data.schema.list.service,
+                servicesTableContainer = d3.select('.services-tables-container')
+
+            data.schema.list.service.forEach(service => {
+                // a. Get data for current year, last year and five years ago
+                const yearWaste             = yearData[`${service}_${data.schema.list.metric[0]}`],
+                    yearRecovery            = yearData[`${service}_${data.schema.list.metric[1]}`],
+                    yearWastePerHousehold   = yearData[`${service}_${data.schema.list.metric[2]}`],
+                    yearCost                = yearData[`${service}_${data.schema.list.metric[3]}`],
+                    yearCostPerHousehold    = yearData[`${service}_${data.schema.list.metric[4]}`],
+                    yearDiversionRate       = yearRecovery  /  totalWaste_mil / 1000000
+
+                const lastYearWaste            = lastYearData[`${service}_${data.schema.list.metric[0]}`],
+                    lastYearRecovery           = lastYearData[`${service}_${data.schema.list.metric[1]}`],
+                    lastYearWastePerHousehold  = lastYearData[`${service}_${data.schema.list.metric[2]}`],
+                    lastYearCost               = lastYearData[`${service}_${data.schema.list.metric[3]}`],
+                    lastYearCostPerHousehold   = lastYearData[`${service}_${data.schema.list.metric[4]}`],
+                    lastYearDiversionRate      = lastYearRecovery  /  lastYearTotalWaste_mil / 1000000
+
+                const fiveYearWaste            = fiveYearData[`${service}_${data.schema.list.metric[0]}`],
+                    fiveYearRecovery           = fiveYearData[`${service}_${data.schema.list.metric[1]}`],
+                    fiveYearWastePerHousehold  = fiveYearData[`${service}_${data.schema.list.metric[2]}`],
+                    fiveYearCost               = fiveYearData[`${service}_${data.schema.list.metric[3]}`],
+                    fiveYearCostPerHousehold   = fiveYearData[`${service}_${data.schema.list.metric[4]}`],
+                    fiveYearDiversionRate      = fiveYearRecovery  /  fiveYearTotalWaste_mil /  1000000
+
+                // b. Calculate performance data 
+                const wasteVsLastYearPct            = lastYearWaste === 0               ? 'na' : `${(yearWaste >= lastYearWaste  ? '+' : '-')}${helpers.numberFormatters.formatPct1dec(Math.abs(yearWaste / lastYearWaste - 1))}`,
+                    recoveryVsLastYearPct           = lastYearRecovery === 0            ? 'na' : `${(yearRecovery >= lastYearRecovery  ? '+' : '-')}${helpers.numberFormatters.formatPct1dec(Math.abs(yearRecovery / lastYearRecovery - 1))}`,
+                    wastePerHouseholdVsLastYearPct  = lastYearWastePerHousehold === 0   ? 'na' : `${(yearWastePerHousehold  >= lastYearWastePerHousehold  ? '+' : '-')}${helpers.numberFormatters.formatPct1dec(Math.abs(yearWastePerHousehold / lastYearWastePerHousehold - 1))}`,
+                    costVsLastYearPct               = lastYearCost === 0                ? 'na' : `${(lastYearCost  >= yearCost  ? '+' : '-')}${helpers.numberFormatters.formatPct1dec(Math.abs(yearCost / lastYearCost - 1))}`,
+                    costPerHouseholdVsLastYearPct   = lastYearCostPerHousehold === 0    ? 'na' : `${(lastYearCostPerHousehold  >= yearCostPerHousehold  ? '+' : '-')}${helpers.numberFormatters.formatPct1dec(Math.abs(yearCostPerHousehold / lastYearCostPerHousehold - 1))}`,
+                    diversionRateVsLastYearPct      = `${(yearDiversionRate  >= lastYearDiversionRate  ? '+' : '-')}${helpers.numberFormatters.formatPct1dec(Math.abs(yearDiversionRate - lastYearDiversionRate))}`
+
+                // b. Calculate performance data 
+                const wasteVsFiveYearPct            = fiveYearWaste === 0               ? 'na' : `${(yearWaste >= fiveYearWaste  ? '+' : '-')}${helpers.numberFormatters.formatPct1dec(Math.abs(yearWaste / fiveYearWaste - 1))}`,
+                    recoveryVsFiveYearPct           = fiveYearRecovery === 0            ? 'na' : `${(yearRecovery >= fiveYearRecovery  ? '+' : '-')}${helpers.numberFormatters.formatPct1dec(Math.abs(yearRecovery / fiveYearRecovery - 1))}`,
+                    wastePerHouseholdVsFiveYearPct  = fiveYearWastePerHousehold === 0   ? 'na' : `${(yearWastePerHousehold  >= fiveYearWastePerHousehold  ? '+' : '-')}${helpers.numberFormatters.formatPct1dec(Math.abs(yearWastePerHousehold / fiveYearWastePerHousehold - 1))}`,
+                    costVsFiveYearPct               = fiveYearCost === 0                ? 'na' : `${(fiveYearCost  >= yearCost  ? '+' : '-')}${helpers.numberFormatters.formatPct1dec(Math.abs(yearCost / fiveYearCost - 1))}`,
+                    costPerHouseholdVsFiveYearPct   = fiveYearCostPerHousehold === 0    ? 'na' : `${(fiveYearCostPerHousehold  >= yearCostPerHousehold  ? '+' : '-')}${helpers.numberFormatters.formatPct1dec(Math.abs(yearCostPerHousehold / fiveYearCostPerHousehold - 1))}`,
+                    diversionRateVsFiveYearPct      = `${(yearDiversionRate  >= fiveYearDiversionRate  ? '+' : '-')}${helpers.numberFormatters.formatPct1dec(Math.abs(yearDiversionRate - fiveYearDiversionRate))}`
+
+                // c. Trend data
+                const serviceWasteData         = dataTable.map( d => d[`${service}_${data.schema.list.metric[0]}`] ),
+                    serviceRecoveryData        = dataTable.map( d => d[`${service}_${data.schema.list.metric[1]}`] ),
+                    serviceWastePerHouseholdData    = dataTable.map( d => d[`${service}_${data.schema.list.metric[2]}`] ),
+                    serviceCostData            = dataTable.map( d => d[`${service}_${data.schema.list.metric[3]}`] ),
+                    serviceCostPerHouseholdData     = dataTable.map( d => d[`${service}_${data.schema.list.metric[4]}`] ),
+                    serviceDiversionRateData         =  serviceWasteData.map( (d,i) => serviceRecoveryData[i] / d)
+
+                // d. Build DOM
+                const serviceContainer = servicesTableContainer.append('div')
+                    .classed(`service-summary-container ${helpers.slugify(service)}`, true)
+
+                const serviceLabel = serviceContainer.append('div')
+                    .classed(`service-summary-label-container ${helpers.slugify(service)}`, true)
+
+                serviceLabel.append('div')
+                    .classed(`service-summary-label ${helpers.slugify(service)}`, true)
+                    .html(service)
+
+                serviceLabel.append('div')
+                    .classed(`service-summary-label-bar ${helpers.slugify(service)}`, true)
+
+                const tableContainer = serviceContainer.append('div')
+                    .classed('service-summary-table', true)
+
+                // Build table
+                let recoveryContainer, diversionContainer
+                const  headerContainer = tableContainer.append('div').classed('service-summary-table-header-container service-summary-table-row', true),
+                    volumeContainer = tableContainer.append('div').classed(`service-summary-table-volume-container service-summary-table-row ${helpers.slugify(service)}`, true),
+                    costContainer = tableContainer.append('div').classed('service-summary-table-cost-container service-summary-table-row', true)
+                if(service.toLowerCase() !== 'garbage'){
+                    recoveryContainer = tableContainer.append('div').classed('service-summary-table-recovery-container service-summary-table-row', true)
+                    // diversionContainer = tableContainer.append('div').classed('service-summary-table-diversion-container service-summary-table-row', true)
+                }
+                const volumePerHouseholdContainer = tableContainer.append('div').classed('service-summary-table-volume-per-household-container service-summary-table-row', true),
+                    costPerHouseholdContainer = tableContainer.append('div').classed('service-summary-table-cost-per-household-container service-summary-table-row', true)
+                
+                headerContainer.append('div').classed('service-summary-table-header metric-header', true).html('Metric')
+                headerContainer.append('div').classed('service-summary-table-header trend-header', true).html('Five year trend')
+                headerContainer.append('div').classed('service-summary-table-header year-header', true).html(`in ${settings.year}`)
+                headerContainer.append('div').classed('service-summary-table-header lastYear-header', true).html(`vs last year <br>${lastYearLabel}`)
+                headerContainer.append('div').classed('service-summary-table-header fiveYear-header', true).html(`vs five years ago <br>${fiveYearLabel}`)
+
+                volumeContainer.append('div').classed('service-summary-table-header metric-label', true).html(`Volume of waste collected (Mt)` )
+                volumeContainer.append('div').classed('service-summary-table-header sparkline-container', true)
+                    .append('svg').attr('id', `volume-sparkline-${helpers.slugify(service)}`).classed('minor-sparkline', true)
+                volumeContainer.append('div').classed('service-summary-table-data year-data', true).html(helpers.numberFormatters.formatComma2dec(yearWaste / 1000000))
+                volumeContainer.append('div').classed('service-summary-table-data lastYear-data', true).html(helpers.numberFormatters.formatComma2dec(lastYearWaste / 1000000))
+                volumeContainer.append('div').classed('service-summary-table-data fiveYear-data', true).html(helpers.numberFormatters.formatComma2dec(fiveYearWaste / 1000000))
+
+                volumeContainer.append('div').classed('service-summary-table-data pct-change performance-label', true).html('% change &rarr;')
+                volumeContainer.append('div').classed('service-summary-table-data pct-change lastYear-vs-data', true).html(wasteVsLastYearPct)
+                volumeContainer.append('div').classed('service-summary-table-data pct-change fiverYear-vs-data', true).html(wasteVsLastYearPct)
+                renderSparkline(`volume-sparkline-${helpers.slugify(service)}`, serviceWasteData, settings.dims.minor_sparkline)
+
+                costContainer.append('div').classed('service-summary-table-header metric-label', true).html(`Cost of of waste collected ($ million)` )
+                costContainer.append('div').classed('service-summary-table-header sparkline-container', true)
+                    .append('svg').attr('id', `cost-sparkline-${helpers.slugify(service)}`).classed('minor-sparkline', true)
+                costContainer.append('div').classed('service-summary-table-data year-data', true).html(helpers.numberFormatters.formatCost2dec(yearCost / 1000000))
+                costContainer.append('div').classed('service-summary-table-data lastYear-data', true).html(helpers.numberFormatters.formatCost2dec(lastYearCost / 1000000))
+                costContainer.append('div').classed('service-summary-table-data fiveYear-data', true).html(helpers.numberFormatters.formatCost2dec(fiveYearCost / 1000000))
+                costContainer.append('div').classed('service-summary-table-header', true)
+                costContainer.append('div').classed('service-summary-table-data pct-change performance-label', true).html('% change &rarr;')
+                costContainer.append('div').classed('service-summary-table-data pct-change lastYear-vs-data', true).html(costVsLastYearPct)
+                costContainer.append('div').classed('service-summary-table-data pct-change fiveYear-vs-data', true).html(wasteVsLastYearPct)
+                renderSparkline(`cost-sparkline-${helpers.slugify(service)}`, serviceCostData, settings.dims.minor_sparkline)
+
+                if(service.toLowerCase() !== 'garbage'){
+                    recoveryContainer.append('div').classed('service-summary-table-header metric-label', true).html(`Volume of recovered materials (Mt)` )
+                    recoveryContainer.append('div').classed('service-summary-table-header sparkline-container', true)
+                        .append('svg').attr('id', `recovery-sparkline-${helpers.slugify(service)}`).classed('minor-sparkline', true)
+                    recoveryContainer.append('div').classed('service-summary-table-data year-data', true).html(helpers.numberFormatters.formatComma2dec(yearRecovery / 1000000))
+                    recoveryContainer.append('div').classed('service-summary-table-data lastYear-data', true).html(helpers.numberFormatters.formatComma2dec(lastYearRecovery / 1000000))
+                    recoveryContainer.append('div').classed('service-summary-table-data fiveYear-data', true).html(helpers.numberFormatters.formatComma2dec(fiveYearRecovery / 1000000))
+                    recoveryContainer.append('div').classed('service-summary-table-header', true)
+                    recoveryContainer.append('div').classed('service-summary-table-data pct-change performance-label', true).html('% change &rarr;')
+                    recoveryContainer.append('div').classed('service-summary-table-data pct-change lastYear-vs-data', true).html(recoveryVsLastYearPct)
+                    recoveryContainer.append('div').classed('service-summary-table-data pct-change fiveYear-vs-data', true).html(wasteVsFiveYearPct)
+                    renderSparkline(`recovery-sparkline-${helpers.slugify(service)}`, serviceRecoveryData, settings.dims.minor_sparkline)                
+
+                    // diversionContainer.append('div').classed('service-summary-table-header metric-label', true).html(`Diversion rate (%)` )
+                    // diversionContainer.append('div').classed('service-summary-table-header sparkline-container', true)
+                    //     .append('svg').attr('id', `diversion-sparkline-${helpers.slugify(service)}`).classed('minor-sparkline', true)
+                    // diversionContainer.append('div').classed('service-summary-table-data year-data', true).html(helpers.numberFormatters.formatPct1dec(yearDiversionRate))
+                    // diversionContainer.append('div').classed('service-summary-table-data lastYear-data', true).html(helpers.numberFormatters.formatPct1dec(lastYearDiversionRate))
+                    // diversionContainer.append('div').classed('service-summary-table-data fiveYear-data', true).html(helpers.numberFormatters.formatPct1dec(fiveYearDiversionRate))
+                    // diversionContainer.append('div').classed('service-summary-table-header', true)
+                    // diversionContainer.append('div').classed('service-summary-table-data pct-change performance-label', true).html('% change &rarr;')
+                    // diversionContainer.append('div').classed('service-summary-table-data pct-change lastYear-vs-data', true).html(diversionRateVsLastYearPct)
+                    // diversionContainer.append('div').classed('service-summary-table-data pct-change fiveYear-vs-data', true).html(diversionRateVsFiveYearPct)
+                    // renderSparkline(`diversion-sparkline-${helpers.slugify(service)}`, serviceDiversionRateData, settings.dims.minor_sparkline)
+                }
+
+                volumePerHouseholdContainer.append('div').classed('service-summary-table-header metric-label', true).html(`Collected per serviced household (kg)` )
+                volumePerHouseholdContainer.append('div').classed('service-summary-table-header sparkline-container', true)
+                    .append('svg').attr('id', `vol-per-hh-sparkline-${helpers.slugify(service)}`).classed('minor-sparkline', true)
+                volumePerHouseholdContainer.append('div').classed('service-summary-table-data year-data', true).html(helpers.numberFormatters.formatComma(yearWastePerHousehold))
+                volumePerHouseholdContainer.append('div').classed('service-summary-table-data lastYear-data', true).html(helpers.numberFormatters.formatComma(lastYearWastePerHousehold))
+                volumePerHouseholdContainer.append('div').classed('service-summary-table-data fiveYear-data', true).html(helpers.numberFormatters.formatComma(lastYearWastePerHousehold))
+                volumePerHouseholdContainer.append('div').classed('service-summary-table-header', true)
+                volumePerHouseholdContainer.append('div').classed('service-summary-table-data pct-change performance-label', true).html('% change &rarr;')
+                volumePerHouseholdContainer.append('div').classed('service-summary-table-data pct-change lastYear-vs-data', true).html(wastePerHouseholdVsLastYearPct)
+                volumePerHouseholdContainer.append('div').classed('service-summary-table-data pct-change fiveYear-vs-data', true).html(wastePerHouseholdVsFiveYearPct)
+                renderSparkline(`vol-per-hh-sparkline-${helpers.slugify(service)}`, serviceWastePerHouseholdData, settings.dims.minor_sparkline)
+
+                costPerHouseholdContainer.append('div').classed('service-summary-table-header metric-label', true).html(`Cost of collection per household` )
+                costPerHouseholdContainer.append('div').classed('service-summary-table-header sparkline-container', true)
+                    .append('svg').attr('id', `cost-per-hh-sparkline-${helpers.slugify(service)}`).classed('minor-sparkline', true)
+                costPerHouseholdContainer.append('div').classed('service-summary-table-data year', true).html(helpers.numberFormatters.formatCost2dec(yearCostPerHousehold))
+                costPerHouseholdContainer.append('div').classed('service-summary-table-data year-data-data', true).html(helpers.numberFormatters.formatCost2dec(lastYearCostPerHousehold))
+                costPerHouseholdContainer.append('div').classed('service-summary-table-data fiveYear-data', true).html(helpers.numberFormatters.formatCost2dec(fiveYearCostPerHousehold))
+                costPerHouseholdContainer.append('div').classed('service-summary-table-header', true)
+                costPerHouseholdContainer.append('div').classed('service-summary-table-data pct-change performance-label', true).html('% change &rarr;')
+                costPerHouseholdContainer.append('div').classed('service-summary-table-data pct-change lastYear-vs-data', true).html(costPerHouseholdVsLastYearPct)
+                costPerHouseholdContainer.append('div').classed('service-summary-table-data pct-change fiveYear-vs-data', true).html(costPerHouseholdVsFiveYearPct)
+                renderSparkline(`cost-per-hh-sparkline-${helpers.slugify(service)}`, serviceCostPerHouseholdData, settings.dims.minor_sparkline)
+
+                // Add bin icon
+                const iconContainer = tableContainer.append('div')
+                    .classed('service-bin-icon-container', true)
+                const svg = iconContainer.append('svg').classed('svg-bin-icon',true)
+                    .attr('viewBox', '0 0 30 20')
+                const binGroup = svg.append('g')
+                    .attr('transform', "translate(5, 20) scale(1 1)")
+                    .attr('id', 'organics-bin')
+
+                binGroup.append('path').attr('fill', '#252d2f')
+                    .attr('d',"M4.427-2.15A1.153 2.045 0 013.274-.107 1.153 2.045 0 012.121-2.15a1.153 2.045 0 011.153-2.045 1.153 2.045 0 011.153 2.045" )
+                binGroup.append('path').attr('fill','#4c5e57')
+                    .attr('d',"M2.161-14.095l9.703.035-.045 13.7-7.802.055c-.421.052-.623-.192-.65-.683z")
+                binGroup.append('path').attr('fill','#3f4c4a')
+                    .attr('d',"M11.74-13.97l2.912-1.13-.24 12.747c-.032.34.055.509-.23.709l-2.364 1.26z")
+                binGroup.append('path').attr('fill','#252d2f')
+                    .attr('d',"M13.678-2.045A1.153 2.045 0 0112.525 0a1.153 2.045 0 01-1.154-2.045 1.153 2.045 0 011.154-2.046 1.153 2.045 0 011.153 2.046")
+
+                const binLid = binGroup.append('g')
+                binLid.append('path').classed(`${helpers.slugify(service)}-lid`, true)
+                    .attr('d', "M0-15.56c.024.096.048 1.472.048 1.472l11.842.097 3.6-1.339.003-1.454-1.613-.068c-.192-1.773-.938-3.476-4.055-1.942l-3.505.145c-3.178-1.334-2.265.836-3.263 1.378l-1.233.096.073 1.354z")
+                const binLidShadow = binLid.append('g').attr('opacity', 0.15)
+                binLidShadow.append('path').attr('d',"M2.262-16.462l8.794.028c3.646-.395 2.787-.363 0 .555H2.234z")
+                binLidShadow.append('path').attr('d',"M12.827-17.276l-1.43.341c-.181-.711-.32-1.27.872-1.497.81-.04.64.616.558 1.156z")
+                binLidShadow.append('path').attr('d',"M5.61-18.436c-1.144-.09-1.398.408-1.58 1.275-.182-.711-.247-1.39.664-1.541.81-.04.701.018.917.266z")
+                binLidShadow.append('path').attr('d',"M9.917-18.557c-.596.237-.48.483-.468 1.321-.182-.711-.633-1.137.353-1.482.81-.04.58.14.115.161z")
+                binLidShadow.append('path').attr('d',"M.52-15.134l11.01.028c.199.006 3.684-1.513 3.591-.999-.124.69-.225.615-3.662 1.81H.521z")
+
+
+            })
+
+            // 4. Fade in vis
+            d3.select('.main-container').transition().duration(2000).style('opacity', null)  
+        };
+
+        /////////////////////////////////
+        /// X. SPARKLINE CHART METHOD ///
+        /////////////////////////////////
+
+        const renderSparkline = function(svgID, data, dims, annotate = false,  annotatePos=0.5, annotateUnit = 'abs'){
+            d3.select(`#${svgID} *`).remove()
+            // a. SVG and chart dimensions (note: width and height are scaled to the container dimensions => use for setting chart aspect ratio. CSS used for setting stroke and market styling)
+            dims.chartHeight = dims.height - dims.margin.top - dims.margin.bottom       // Chart dimensions include the margin
+            dims.chartWidth = dims.width - dims.margin.left - dims.margin.right
+            // b. Setup SVG element for dimensions 
+            const svg = d3.select('#'+svgID)
+                    .attr('viewBox', `0 0 ${dims.width} ${dims.height}`),   
+                bg = svg.append('g') 
+                    // Setting the viewBox allows the SVg element to scale to its HTML continer size 
+                chart = svg.append('g')    
+                    .attr('transform', `translate(${dims.margin.left} , ${dims.margin.top} )`);     // Group element for the chart 
+            // b. Setup x and y scales.  
+            const yDomain =  settings.yDomain === 'includeZero' ? d3.max(data) > 0 ? [0, d3.max(data)] : [d3.min(data, 0)]                             // If settings.y0 is specified as true, extend the domain to zero on the y xis (for both positive and negative series)
+                        : settings.yDomain === 'indexed' ? [-d3.max(data.map(d => Math.abs(d)))  , d3.max(data.map(d => Math.abs(d))) ]          // If indexed then set an even with teh "absolute max: as extent =? this ensures a sparkline startign in "vertical center" with equal  
+                            : d3.extent(data),                                                              // Or else use the y data extent (min and max) to set the domain (this emphasises the 'trend' at the expense of showing changes relative to zero)         
+                xScale = d3.scaleLinear().domain([0, data.length-1]).range([dims.margin.left, dims.chartWidth - dims.margin.right ]),
+                yScale = d3.scaleLinear().domain(yDomain).range([dims.chartHeight - dims.margin.top, dims.margin.bottom]);
+
+            // c. Setup the 'shape generator' function for a line: this takes data points (inputs) and creates an SVG path string for that data, using the scales 
+            const line = d3.line()
+                .x((d, i) => xScale(i))
+                .y(d => yScale(d));
+            // d. Render sparkline path and start/end markers; and one year ago
+            chart.append('path').classed('sparkline', true)                                 // Append an SVG path for the sparkline
+                .datum(data)                                                                // ..using the supplied data array
+                .attr('d', line);                                                           // ..and line generator
+            chart.append('circle').classed('sparkline-start-point marker', true)            // Append circle marker at the start of the line
+                .attr('cx', xScale(0))
+                .attr('cy', yScale(data[0]))
+            chart.append('circle').classed('sparkline-end-point marker', true)              // Append circle marker at the end of the line
+                .attr('cx', xScale(data.length - 1))
+                .attr('cy', yScale(data[data.length - 1]))
+            chart.append('circle').classed('sparkline-year-ago-point marker', true)         // Append circle marker at the end of the line
+                .attr('cx', xScale(data.length - 2))
+                .attr('cy', yScale(data[data.length - 2]))
+
+            // e. Annotation for headline charts
+            if(annotate){
+                const latestData = data[data.length -1],
+                    lastYearData = data[data.length -2],
+                    fiveYearData = data[data.length - 5],
+                    labelSign = latestData >= lastYearData ? 'more' : 'less',
+                    pctChangeVsLastYear = annotateUnit ==='pct' ? (latestData - lastYearData) : (latestData/lastYearData -1),
+                    labelY =  annotatePos * dims.height
+
+                bg.append('text')
+                    .classed('sparkline-annotation', true)
+                    .attr('x', dims.margin.left + xScale(0))
+                    .attr('y', dims.height - dims.margin.bottom)
+                    .text('Five year trendline')
+                bg.append('text')
+                    .classed('sparkline-annotation large', true)
+                    .attr('x', dims.margin.left + xScale(3) + 2)
+                    .attr('y', labelY)
+                    .text(helpers.numberFormatters.formatPct1dec(Math.abs(pctChangeVsLastYear)))
+                bg.append('text')
+                    .classed('sparkline-annotation', true)
+                    .attr('x', dims.margin.left + xScale(3) + 2)
+                    .attr('y', labelY+ 9)
+                    .text(labelSign)
+                bg.append('text')
+                    .classed('sparkline-annotation', true)
+                    .attr('x', dims.margin.left + xScale(3) + 2)
+                    .attr('y', dims.height * 0.625 + 18)
+                    .text('vs last year')
+                bg.append('rect')
+                    .classed('sparkline-shading-1yr', true)
+                    .attr('x', xScale(3) + dims.margin.left )
+                    .attr('y', 0)
+                    .attr('width', xScale(1) - dims.margin.left)
+                    .attr('height', dims.height) 
+            }
+
+
+        }; // end renderSparkline
+
+        ////////////////////////////////
+        /// X. HELPER FUNCTIONS      ///
+        ////////////////////////////////
+
+        const helpers= {
+            numberFormatters: {
+                formatComma:           	d3.format(",.0f"),
+                formatComma1dec:       	d3.format(",.1f"),
+                formatComma2dec:       	d3.format(",.2f"),
+                formatInteger:         	d3.format(".0f"),   
+                formatCostInteger:     	d3.format("$,.0f"),  
+                formatCost1dec:        	d3.format("$,.1f"),  
+                formatCost2dec:        	d3.format("$,.2f"),  
+                formatPct:          	d3.format(".0%"), 
+                formatPct1dec:          d3.format(".1%")  
+            },
+            slugify: function (str) {
+                str = str.replace(/^\s+|\s+$/g, '').toLowerCase(); // trim           
+                const from = "àáäâèéëêìíïîòóöôùúüûñç·/_,:;",      // remove accents, swap ñ for n, etc
+                    to   = "aaaaeeeeiiiioooouuuunc------"
+                for (var i=0, l=from.length ; i<l ; i++) {
+                    str = str.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
+                }
+                str = str.replace(/[^a-z0-9 -]/g, '') // remove invalid chars
+                    .replace(/\s+/g, '-') // collapse whitespace and replace by -
+                    .replace(/-+/g, '-'); // collapse dashes
+                return str;
+            } 
+        }
+
+    </script>
+</html>
+
