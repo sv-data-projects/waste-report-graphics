@@ -779,7 +779,7 @@
 
             renderSparkline(`total-waste-sparkline`, managedWasteData, settings.dims.major_sparkline, true)
             renderSparkline(`total-landfill-sparkline`, landfilledData, settings.dims.major_sparkline, true)
-            renderSparkline(`diversion-rate-sparkline`, diversionRateData, settings.dims.major_sparkline, true)
+            renderSparkline(`diversion-rate-sparkline`, diversionRateData, settings.dims.major_sparkline, true, 'pct')
             renderSparkline(`total-recovery-sparkline`, recoveryData, settings.dims.major_sparkline, true)
             renderSparkline(`local-recovery-sparkline`, localRecoveryData, settings.dims.major_sparkline, true)
             renderSparkline(`export-sparkline`, exportData, settings.dims.major_sparkline, true)
@@ -881,7 +881,7 @@
         /// X. SPARKLINE CHART METHOD ///
         /////////////////////////////////
 
-        const renderSparkline = function(svgID, data, dims, annotate = false){
+        const renderSparkline = function(svgID, data, dims, annotate = false, annotateUnit = 'abs'){
             d3.select(`#${svgID} *`).remove()
             // a. SVG and chart dimensions (note: width and height are scaled to the container dimensions => use for setting chart aspect ratio. CSS used for setting stroke and market styling)
             dims.chartHeight = dims.height - dims.margin.top - dims.margin.bottom       // Chart dimensions include the margin
@@ -925,6 +925,7 @@
                     lastYearData = data[data.length -2],
                     fiveYearData = data[data.length - 5],
                     labelSign = latestData >= lastYearData ? 'more than' : 'less than',
+                    pctChangeVsLastYear = annotateUnit ==='pct' ? (latestData - lastYearData) : (latestData/lastYearData -1),
                     labelY = yScale(latestData) < dims.chartHeight * 0.5 ? dims.height * 0.625 : dims.height * 0.2
 
                 bg.append('text')
@@ -937,7 +938,7 @@
                     .classed('sparkline-annotation large', true)
                     .attr('x', dims.margin.left + xScale(3) + 2)
                     .attr('y', labelY)
-                    .text(helpers.numberFormatters.formatPct1dec(Math.abs(latestData/lastYearData -1)))
+                    .text(helpers.numberFormatters.formatPct1dec(Math.abs(pctChangeVsLastYear)))
                 bg.append('text')
                     .classed('sparkline-annotation', true)
                     .attr('x', dims.margin.left + xScale(3) + 2)
@@ -956,8 +957,6 @@
                     .attr('width', xScale(1) - dims.margin.left)
                     .attr('height', dims.height) 
             }
-
-
         }; // end renderSparkline
 
         ////////////////////////////////
