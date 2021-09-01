@@ -396,7 +396,7 @@
                     const countryGroup = infoPane.append('g')
                         .attr('transform', `translate(${infoPaneMargin.left}, ${countryGroupYpos})`)
                     countryGroup.append('text').classed('country-list-name', true)
-                        .text( i < data.schema.list.country.length ? `${i +1}. ${country}` : `${country}` )
+                        .text( i < data.schema.list.country.length - 1 ? `${i +1}. ${country}` : `${country}` )
 
                     const countryTotalVol = data.byExportCountry[country].Total
                     countryGroup.append('text').classed('country-total-vol', true)
@@ -409,7 +409,7 @@
                         .attr('width', countryBarScale(countryTotalVol))
 
                     // Add materials
-                    if(i < 5 || country === 'All other countries'){
+                    if(i < 5){
                         let materialsCounter = 0                
                         data.schema.list.materials.forEach((material, i) => {
                             const materialMax =  d3.max(data.inputData.export.map(d => d[material]))
@@ -449,7 +449,7 @@
                 .attr('x', titleMargin.left)
                 .attr('y', titleMargin.top + 35)
                 .attr('dy', 0)
-                .text(`a breakdown by export country and materials in ${settings.year}`)
+                .text(`a breakdown by export destination and materials in ${settings.year}`)
 
             // b. Totals group (bottom left)
             const totalGroup = titles.append('g')
