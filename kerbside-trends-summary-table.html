@@ -308,9 +308,6 @@
                 color: var(--xCharcoal);
                 font-style: italic;
             }
-            .service-summary-table-header.label{
-
-            }
             .service-summary-table-header.year,
             .service-summary-table-header.lastYear,
             .service-summary-table-header.fiveYear{
@@ -332,6 +329,7 @@
             #total-waste-container .sparkline{
                 stroke: var(--xCharcoal);
             }
+            #total-waste-sparkline text,
             #total-waste-container .marker{
                 fill: var(--xCharcoal);
             }
@@ -341,6 +339,7 @@
             #waste-per-household-container .sparkline{
                 stroke: var(--xCharcoal);
             }
+            #waste-per-household-sparkline text,
             #waste-per-household-container .marker{
                 fill: var(--xCharcoal);
             }
@@ -351,6 +350,7 @@
             #diversion-rate-container .sparkline{
                 stroke: var(--secondaryBottleGreen);
             }
+            #diversion-rate-sparkline text,
             #diversion-rate-container .marker{
                 fill: var(--secondaryBottleGreen);
             }
@@ -360,6 +360,7 @@
             #total-recovery-container .sparkline{
                 stroke: var(--secondaryBottleGreen);
             }
+            #total-recovery-sparkline text,
             #total-recovery-container .marker{
                 fill: var(--secondaryBottleGreen);
             }
@@ -370,6 +371,7 @@
             #total-cost-container .sparkline{
                 stroke: var(--tertiaryBlue);
             }
+            #total-cost-sparkline text,
             #total-cost-container .marker{
                 fill: var(--tertiaryBlue);
             }
@@ -501,7 +503,7 @@
     </head>
 
     <body>
-        <main class ='main-container'>
+        <main class ='main-container' style='opacity: 0'>
             <!-- Main title -->
             <div class = 'title-container'>
                 <h1 class = 'main-title'></h1>
