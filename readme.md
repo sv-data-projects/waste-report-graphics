@@ -205,25 +205,29 @@ In most cases, graphics are designed to be flexible enough for use in print and 
 ## Waste report graphics and their options
 | Visualisation name | html filename | Query parameter name | Query parameter value format |  Query parameter default |  Query parameter description
 | --- | --- | --- |---| ---| ---|
-| Victorian waste flow illustrative graphic (full page) | waste-vic-flow-infographic.html | year | YYYY-YY |  2019-20 | Specifies FY data to display
+| Victorian waste flow illustrative graphic (full page) | [waste-vic-flow-infographic.html](https://sv-data-projects.github.io/waste-report-graphics/waste-vic-flow-infographic.html) | year | YYYY-YY |  2019-20 | Specifies FY data to display
 | | | extended-typography | true, false | true |  Show title text with with handwriting typeface
-| Victorian waste flows summary graphic (half page 'flow loop')| waste-vic-flow-summary-graphic.html |  year | YYYY-YY | 2019-20 | Specifies FY data to display
+| Victorian waste flows summary graphic (half page 'flow loop')| [waste-vic-flow-summary-graphic.html](https://sv-data-projects.github.io/waste-report-graphics/waste-vic-flow-summary-graphic.html) |  year | YYYY-YY | 2019-20 | Specifies FY data to display
 | | | mode | dark, light | light | Show the graphic with dark mode colour scheme
-| Kerbside waste illustrative summary infographic (half page)| kerbside-flow-infographic.html |  year  | YYYY-YY | 2019-20 | Specifies FY data to display
+| Kerbside waste illustrative summary infographic (half page)| [kerbside-flow-infographic.html](https://sv-data-projects.github.io/waste-report-graphics/kerbside-summary-infographic.html) |  year  | YYYY-YY | 2019-20 | Specifies FY data to display
+| Kerbside waste illustrative infographic (full page)| [kerbside-summary-infographic.html](https://sv-data-projects.github.io/waste-report-graphics/kerbside-flow-infographic.html) | YYYY-YY |  year | 2019-20 | Specifies FY data to display
 | | | extended-typography | true, false | true | Show title text with with handwriting typeface
-| Kerbside waste illustrative infographic (full page)| kerbside-summary-infographic.html | YYYY-YY |  year | 2019-20 | Specifies FY data to display
-| | | extended-typography | true, false | true | Show title text with with handwriting typeface
-| Kerbside bin composition graphic (single bin)| kerbside-bin-composition.html | year | YYYY-YY | 2019-20
+| Kerbside bin composition graphic (single bin)| [kerbside-bin-composition.html](https://sv-data-projects.github.io/waste-report-graphics/kerbside-bin-composition.html) | year | YYYY-YY | 2019-20
 | | | yellow-bin-lid | true, false | false | Whether to colour bin lid yellow (note: default is false colour clashes with material colour)
-| Victorian waste flow (sankey) diagram (full page)| waste-vic-flow-sankey.html |  year | YYYY-YY | 2019-20 | Specifies FY data to display
+| Victorian waste flow (sankey) diagram (full page)| [waste-vic-flow-sankey.html](https://sv-data-projects.github.io/waste-report-graphics/waste-vic-flow-sankey.html) |  year | YYYY-YY | 2019-20 | Specifies FY data to display
 | Waste metrics trends tables (headlines and by material summary) | waste-trends-summary-table.html |  year | YYYY-YY | 2019-20 | Specifies FY data to display
-| Waste diversion radial bar chart and table | waste-diversion-by-material.html |  year |  YYYY-YY | 2019-20 | Specifies FY data to display
+| Kerbside trends summary tables (headlines and by services summary) | kerbside-trends-summary-table.html |  year | YYYY-YY | 2019-20 | Specifies FY data to display
+| Waste diversion radial bar chart and table | [waste-diversion-by-material.html](https://sv-data-projects.github.io/waste-report-graphics/waste-diversion-by-material.html) | year |  YYYY-YY | 2019-20 | Specifies FY data to display
 | | | mode | dark, light | light | Show the graphic with dark mode colour scheme
 | | | layout | portrait, landscape, chart-only | portrait | Layout options for chart and accompanying data table (or to not show the table)
-| Victorian recovered waste export map | waste-export-map.html |  year |  YYYY-YY | 2019-20 | Specifies FY data to display
-| Victorian WRRG waste data map | wrrg-map.html|  year |  YYYY-YY | 2019-20 | Specifies FY data to display
+| Victorian recovered waste export map | [waste-export-map.html](https://sv-data-projects.github.io/waste-report-graphics/waste-export-map.html) | year | YYYY-YY | 2019-20 | Specifies FY data to display
+| | | showSparklines | true, false | true | Hides all bar chart sparklines
+| Victorian WRRG waste data map | [wrrg-map.html](https://sv-data-projects.github.io/waste-report-graphics/wrrg-map.html) | year | YYYY-YY | 2019-20 | Specifies FY data to display
 | | | showGlass | true, false | true | Whether to show the layout with glass collection data (for WRRGs with collection/data)
 | | | colourScale | ramp, categorical | ramp | Whether to show the WRRG regions with data encoded in a colour ramp, or as multi-coloured categorical colours (not recommended)
+| Progress to Recycling Victorian Targets diagrams | [progress-vs-rv-targetse.html](https://sv-data-projects.github.io/waste-report-graphics/progress-vs-rv-targets.html) |  alternate | true or false | true | Alternates between 'text | diagram' and' diagram| text' for each target/row; or just 'text | diagram'
+| | | target | 0, 1, 2, 3, all | all | Can be used to display just one target at a time
+
 
 ## Further customisation of waste report graphics 
 Some visualisations can be tweaked and customised further:
