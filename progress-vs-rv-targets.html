@@ -180,8 +180,10 @@
                 showY0: false
             },
             display:{
-                targets:        'all',      // Show 'all' targets by default or single target by index
-                alternating:     true      // Show alternating labels
+                targets:            'all',      // Show 'all' targets by default or single target by index
+                alternating:        true,      // Show alternating labels
+                showDefinitions:    true,
+                showCircleLabels:   false
             }
         }
 
@@ -252,6 +254,12 @@
             if (settings.queryParameters.has('alternate')) { 
                 settings.display.alternating = settings.queryParameters.get('alternate')  === 'false' ? false : true
             }
+            if (settings.queryParameters.has('showDefinitions')) { 
+                settings.display.showDefinitions = settings.queryParameters.get('showDefinitions') === 'false' ? false : true
+            }
+            if (settings.queryParameters.has('showCircleLabels')) { 
+                settings.display.showCircleLabels = settings.queryParameters.get('showCircleLabels') === 'false' ? false : true
+            }
         };
 
         async function transformData(dataTable) {   
@@ -315,7 +323,7 @@
                 infoContainer.append('div').classed('target-text', true)
                     .html(obj.Target)
                 infoContainer.append('div').classed('target-definition', true)
-                    .html(obj.Definition)
+                    .html(settings.display.showDefinitions ? obj.Definition : '')
 
 
                 // b. Add "Performance " graphic
@@ -335,18 +343,21 @@
                 // Append circular label 
                 const labelRadius = radius * 1.05
                 const targetUp = chartData[chartData.length - 1].value > chartData[0].value ? true  : false
-                const circularLabelPath = `M${0} ${0}  A${labelRadius}, ${labelRadius}, 0, 0, 1, ${0}, ${labelRadius * 2}
-                    A${labelRadius}, ${labelRadius}, 1, 0, 1, ${0}, ${0}`
 
-                defs.append('path').attr('id', `${helpers.slugify(obj.Label)}-label-path`)
-                    .attr('transform', `translate(${settings.dims.width * 0.5}, ${settings.dims.height * 0.5 - labelRadius})`)
-                    .attr('d', circularLabelPath)
+                if(settings.display.showCircleLabels){
+                    const circularLabelPath = `M${0} ${0}  A${labelRadius}, ${labelRadius}, 0, 0, 1, ${0}, ${labelRadius * 2}
+                        A${labelRadius}, ${labelRadius}, 1, 0, 1, ${0}, ${0}`
 
-                visBG.append('text').classed('targets-circular-label', true)
-                    .append('textPath').attr("href", `#${helpers.slugify(obj.Label)}-label-path`)
-                    .html(`Tracking <tspan class ="current">progress</tspan> towards <tspan class ="target">targets</tspan>`)	
-                    .attr('text-anchor', targetUp ? 'end' : 'start')
-                    .attr('startOffset', targetUp ? '95%' : '5%')
+                    defs.append('path').attr('id', `${helpers.slugify(obj.Label)}-label-path`)
+                        .attr('transform', `translate(${settings.dims.width * 0.5}, ${settings.dims.height * 0.5 - labelRadius})`)
+                        .attr('d', circularLabelPath)
+
+                    visBG.append('text').classed('targets-circular-label', true)
+                        .append('textPath').attr("href", `#${helpers.slugify(obj.Label)}-label-path`)
+                        .html(`Tracking <tspan class ="current">progress</tspan> towards <tspan class ="target">targets</tspan>`)	
+                        .attr('text-anchor', targetUp ? 'end' : 'start')
+                        .attr('startOffset', targetUp ? '95%' : '5%')
+                } 
 
                 // Append a sparkline
                     // b. Setup SVG element for dimensions 
