@@ -12,7 +12,7 @@
             /***********************************************************/
             /***********************************************************/
             /****                                                   ****/
-            /**** VICTORRINA WRRG WASTE DATA MAP  | CUSTOM CSS      ****/
+            /****  LOCAL GOV COLLECTION TREND TABLES | CUSTOM CSS   ****/
             /**** -----------------------------------------------   ****/
             /**** - CSS Variables and loaded fonts from core.css    ****/
             /****                                                   ****/
@@ -608,7 +608,12 @@
                     height: 100,
                     margin: { top: 5, right: 5, bottom: 5, left: 5 }
                 },
+            },
+            layout: {
+                showDefinitions:        true,
+                circularLabels:         false
             }
+
         }
 
         const data = {          // Initiate data object that populated by the parseData() function, 
@@ -785,16 +790,16 @@
                 const wasteVsLastYearPct            = lastYearWaste === 0               ? 'na' : `${(yearWaste >= lastYearWaste  ? '+' : '-')}${helpers.numberFormatters.formatPct1dec(Math.abs(yearWaste / lastYearWaste - 1))}`,
                     recoveryVsLastYearPct           = lastYearRecovery === 0            ? 'na' : `${(yearRecovery >= lastYearRecovery  ? '+' : '-')}${helpers.numberFormatters.formatPct1dec(Math.abs(yearRecovery / lastYearRecovery - 1))}`,
                     wastePerHouseholdVsLastYearPct  = lastYearWastePerHousehold === 0   ? 'na' : `${(yearWastePerHousehold  >= lastYearWastePerHousehold  ? '+' : '-')}${helpers.numberFormatters.formatPct1dec(Math.abs(yearWastePerHousehold / lastYearWastePerHousehold - 1))}`,
-                    costVsLastYearPct               = lastYearCost === 0                ? 'na' : `${(lastYearCost  >= yearCost  ? '+' : '-')}${helpers.numberFormatters.formatPct1dec(Math.abs(yearCost / lastYearCost - 1))}`,
-                    costPerHouseholdVsLastYearPct   = lastYearCostPerHousehold === 0    ? 'na' : `${(lastYearCostPerHousehold  >= yearCostPerHousehold  ? '+' : '-')}${helpers.numberFormatters.formatPct1dec(Math.abs(yearCostPerHousehold / lastYearCostPerHousehold - 1))}`,
+                    costVsLastYearPct               = lastYearCost === 0                ? 'na' : `${(yearCost >= lastYearCost  ? '+' : '-')}${helpers.numberFormatters.formatPct1dec(Math.abs(yearCost / lastYearCost - 1))}`,
+                    costPerHouseholdVsLastYearPct   = lastYearCostPerHousehold === 0    ? 'na' : `${(yearCostPerHousehold >= lastYearCostPerHousehold ? '+' : '-')}${helpers.numberFormatters.formatPct1dec(Math.abs(yearCostPerHousehold / lastYearCostPerHousehold - 1))}`,
                     diversionRateVsLastYearPct      = `${(yearDiversionRate  >= lastYearDiversionRate  ? '+' : '-')}${helpers.numberFormatters.formatPct1dec(Math.abs(yearDiversionRate - lastYearDiversionRate))}`
 
                 // b. Calculate performance data 
                 const wasteVsFiveYearPct            = fiveYearWaste === 0               ? 'na' : `${(yearWaste >= fiveYearWaste  ? '+' : '-')}${helpers.numberFormatters.formatPct1dec(Math.abs(yearWaste / fiveYearWaste - 1))}`,
                     recoveryVsFiveYearPct           = fiveYearRecovery === 0            ? 'na' : `${(yearRecovery >= fiveYearRecovery  ? '+' : '-')}${helpers.numberFormatters.formatPct1dec(Math.abs(yearRecovery / fiveYearRecovery - 1))}`,
                     wastePerHouseholdVsFiveYearPct  = fiveYearWastePerHousehold === 0   ? 'na' : `${(yearWastePerHousehold  >= fiveYearWastePerHousehold  ? '+' : '-')}${helpers.numberFormatters.formatPct1dec(Math.abs(yearWastePerHousehold / fiveYearWastePerHousehold - 1))}`,
-                    costVsFiveYearPct               = fiveYearCost === 0                ? 'na' : `${(fiveYearCost  >= yearCost  ? '+' : '-')}${helpers.numberFormatters.formatPct1dec(Math.abs(yearCost / fiveYearCost - 1))}`,
-                    costPerHouseholdVsFiveYearPct   = fiveYearCostPerHousehold === 0    ? 'na' : `${(fiveYearCostPerHousehold  >= yearCostPerHousehold  ? '+' : '-')}${helpers.numberFormatters.formatPct1dec(Math.abs(yearCostPerHousehold / fiveYearCostPerHousehold - 1))}`,
+                    costVsFiveYearPct               = fiveYearCost === 0                ? 'na' : `${(yearCost >= fiveYearCost ? '+' : '-')}${helpers.numberFormatters.formatPct1dec(Math.abs(yearCost / fiveYearCost - 1))}`,
+                    costPerHouseholdVsFiveYearPct   = fiveYearCostPerHousehold === 0    ? 'na' : `${(yearCostPerHousehold >= fiveYearCostPerHousehold ? '+' : '-')}${helpers.numberFormatters.formatPct1dec(Math.abs(yearCostPerHousehold / fiveYearCostPerHousehold - 1))}`,
                     diversionRateVsFiveYearPct      = `${(yearDiversionRate  >= fiveYearDiversionRate  ? '+' : '-')}${helpers.numberFormatters.formatPct1dec(Math.abs(yearDiversionRate - fiveYearDiversionRate))}`
 
                 // c. Trend data
@@ -849,19 +854,19 @@
 
                 volumeContainer.append('div').classed('service-summary-table-data pct-change performance-label', true).html('% change &rarr;')
                 volumeContainer.append('div').classed('service-summary-table-data pct-change lastYear-vs-data', true).html(wasteVsLastYearPct)
-                volumeContainer.append('div').classed('service-summary-table-data pct-change fiverYear-vs-data', true).html(wasteVsLastYearPct)
+                volumeContainer.append('div').classed('service-summary-table-data pct-change fiverYear-vs-data', true).html(wasteVsFiveYearPct)
                 renderSparkline(`volume-sparkline-${helpers.slugify(service)}`, serviceWasteData, settings.dims.minor_sparkline)
 
-                costContainer.append('div').classed('service-summary-table-header metric-label', true).html(`Cost of of waste collected ($ million)` )
+                costContainer.append('div').classed('service-summary-table-header metric-label', true).html(`Cost of of waste collected ($)` )
                 costContainer.append('div').classed('service-summary-table-header sparkline-container', true)
                     .append('svg').attr('id', `cost-sparkline-${helpers.slugify(service)}`).classed('minor-sparkline', true)
-                costContainer.append('div').classed('service-summary-table-data year-data', true).html(helpers.numberFormatters.formatCost2dec(yearCost / 1000000))
-                costContainer.append('div').classed('service-summary-table-data lastYear-data', true).html(helpers.numberFormatters.formatCost2dec(lastYearCost / 1000000))
-                costContainer.append('div').classed('service-summary-table-data fiveYear-data', true).html(helpers.numberFormatters.formatCost2dec(fiveYearCost / 1000000))
+                costContainer.append('div').classed('service-summary-table-data year-data', true).html(`${helpers.numberFormatters.formatCost1dec(yearCost / 1000000)} million`)
+                costContainer.append('div').classed('service-summary-table-data lastYear-data', true).html(`${helpers.numberFormatters.formatCost1dec(lastYearCost / 1000000)} million`)
+                costContainer.append('div').classed('service-summary-table-data fiveYear-data', true).html(`${helpers.numberFormatters.formatCost1dec(fiveYearCost / 1000000)} million`)
                 costContainer.append('div').classed('service-summary-table-header', true)
                 costContainer.append('div').classed('service-summary-table-data pct-change performance-label', true).html('% change &rarr;')
                 costContainer.append('div').classed('service-summary-table-data pct-change lastYear-vs-data', true).html(costVsLastYearPct)
-                costContainer.append('div').classed('service-summary-table-data pct-change fiveYear-vs-data', true).html(wasteVsLastYearPct)
+                costContainer.append('div').classed('service-summary-table-data pct-change fiveYear-vs-data', true).html(costVsLastYearPct)
                 renderSparkline(`cost-sparkline-${helpers.slugify(service)}`, serviceCostData, settings.dims.minor_sparkline)
 
                 if(service.toLowerCase() !== 'garbage'){
@@ -895,7 +900,7 @@
                     .append('svg').attr('id', `vol-per-hh-sparkline-${helpers.slugify(service)}`).classed('minor-sparkline', true)
                 volumePerHouseholdContainer.append('div').classed('service-summary-table-data year-data', true).html(helpers.numberFormatters.formatComma(yearWastePerHousehold))
                 volumePerHouseholdContainer.append('div').classed('service-summary-table-data lastYear-data', true).html(helpers.numberFormatters.formatComma(lastYearWastePerHousehold))
-                volumePerHouseholdContainer.append('div').classed('service-summary-table-data fiveYear-data', true).html(helpers.numberFormatters.formatComma(lastYearWastePerHousehold))
+                volumePerHouseholdContainer.append('div').classed('service-summary-table-data fiveYear-data', true).html(helpers.numberFormatters.formatComma(fiveYearWastePerHousehold))
                 volumePerHouseholdContainer.append('div').classed('service-summary-table-header', true)
                 volumePerHouseholdContainer.append('div').classed('service-summary-table-data pct-change performance-label', true).html('% change &rarr;')
                 volumePerHouseholdContainer.append('div').classed('service-summary-table-data pct-change lastYear-vs-data', true).html(wastePerHouseholdVsLastYearPct)
@@ -1026,8 +1031,6 @@
                     .attr('width', xScale(1) - dims.margin.left)
                     .attr('height', dims.height) 
             }
-
-
         }; // end renderSparkline
 
         ////////////////////////////////
