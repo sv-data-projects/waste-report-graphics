@@ -532,8 +532,8 @@
                     .attr('viewBox', `0 0 ${settings.dims.width} ${settings.dims.height}`)
                     .attr('preserveAspectRatio', 'xMidYMid meet')
                 const defs = vis.append('defs'),
-                    svgTitle = svg.append('title').attr('id', 'svg-title'),
-                    svgDescription = svg.append('title').attr('id', 'svg-description')
+                    svgTitle = vis.append('title').attr('id', 'svg-title'),
+                    svgDescription = vis.append('title').attr('id', 'svg-description')
 
                 // b. Create layering groups to render to (bottom layer first)
                 const bgLayer = vis.append('g').classed('background-group', true)                    
