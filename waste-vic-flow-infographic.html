@@ -6,6 +6,7 @@
         <meta name="description" content="Victorian waste flows data graphic">
         <meta name="author" content="Sustainability Victoria">
         <script src="https://d3js.org/d3.v7.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/4.3.2/iframeResizer.contentWindow.js" integrity="sha512-cJ7aOLpXbec1Km9craM6xL6UOdlWf9etIz7f+cwQv2tuarLm3PLb3dv3ZqIK++SE4ui+EE0nWqKB0dOaAOv9gQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>  
         <link rel="stylesheet" href="./css/core.css">
         <style>
 
@@ -1474,6 +1475,8 @@
                 flowExtent = d3.extent(yearData.map(d => d.value))
 
             const svg = d3.select(`#${settings.svgID}`),
+                svgTitle = svg.append('title').attr('id', 'svg-title'),
+                svgDescription = svg.append('title').attr('id', 'svg-description'),
                 generationLayer = svg.append('g').classed('generation-group', true),
                 generationFlows = generationLayer.append('g').classed('generation-flows', true),
                 generationNodes = generationLayer.append('g').classed('generation-nodes', true),

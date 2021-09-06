@@ -7,9 +7,21 @@
     <meta name="author" content="Sustainability Victoria">
     <link rel="stylesheet" href="./css/core.css">
     <script src="https://d3js.org/d3.v7.min.js"></script>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/4.3.2/iframeResizer.contentWindow.js" integrity="sha512-cJ7aOLpXbec1Km9craM6xL6UOdlWf9etIz7f+cwQv2tuarLm3PLb3dv3ZqIK++SE4ui+EE0nWqKB0dOaAOv9gQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>  
     <style>
-            body{
+
+        /***********************************************************/
+        /***********************************************************/
+        /****                                                   ****/
+        /**** VICTORIAN WASTE EXPORT DATA MAP  | CUSTOM CSS     ****/
+        /**** -----------------------------------------------   ****/
+        /**** - CSS Variables and loaded fonts from core.css    ****/
+        /****                                                   ****/
+        /***********************************************************/
+        /***********************************************************/
+
+
+        body{
             font-family: 'DIN Next LT Pro';
             margin: 0;
         }
@@ -130,7 +142,7 @@
         .country-material-name{
             font-size: 8px;
         }
-  </style>
+    </style>
 </head>
 
 <body>
@@ -261,6 +273,8 @@
         async function renderMap(settings, worldShapeData, statesShapeData){
             // 1. SPECIFY LAYOUT GROUPS: Layers appended in rendering order
             const svg = d3.select(`#${settings.svgID}`).attr('viewBox', `0 0 ${settings.dims.width} ${settings.dims.height}`),
+                svgTitle = svg.append('title').attr('id', 'svg-title'),
+                svgDescription = svg.append('title').attr('id', 'svg-description'),
                 mapGroup = svg.append('g').classed('map-group', true),
                 countries = mapGroup.append('g').classed('countries-group', true),
                 ausStates = mapGroup.append('g').classed('aus-states-group', true),

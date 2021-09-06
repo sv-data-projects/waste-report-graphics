@@ -199,7 +199,9 @@
                 .attr('xmlns', "http://www.w3.org/2000/svg" )
                 .attr('xmlns:xlink', "http://www.w3.org/1999/xlink")
 
-            const defs = svg.append('defs')
+            const defs = svg.append('defs'),
+                svgTitle = svg.append('title').attr('id', 'svg-title')
+                svgDescription = svg.append('title').attr('id', 'svg-description')
 
             const recyclingInsert = {x: settings.dims.width * 0.35, y: settings.dims.height * 0.5},
                 iconWidth = 20,  iconHeight = 22.5, iconBinHeight = 19.3, iconScale = 1.15
@@ -211,7 +213,7 @@
 
             let cumulativeProp = -iconBinHeight
 
-                // a. Cxreate chart data
+                // a. Create chart data
                 const recycleBinChartData = []
                 data.schema.list.kerbsideRecycleMaterialGroups.forEach (group => {
                     recycleBinChartData.push({ group,  volume: d3.sum(recycleBinData.filter(d => d.group === group).map(d => d.volume)) })

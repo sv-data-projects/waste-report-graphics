@@ -6,6 +6,7 @@
         <meta name="description" content="Progress vs RV targets">
         <meta name="author" content="Sustainability Victoria">
         <script src="https://d3js.org/d3.v7.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/4.3.2/iframeResizer.contentWindow.js" integrity="sha512-cJ7aOLpXbec1Km9craM6xL6UOdlWf9etIz7f+cwQv2tuarLm3PLb3dv3ZqIK++SE4ui+EE0nWqKB0dOaAOv9gQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>  
         <link rel="stylesheet" href="./css/core.css">
         <style>
 
@@ -330,7 +331,10 @@
                 const svg = svgContainer.append('svg').attr('id', `vis-target-${i+ 1}`)
                         .attr('viewBox', `0 0 ${settings.dims.width} ${settings.dims.height}`)
                         .attr('width', `100%`)
-                const defs = svg.append('defs')
+                const defs = svg.append('defs'),
+                    svgTitle = svg.append('title').attr('id', 'svg-title'),
+                    svgDescription = svg.append('title').attr('id', 'svg-description'),
+
                 const radius = settings.dims.height * 0.425
 
                 // Append a circular border

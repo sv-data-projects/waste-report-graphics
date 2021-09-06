@@ -6,13 +6,14 @@
         <meta name="description" content="Waste diversion radial chart with table">
         <meta name="author" content="Sustainability Victoria">
         <script src="https://d3js.org/d3.v7.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/4.3.2/iframeResizer.contentWindow.js" integrity="sha512-cJ7aOLpXbec1Km9craM6xL6UOdlWf9etIz7f+cwQv2tuarLm3PLb3dv3ZqIK++SE4ui+EE0nWqKB0dOaAOv9gQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>  
         <link rel="stylesheet" href="./css/core.css">
         <style>
 
             /***********************************************************/
             /***********************************************************/
             /****                                                   ****/
-            /**** WASTE DIVERSSION GRPAHIC AND TABLE  | CUSTOM CSS  ****/
+            /**** WASTE DIVERSSON GRPAHIC AND TABLE  | CUSTOM CSS  ****/
             /**** ---------------------------------------------     ****/
             /**** - CSS Variables and loaded fonts from core.css    ****/
             /****                                                   ****/
@@ -444,6 +445,8 @@
                 const svg= d3.select(`#${settings.svgID}`).attr("viewBox", `0 0 ${settings.dims.width} ${settings.dims.height}`)
 
                 const defs = svg.append('defs'),
+                    svgTitle = svg.append('title').attr('id', 'svg-title'),
+                    svgDescription = svg.append('title').attr('id', 'svg-description'),
                     backgroundLayer = svg.append('g').classed('bg-group', true),                // Background layer
                     canvas = svg.append('g').classed('vis-group', true)                         // Centered rendering layer
                         .attr("height", settings.dims.height - settings.dims.margin.top - settings.dims.margin.bottom)

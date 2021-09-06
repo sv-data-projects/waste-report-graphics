@@ -429,9 +429,9 @@
                                 </g>
                             </g>
                         </g>
-                        <use id="recycling-bin-1"   xlink:href="#recycling-bin"     transform = "translate(125, 190) scale(1.5)"/>
-                        <use id="garbage-bin-1"     xlink:href="#garbage-bin-flat"  transform = "translate(217, 190) scale(1.7 1.7)"/>
-                        <use id="organics-bin-1"    xlink:href="#organics-bin"      transform = "translate(330, 190) scale(-1.5 1.5)"/>
+                        <use id="recycling-bin-1"   href="#recycling-bin"     transform = "translate(125, 190) scale(1.5)"/>
+                        <use id="garbage-bin-1"     href="#garbage-bin-flat"  transform = "translate(217, 190) scale(1.7 1.7)"/>
+                        <use id="organics-bin-1"    href="#organics-bin"      transform = "translate(330, 190) scale(-1.5 1.5)"/>
                     </g>
                     <g id="foreground-layer">
                         <g id="streetlight-group">
@@ -684,7 +684,7 @@
                 <!-- 3. BACKGROUND ILLUSTRATION FOR THE LOWER SCENE WITH COUNCIL BUIlDING AND BINS -->
                 <g id = "council-scene" transform= "translate(445, 1285) scale(2.75)">
                     <defs>
-                        <g id="garbage-bin-council"">
+                        <g id="garbage-bin-council">
                             <path fill="#252d2f" d="M4.427-2.15A1.153 2.045 0 013.274-.107 1.153 2.045 0 012.121-2.15a1.153 2.045 0 011.153-2.045 1.153 2.045 0 011.153 2.045"/>
                             <path fill="#4c5e57" d="M2.161-14.095l9.703.035-.045 13.7-7.802.055c-.421.052-.623-.192-.65-.683z"/>
                             <path fill="#3f4c4a" d="M11.74-13.97l2.912-1.13-.24 12.747c-.032.34.055.509-.23.709l-2.364 1.26z"/>
@@ -700,7 +700,7 @@
                                 </g>
                             </g>
                         </g>
-                        <g id="recycling-bin-council"">
+                        <g id="recycling-bin-council">
                             <path fill="#252d2f" d="M4.427-2.15A1.153 2.045 0 013.274-.107 1.153 2.045 0 012.121-2.15a1.153 2.045 0 011.153-2.045 1.153 2.045 0 011.153 2.045"/>
                             <path fill="#4c5e57" d="M2.161-14.095l9.703.035-.045 13.7-7.802.055c-.421.052-.623-.192-.65-.683z"/>
                             <path fill="#3f4c4a" d="M11.74-13.97l2.912-1.13-.24 12.747c-.032.34.055.509-.23.709l-2.364 1.26z"/>
@@ -716,7 +716,7 @@
                                 </g>
                             </g>
                         </g>
-                        <g id="organics-bin-council"">
+                        <g id="organics-bin-council">
                             <path fill="#252d2f" d="M4.427-2.15A1.153 2.045 0 013.274-.107 1.153 2.045 0 012.121-2.15a1.153 2.045 0 011.153-2.045 1.153 2.045 0 011.153 2.045"/>
                             <path fill="#4c5e57" d="M2.161-14.095l9.703.035-.045 13.7-7.802.055c-.421.052-.623-.192-.65-.683z"/>
                             <path fill="#3f4c4a" d="M11.74-13.97l2.912-1.13-.24 12.747c-.032.34.055.509-.23.709l-2.364 1.26z"/>
@@ -907,11 +907,11 @@
                             <path fill="#e3dbdb" d="M128.07 166.44h1.052c.343.055.197-1.127.047-1.194-.575.023-.98.193-1.115.44z"/>
                         </g>
                     </g>
-                    <use id="bin-chicken-1" xlink:href="#bin-chicken"  transform = "translate(315, 180) scale(0.45 0.45)"/>
-                    <use id="garbage-bin-2"     xlink:href="#garbage-bin-council"       transform = "translate(265, 196) scale(-1.5 1.5)"/>
-                    <use id="recycling-bin-2"   xlink:href="#recycling-bin-council"     transform = "translate(305, 196) scale(-1.5 1.5)"/>
-                    <use id="organics-bin-2"    xlink:href="#organics-bin-council"      transform = "translate(345, 196) scale(-1.5 1.5)"/>
-                    <use id="bin-chicken-2" xlink:href="#bin-chicken"  transform = "translate(235, 188) scale(-0.55 0.55)"/>
+                    <use id="bin-chicken-1" href="#bin-chicken"  transform = "translate(315, 180) scale(0.45 0.45)"/>
+                    <use id="garbage-bin-2"     href="#garbage-bin-council"       transform = "translate(265, 196) scale(-1.5 1.5)"/>
+                    <use id="recycling-bin-2"   href="#recycling-bin-council"     transform = "translate(305, 196) scale(-1.5 1.5)"/>
+                    <use id="organics-bin-2"    href="#organics-bin-council"      transform = "translate(345, 196) scale(-1.5 1.5)"/>
+                    <use id="bin-chicken-2" href="#bin-chicken"  transform = "translate(235, 188) scale(-0.55 0.55)"/>
                 </g>
             </svg>
         </div>
@@ -1300,7 +1300,7 @@
                     .attr('d',breakdownLabelPath )
                 recyclingBreakdownChart.append('text').classed('recycling-breakdown-label', true)
                     .attr('transform', `translate(${(chartBgRadius + breakdownLabelOffset) *0.25}, ${-(chartBgRadius) * 1.5 - breakdownLabelOffset })`)
-                        .append('textPath').attr("xlink:href", `#breakdown-chart-label-path`)
+                        .append('textPath').attr("href", `#breakdown-chart-label-path`)
                         .attr("startOffset", '100%')
                         .style("text-anchor", 'end')
                         .text(`What's in our mixed recyclables?`)	
@@ -1369,7 +1369,7 @@
 
                 diversionCallout.append('text').classed('recycling-breakdown-label', true)
                     .attr('transform', `translate(${-(chartBgRadius + breakdownLabelOffset) *0.25}, ${-(chartBgRadius) * 1.5 - breakdownLabelOffset })`)
-                        .append('textPath').attr("xlink:href", `#diversion-callout-label-path`)
+                        .append('textPath').attr("href", `#diversion-callout-label-path`)
                         .text(`How much kerbside waste was recovered?`)	
 
                 // c. Headline diversion rate label

@@ -6,378 +6,328 @@
         <meta name="description" content="Victorian waste flow summary graphic ">
         <meta name="author" content="Sustainability Victoria ">
         <script src="https://d3js.org/d3.v7.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/4.3.2/iframeResizer.contentWindow.js" integrity="sha512-cJ7aOLpXbec1Km9craM6xL6UOdlWf9etIz7f+cwQv2tuarLm3PLb3dv3ZqIK++SE4ui+EE0nWqKB0dOaAOv9gQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>  
+        <link rel="stylesheet" href="./css/core.css">
         <style>
-            /* COLOUR PALETTES | MID-2021 BRAND STYLE GUIDE*/
-            :root {
-                /** PRIMARY SV GREEN AND SECONDARY PALLETTE **/
-                --svGreen:                       #9ACA3C;
-                /** SECONDARY PALLETTE **/
-                --secondaryGreenLight:           #D5E0A1;
-                --secondaryBottleGreen:          #174F37;
-                --secondaryBottleGreenLight:     #79B5AA;
-                --secondaryGrey:                 #B1B1B0;
-                --secondaryGreyLight:            #CFCFCF;
-                --secondaryGreyLightest:         #ECECEC;
-                /** TERTIARY PALETTE **/
-                --tertiaryPurple:       #51284F;
-                --tertiaryPurpleLight:  #8276B3;
-                --tertiaryRed:          #E04F39;
-                --tertiaryRedLight:     #F78684;
-                --tertiaryYellow:       #EFC041;
-                --tertiaryYellowLight:  #F5E065;
-                --tertiaryCard:         #B39981;
-                --tertiaryCardLight:    #DCBFA6;
-                --tertiaryEmerald:      #009E71;
-                --tertiaryEmeraldLight: #93CCB9;
-                --tertiaryBlue:         #005E88;
-                --tertiaryBlueLight:    #A0D6E9;
-            }
 
-        /***************************************/
-        /*** IMPORTED FONTS  | ALL WEIGHTS  ***/
-        /***************************************/
+            /***********************************************************/
+            /***********************************************************/
+            /****                                                   ****/
+            /**** SUMMARY VIC FLOWS INFOGRAPHIC |++   CUSTOM CSS    ****/
+            /**** -----------------------------------------------   ****/
+            /**** - CSS Variables and loaded fonts from core.css    ****/
+            /****                                                   ****/
+            /***********************************************************/
+            /********************************************++***************/
 
-            @font-face {
-                font-family: 'DIN Next LT Pro';
-                src: local('DIN Next LT Pro Light'), local('DIN-Next-LT-Pro-Light'),
-                    url('fonts/DINNextLTPro-Light.woff2') format('woff2'),
-                    url('fonts/DINNextLTPro-Light.woff') format('woff'),
-                    url('fonts/DINNextLTPro-Light.ttf') format('truetype');
-                font-weight: 300;
-                font-style: light;
-            }
-            @font-face {
-                font-family: 'DIN Next LT Pro';
-                src: local('DIN Next LT Pro Regular'), local('DIN-Next-LT-Pro-Regular'),
-                    url('fonts/DINNextLTPro-Regular.woff2') format('woff2'),
-                    url('fonts/DINNextLTPro-Regular.woff') format('woff'),
-                    url('fonts/DINNextLTPro-Regular.ttf') format('truetype');
-                font-weight: 400;
-                font-style: normal;
-            }
-            @font-face {
-                font-family: 'DIN Next LT Pro';
-                src: local('DIN Next LT Pro Medium'), local('DIN-Next-LT-Pro-Medium'),
-                    url('fonts/DINNextLTPro-Medium.woff2') format('woff2'),
-                    url('fonts/DINNextLTPro-Medium.woff') format('woff'),
-                    url('fonts/DINNextLTPro-Medium.ttf') format('truetype');
-                font-weight: 500;
-                font-style: medium;
-            }
-            @font-face {
-                font-family: 'DIN Next LT Pro';
-                src: local('DIN Next LT Pro Heavy'), local('DIN-Next-LT-Pro-Heavy'),
-                    url('fonts/DINNextLTPro-Heavy.woff2') format('woff2'),
-                    url('fonts/DINNextLTPro-Heavy.woff') format('woff'),
-                    url('fonts/DINNextLTPro-Heavy.ttf') format('truetype');
-                font-weight: 800;
-                font-style: heavy;
-            }
+            /*******************************************/
+            /***  PAGE LAYOUT | HEADLINE + MATERIAL ***/
+            /******************************************/
 
-            body{
-                font-family: 'DIN Next LT Pro';
-                margin: 0;
-            }
+                body{
+                    font-family: 'DIN Next LT Pro';
+                    margin: 0;
+                }
 
 
-        .paper-and-paperboard.node{
-            fill: var(--tertiaryYellow);
-        }
-        .flow-link.paper-and-paperboard{
-            stroke: var(--tertiaryYellow );
-        }
-        .plastic-packaging.node{
-            fill: var(--tertiaryRedLight);
-        }
-        .flow-link.plastic-packaging{
-            stroke: var(--tertiaryRedLight);
-        }
-        .metal-packaging.node{
-            fill: var(--tertiaryBlueLight);
-        }
-        .flow-link.metal-packaging{
-            stroke: var(--tertiaryBlueLight);
-        }
-        .glass-packaging.node{
-            fill: var(--tertiaryPurpleLight)
-        }
-        .flow-link.glass-packaging{
-            stroke: var(--tertiaryPurpleLight)
-        }
-        .organics.material{
-            fill: var(--tertiaryEmeraldLight);
-        }
-        .flow-link.organics{
-            stroke: var(--tertiaryEmeraldLight);
-        }
-        .aggregates-masonry-soil.material{
-            fill: var(--tertiaryCard);
-        }
-        .aggregates-masonry-soil{
-            stroke: var(--tertiaryCard);
-        }
-        .rubber.material{
-            fill: var(--secondaryGrey);
-        }
-        .flow-link.rubber{
-            stroke: var(--secondaryGrey);
-        }
+                .paper-and-paperboard.node{
+                    fill: var(--tertiaryYellow);
+                }
+                .flow-link.paper-and-paperboard{
+                    stroke: var(--tertiaryYellow );
+                }
+                .plastic-packaging.node{
+                    fill: var(--tertiaryRedLight);
+                }
+                .flow-link.plastic-packaging{
+                    stroke: var(--tertiaryRedLight);
+                }
+                .metal-packaging.node{
+                    fill: var(--tertiaryBlueLight);
+                }
+                .flow-link.metal-packaging{
+                    stroke: var(--tertiaryBlueLight);
+                }
+                .glass-packaging.node{
+                    fill: var(--tertiaryPurpleLight)
+                }
+                .flow-link.glass-packaging{
+                    stroke: var(--tertiaryPurpleLight)
+                }
+                .organics.material{
+                    fill: var(--tertiaryEmeraldLight);
+                }
+                .flow-link.organics{
+                    stroke: var(--tertiaryEmeraldLight);
+                }
+                .aggregates-masonry-soil.material{
+                    fill: var(--tertiaryCard);
+                }
+                .aggregates-masonry-soil{
+                    stroke: var(--tertiaryCard);
+                }
+                .rubber.material{
+                    fill: var(--secondaryGrey);
+                }
+                .flow-link.rubber{
+                    stroke: var(--secondaryGrey);
+                }
 
 
-        /***************************/
-        /*****  GENERAL STYLING  ***/
-        /***************************/
-            .hidden{ 
-                display: none;
-            }
-            .bg-rect{
-                fill: none;
-            }
+                /***************************/
+                /*****  GENERAL STYLING  ***/
+                /***************************/
+                    .hidden{ 
+                        display: none;
+                    }
+                    .bg-rect{
+                        fill: none;
+                    }
 
-        /*****************************************/
-        /*****  TYPOGRAPHY AND ELEMENT COLOUR  ***/
-        /*****************************************/
+                /*****************************************/
+                /*****  TYPOGRAPHY AND ELEMENT COLOUR  ***/
+                /*****************************************/
 
-        .main-title{
-            fill: rgb(40, 40, 40);
-        }
+                .main-title{
+                    fill: rgb(40, 40, 40);
+                }
 
-        .waste-stream-headline,
-        .label.waste-stream,
-        .data-label.waste-stream,
-        .icon.waste-stream,
-        .generation-headline,
-        .waste-stream-headline,
-        .generation-unit,
-        .landfill-label-bg{
-            fill:  var(--secondaryBottleGreen);
-        }
+                .waste-stream-headline,
+                .label.waste-stream,
+                .data-label.waste-stream,
+                .icon.waste-stream,
+                .generation-headline,
+                .waste-stream-headline,
+                .generation-unit,
+                .landfill-label-bg{
+                    fill:  var(--secondaryBottleGreen);
+                }
 
-        .landfill.icon,
-        .landfill-headline,
-        .landfill-unit, 
-        .arrow-landfill{
-            fill: var(--tertiaryRed);
-        }
-        .main-subtitle,
-        .recovery.icon,
-        .recovery-headline,
-        .recovery-unit,
-        .diversion-headline,
-        .diversion-unit, 
-        .diversion-unit-large,
-        .recycled-icon,
-        .donut-arc.diversion,
-        .donut-diversion-pct,
-        .diversion-label, 
-        .diversion-main-label{
-            fill: var(--secondaryBottleGreenLight);
-        }
-        .diversion-main-label, 
-        .diversion-pct-number,
-        .diversion-pct-unit{
-            stroke: var(--secondaryBottleGreenLight);
-            fill: none;
-        }
-        .donut-chart-bg{
-            fill: #fff;
-        }
-        .arrow-diversion{
-            fill: #8F9F9C;      /* Manually picked from gradient */
-        }
-        .main-title{
-            text-transform: uppercase;
-        }
-        .main-title, 
-        .title-label{
-            font-size: 30px;
-        }
-        .main-subtitle,
-        .label.waste-stream,
-        .data-label.waste-stream{
-            font-size: 14px;
-        }
+                .landfill.icon,
+                .landfill-headline,
+                .landfill-unit, 
+                .arrow-landfill{
+                    fill: var(--tertiaryRed);
+                }
+                .main-subtitle,
+                .recovery.icon,
+                .recovery-headline,
+                .recovery-unit,
+                .diversion-headline,
+                .diversion-unit, 
+                .diversion-unit-large,
+                .recycled-icon,
+                .donut-arc.diversion,
+                .donut-diversion-pct,
+                .diversion-label, 
+                .diversion-main-label{
+                    fill: var(--secondaryBottleGreenLight);
+                }
+                .diversion-main-label, 
+                .diversion-pct-number,
+                .diversion-pct-unit{
+                    stroke: var(--secondaryBottleGreenLight);
+                    fill: none;
+                }
+                .donut-chart-bg{
+                    fill: #fff;
+                }
+                .arrow-diversion{
+                    fill: #8F9F9C;      /* Manually picked from gradient */
+                }
+                .main-title{
+                    text-transform: uppercase;
+                }
+                .main-title, 
+                .title-label{
+                    font-size: 30px;
+                }
+                .main-subtitle,
+                .label.waste-stream,
+                .data-label.waste-stream{
+                    font-size: 14px;
+                }
 
-        .label.waste-stream,
-        .data-label.waste-stream,
-        .diversion-label, 
-        .diversion-pct-number{
-            text-anchor: middle;
-        }
-        .diversion-headline,
-        .diversion-unit, 
-        .diversion-unit-large{
-            text-anchor: end;
-        }
-        .generation-headline-figure{
-            font-size: 80px;
-            text-anchor: end;
-            letter-spacing: -2px;
-        }
-        .generation-headline,
-        .waste-stream-headline,
-        .generation-unit,
-        .recovery-unit,
-        .landfill-unit{
-            font-size: 18px;
-        }
-        .generation-headline{
-            text-transform: uppercase;    
-            font-size: 40px;        
-        }
-        .recovery-headline{
-            font-size: 100px;
-            letter-spacing: -8px;
-        }
-        .landfill-label-bg{
-            opacity: 0.9;
-            display: none;
-        }
-        .main-title,
-        .main-subtitle,
-        .diversion-pct-unit,
-        .recovery.icon,
-        .recovery-headline,
-        .recovery-unit,
-        .landfill.icon,
-        .landfill-headline,
-        .landfill-unit{
-            dominant-baseline: hanging;
-        }
-        .landfill.icon,
-        .landfill-headline,
-        .landfill-unit{
-            mix-blend-mode: exclusion;
-        }
-        .main-title,
-        .title-label,
-        .recovery.icon,
-        .recovery-headline,
-        .recovery-unit,
-        .landfill.icon,
-        .landfill-headline,
-        .landfill-unit,
-        .diversion-headline,
-        .diversion-unit,
-        .diversion-label,
-        .diversion-pct-number,
-        .diversion-pct-unit,
-        .diversion-main-label,
-        .label.waste-stream,
-        .generation-headline-figure,
-        .generation-unit, 
-        .generation-headline{
-            font-weight: 500;
-        }
-        .diversion-main-label{
-            font-weight: 700;
-        }
-        .landfill-headline,
-        .diversion-headline{
-            font-size: 60px;
-        }
-        .landfill-headline{
-            letter-spacing: -4px;
-        }
-        .diversion-headline{
-            letter-spacing: -2px;
-        }
-        .diversion-unit{
-            font-size: 20px;
-        }
-        .diversion-unit-large{
-            font-size: 36px;
-        }
-        .diversion-label{
-            font-size: 10px;
-        }
-        .diversion-pct-number{
-            font-size: 150px;
-            stroke-width: 4px;
-            letter-spacing: -6px;
-            dominant-baseline: middle;
-        }
-        .diversion-main-label,
-        .diversion-pct-unit{
-            font-size: 44px;
-            letter-spacing: 1px;
-            stroke-width: 1.75px;
-        }
+                .label.waste-stream,
+                .data-label.waste-stream,
+                .diversion-label, 
+                .diversion-pct-number{
+                    text-anchor: middle;
+                }
+                .diversion-headline,
+                .diversion-unit, 
+                .diversion-unit-large{
+                    text-anchor: end;
+                }
+                .generation-headline-figure{
+                    font-size: 80px;
+                    text-anchor: end;
+                    letter-spacing: -2px;
+                }
+                .generation-headline,
+                .waste-stream-headline,
+                .generation-unit,
+                .recovery-unit,
+                .landfill-unit{
+                    font-size: 18px;
+                }
+                .generation-headline{
+                    text-transform: uppercase;    
+                    font-size: 40px;        
+                }
+                .recovery-headline{
+                    font-size: 100px;
+                    letter-spacing: -8px;
+                }
+                .landfill-label-bg{
+                    opacity: 0.9;
+                    display: none;
+                }
+                .main-title,
+                .main-subtitle,
+                .diversion-pct-unit,
+                .recovery.icon,
+                .recovery-headline,
+                .recovery-unit,
+                .landfill.icon,
+                .landfill-headline,
+                .landfill-unit{
+                    dominant-baseline: hanging;
+                }
+                .landfill.icon,
+                .landfill-headline,
+                .landfill-unit{
+                    mix-blend-mode: exclusion;
+                }
+                .main-title,
+                .title-label,
+                .recovery.icon,
+                .recovery-headline,
+                .recovery-unit,
+                .landfill.icon,
+                .landfill-headline,
+                .landfill-unit,
+                .diversion-headline,
+                .diversion-unit,
+                .diversion-label,
+                .diversion-pct-number,
+                .diversion-pct-unit,
+                .diversion-main-label,
+                .label.waste-stream,
+                .generation-headline-figure,
+                .generation-unit, 
+                .generation-headline{
+                    font-weight: 500;
+                }
+                .diversion-main-label{
+                    font-weight: 700;
+                }
+                .landfill-headline,
+                .diversion-headline{
+                    font-size: 60px;
+                }
+                .landfill-headline{
+                    letter-spacing: -4px;
+                }
+                .diversion-headline{
+                    letter-spacing: -2px;
+                }
+                .diversion-unit{
+                    font-size: 20px;
+                }
+                .diversion-unit-large{
+                    font-size: 36px;
+                }
+                .diversion-label{
+                    font-size: 10px;
+                }
+                .diversion-pct-number{
+                    font-size: 150px;
+                    stroke-width: 4px;
+                    letter-spacing: -6px;
+                    dominant-baseline: middle;
+                }
+                .diversion-main-label,
+                .diversion-pct-unit{
+                    font-size: 44px;
+                    letter-spacing: 1px;
+                    stroke-width: 1.75px;
+                }
 
-        /*** VISUALS ELEMENTS ****/
-        .flow{
-            fill: none;
-            stroke-linecap: butt;
-            stroke-linejoin: round;
-            mix-blend-mode: screen;
-        }
-        .diversion-label-path{
-            fill: none;
-            stroke-width: 1px;
-            stroke: none ;
-        }
-        .donut-arc{
-            stroke: #fff;
-            stroke-width: 0.5px;
-            fill: #cfcfcf;
-        }
-        .donut-diversion-pct{
-            font-size: 20px;
-            font-weight: 500;
-            text-anchor: middle;
-            dominant-baseline: middle;
-        }
-        .vic-outline{
-            fill: #000;
-            opacity: 0.1;
-        }
+                /*** VISUALS ELEMENTS ****/
+                .flow{
+                    fill: none;
+                    stroke-linecap: butt;
+                    stroke-linejoin: round;
+                    mix-blend-mode: screen;
+                }
+                .diversion-label-path{
+                    fill: none;
+                    stroke-width: 1px;
+                    stroke: none ;
+                }
+                .donut-arc{
+                    stroke: #fff;
+                    stroke-width: 0.5px;
+                    fill: #cfcfcf;
+                }
+                .donut-diversion-pct{
+                    font-size: 20px;
+                    font-weight: 500;
+                    text-anchor: middle;
+                    dominant-baseline: middle;
+                }
+                .vic-outline{
+                    fill: #000;
+                    opacity: 0.1;
+                }
 
-        /**** DARK MODE ELEMENTS ******/
-        .dark .bg-rect,
-        .dark .donut-chart-bg{
-            fill: rgb(40, 40, 40);
-            mix-blend-mode: darken;
-        }
-        .dark .main-title,
-        .dark .vic-outline,
-        .dark .title-label,
-        .dark .waste-stream-headline,
-        .dark .label.waste-stream,
-        .dark .data-label.waste-stream,
-        .dark .icon.waste-stream,
-        .dark .generation-headline,
-        .dark .waste-stream-headline,
-        .dark .generation-unit,
-        .dark .landfill-label-bg, 
-        .dark .arrow-diversion{
-            fill: #fff;
-        }
-        .dark .landfill.icon,
-        .dark .landfill-headline,
-        .dark .landfill-unit{
-            fill: var(--tertiaryRed);
-        }
+                /**** DARK MODE ELEMENTS ******/
+                .dark .bg-rect,
+                .dark .donut-chart-bg{
+                    fill: rgb(40, 40, 40);
+                    mix-blend-mode: darken;
+                }
+                .dark .main-title,
+                .dark .vic-outline,
+                .dark .title-label,
+                .dark .waste-stream-headline,
+                .dark .label.waste-stream,
+                .dark .data-label.waste-stream,
+                .dark .icon.waste-stream,
+                .dark .generation-headline,
+                .dark .waste-stream-headline,
+                .dark .generation-unit,
+                .dark .landfill-label-bg, 
+                .dark .arrow-diversion{
+                    fill: #fff;
+                }
+                .dark .landfill.icon,
+                .dark .landfill-headline,
+                .dark .landfill-unit{
+                    fill: var(--tertiaryRed);
+                }
 
-        .dark .main-subtitle,
-        .dark .recovery.icon,
-        .dark .recovery-headline,
-        .dark .recovery-unit,
-        .dark .diversion-headline,
-        .dark .diversion-unit, 
-        .dark .diversion-unit-large,
-        .dark .recycled-icon,
-        .dark .donut-arc.diversion,
-        .dark .donut-diversion-pct,
-        .dark .diversion-label, 
-        .dark .diversion-main-label{
-            fill: var(--secondaryBottleGreenLight);
-        }
-        .dark .diversion-main-label, 
-        .dark .diversion-pct-number,
-        .dark .diversion-pct-unit{
-            stroke: var(--secondaryBottleGreenLight);
-            fill: none;
-        }
+                .dark .main-subtitle,
+                .dark .recovery.icon,
+                .dark .recovery-headline,
+                .dark .recovery-unit,
+                .dark .diversion-headline,
+                .dark .diversion-unit, 
+                .dark .diversion-unit-large,
+                .dark .recycled-icon,
+                .dark .donut-arc.diversion,
+                .dark .donut-diversion-pct,
+                .dark .diversion-label, 
+                .dark .diversion-main-label{
+                    fill: var(--secondaryBottleGreenLight);
+                }
+                .dark .diversion-main-label, 
+                .dark .diversion-pct-number,
+                .dark .diversion-pct-unit{
+                    stroke: var(--secondaryBottleGreenLight);
+                    fill: none;
+                }
 
         </style>
     </head>
@@ -581,7 +531,9 @@
                 const vis = d3.select(`#${settings.svgID}`)
                     .attr('viewBox', `0 0 ${settings.dims.width} ${settings.dims.height}`)
                     .attr('preserveAspectRatio', 'xMidYMid meet')
-                const defs = vis.append('defs')
+                const defs = vis.append('defs'),
+                    svgTitle = svg.append('title').attr('id', 'svg-title'),
+                    svgDescription = svg.append('title').attr('id', 'svg-description')
 
                 // b. Create layering groups to render to (bottom layer first)
                 const bgLayer = vis.append('g').classed('background-group', true)                    

@@ -6,13 +6,14 @@
         <meta name="description" content="Victorian WRRG data map">
         <meta name="author" content="Sustainability Victoria">
         <script src="https://d3js.org/d3.v7.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/4.3.2/iframeResizer.contentWindow.js" integrity="sha512-cJ7aOLpXbec1Km9craM6xL6UOdlWf9etIz7f+cwQv2tuarLm3PLb3dv3ZqIK++SE4ui+EE0nWqKB0dOaAOv9gQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>  
         <link rel="stylesheet" href="./css/core.css">
         <style>
 
             /***********************************************************/
             /***********************************************************/
             /****                                                   ****/
-            /**** VICTORRINA WRRG WASTE DATA MAP  | CUSTOM CSS      ****/
+            /**** VICTORIAN WRRG WASTE DATA MAP  | CUSTOM CSS      ****/
             /**** -----------------------------------------------   ****/
             /**** - CSS Variables and loaded fonts from core.css    ****/
             /****                                                   ****/
@@ -23,7 +24,6 @@
                 font-family: 'DIN Next LT Pro';
                 margin: 0;                          /* Full bleed presentation */
             }
-
 
             /********************************/
             /*****  WRRG MAP TYPOGRAPHY   ***/
@@ -113,9 +113,9 @@
                 }
 
 
-            /************************************/
-            /*****  CATEGEGORIAL WRRG COLOURS ***/
-            /************************************/
+            /**********************************/
+            /***** CATEGORICAL WRRG COLOURS ***/
+            /**********************************/
 
                 .multi-colour .wrrg-infoPane-background.barwon-south-west-waste-and-resource-recovery-group,
                 .multi-colour .diversion.barwon-south-west-waste-and-resource-recovery-group,
@@ -448,6 +448,8 @@
 
                 // 2. SPECIFY LAYOUT GROUPS: Layers appended in rendering order
                 const svg = d3.select(`#${settings.svgID}`).attr('viewBox', `0 0 ${settings.dims.width} ${settings.dims.height}`),
+                    svgTitle = svg.append('title').attr('id', 'svg-title'),
+                    svgDescription = svg.append('title').attr('id', 'svg-description'),
                     mapGroup = svg.append('g').classed('map-group', true),
                     lgas = mapGroup.append('g').classed('lga-group', true), 
                     wrrgs = mapGroup.append('g').classed('wrrg-group', true), 
