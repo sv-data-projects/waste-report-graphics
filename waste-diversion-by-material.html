@@ -140,11 +140,14 @@
             .material-data-table.other-materials{
                 fill: var(--xDarkCard);
             }
-            .radialBar-material-label{
-                fill: var(--xCharcoal);
+            .radialBar-material-label,
+            .radialBar-pct-label {
+                fill: #000;
+                pointer-events: none;
             }
             .arc{
-                opacity: 0.8;
+                filter: grayscale(0.65) brightness(1.1);
+                cursor: pointer;
             }
 
             /********************************/
@@ -462,6 +465,17 @@
                     .data(chartData)
                         .join('path')
                         .attr('class', d => `${d.class} arc`)
+                    .on('mouseover', function(){
+                        d3.selectAll(`.arc, .radialBar-material-label:not(.${this.classList[0]}), .radialBar-pct-label:not(.${this.classList[0]})`).style('opacity', 0.2)  
+                        d3.select(this)
+                            .style('opacity', 1)  
+                            .style('filter', 'grayscale(0) brightness(1)')          
+                    })
+                    .on('mouseout', function(){
+                        d3.selectAll('.arc, .radialBar-material-label, .radialBar-pct-label')
+                            .style('filter', null)  
+                            .style('opacity',null)  
+                    })
 
                     arcs.transition()            // Random fun on load
                         .delay((d, i) => i * 500)
@@ -549,6 +563,11 @@
                         .append('textPath').attr("xlink:href", `#label-path-${slugMaterialName}`)
                             .attr('startOffset', '3px')
                             .text(d.material)	
+                            .style('opacity', 0)
+                                .transition()               
+                                .delay(d  => i * 500)
+                                .duration(500)
+                                .style('opacity', null)
 
                     // Data label
                     annotationLayer.append('text')
@@ -556,6 +575,11 @@
                         .append('textPath').attr("xlink:href", `#label-path-${slugMaterialName}`)
                             .attr('startOffset', helpers.numberFormatters.formatPct1dec(d.diversionRate - 0.005))
                             .text(helpers.numberFormatters.formatPct1dec(d.diversionRate))
+                            .style('opacity', 0)
+                                .transition()               
+                                .delay(d => 1000 + (i * 550))
+                                .duration(250)
+                                .style('opacity', null)
                 })
 
             // 7. Add title labels
