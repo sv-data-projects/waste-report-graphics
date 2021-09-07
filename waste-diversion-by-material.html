@@ -663,7 +663,7 @@
                     .style('opacity', null)
             setTimeout(() => {
                 d3.select(`#${settings.svgID}`).style('pointer-events', null)    
-            }, 5250);
+            }, 5500);
 
 
             function barMouseover(){
@@ -682,7 +682,7 @@
                     total = this.__data__.total
 
                 d3.select('#material-info-label')
-                    .text(d => `In ${settings.year} total of  ${helpers.numberFormatters.formatComma(total)} tonnes of ${material.toLowerCase()} waste was collected.
+                    .text(d => `In ${settings.year}, a total of ${helpers.numberFormatters.formatComma(total)} tonnes of ${material.toLowerCase()} waste was collected.
                          ${helpers.numberFormatters.formatComma(landfill)} tonnes were send to to landfill, while
                          ${helpers.numberFormatters.formatComma(diverted)} tonnes were diverted.`
                     )
