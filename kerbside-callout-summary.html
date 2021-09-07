@@ -39,7 +39,7 @@
             /************************/
 
             .recycling-rate-main{
-                font-size: 60px;
+                font-size: 70px;
                 letter-spacing: -3px;
                 font-weight: 400;
             }
@@ -67,10 +67,10 @@
             .table-header,
             .table-content, 
             .lga-annotation{
-                font-size: 16px;
+                font-size: 20px;
             }
             .recycling-breakdown-material-label{
-                font-size: 10px;
+                font-size: 13px;
                 text-anchor: end;
             }
             .lga-label,
@@ -247,7 +247,7 @@
                             <path fill="#5d7a5a" d="M169.207 124.721c-.996.006-1.846.51-2.022 1.928H136.98c-2.216 0-4.053 1.784-4 4 .069 2.386-.046 8.585-.06 9.357l-4.032.054s-1.176-5.292-3.37-6.134c-1.05-.402-3.522-.726-4.583-.018-2.016 1.346-1.619 5.32-1.706 10.245v10.655c0 2.216 1.784 4 4 4h11.394c.692 1.024 1.653 2.245 2.357 2.53h34.165c4.432 0 8-3.569 8-8v-18.689a7.98 7.98 0 00-7.9-7.997c-.174-1.423-1.03-1.93-2.03-1.93h-.008z"/>
                         </clipPath>
                     </defs>
-                    <path class = "sky" fill="#d7f4ee" d="M-388.285 204C298.443-82.731 945.97-65.578 1595.258 204v375.633H-388.285z"/>
+                    <path class = "sky" fill="var(--secondaryGreyLightest)" d="M-388.285 204C298.443-82.731 945.97-65.578 1595.258 204v375.633H-388.285z"/>
                     <path class = "ground" fill="#c8ab37" d="M458.211 513.585h416.948v60.923H458.211z"/>
                     <path class = "foreground-grass" fill="#D5E0A1" d="M-388.776 579.613c277.38-170.866 617.885-172.25 854.673-154.826-.601 27.529 14.06 149.008 14.06 149.008z"/>
                     <path class = "foreground-grass" fill="#D5E0A1" d="M1591.542 598.231c-257.8-114.563-325.884-189.535-877.28-173.444.6 27.529-16.28 129.386-14.06 149.008 299.705 4.497 591.637 19.829 891.34 24.436z"/>
@@ -301,13 +301,13 @@
                             <path fill="#216778" d="M72.614 421.637l-.41 18.965.924-.184.238-8.54c2.608.236 5.936.83 7.084.336l-7.062-1.273.389-8.174c3.321.279 6.613.542 7.907-.125z"/>
                             <path fill="#216778" d="M81.561 422.629l-.41 18.964.716.076.232-8.624c2.891.234 6.56.893 8.229.46l-8.201-1.48.234-8.68c3.137.149 10.426 1.247 8.27.288z"/>
                         </g>
-                        <g transform="translate(0 -5)">
+                        <!-- <g transform="translate(0 -5)">
                             <path fill="#c87137" d="M143.03 550.664v-25.092h-15.166c-6.491 20.26-14.362 14.241-19.199-7.148l-6.867.326c2.796 18.076 11.475 39.892 27.901 23.33v7.757z"/>
                             <circle cx="126.486" cy="507.925" r="21.776" fill="#aade87"/>
                             <circle cx="107.598" cy="478.008" r="24.671" fill="#87de87"/>
                             <circle cx="151.715" cy="518.817" r="18.881" fill="#b3ff80"/>
                             <circle cx="89.254" cy="504.058" r="27.291" fill="#cfa"/>
-                        </g>
+                        </g> -->
                         <g id="landfill">
                             <circle cx="529.941" cy="539.384" r="13.485"fill="#483e37"/>
                             <circle r="13.485" cy="519.182" cx="548.554"fill="#6c5d53"/>
@@ -427,13 +427,13 @@
                                 <circle cx="113.463" cy="168.449" r="1.447" fill="#748577"/>
                             </g>
                         </g>
-                        <g transform="translate(-9 130)">
+                        <!-- <g transform="translate(-9 130)">
                             <path fill="#c87137" d="M412.39 418.919v-33.395h-20.184c-8.64 26.962-19.114 18.953-25.552-9.514l-9.14.435c3.721 24.057 15.273 53.09 37.134 31.049v10.324z"/>
                             <circle cx="390.371" cy="362.038" r="28.981" fill="#aade87"/>
                             <circle cx="365.233" cy="322.221" r="32.834" fill="#87de87"/>
                             <circle cx="423.949" cy="376.533" r="25.128" fill="#b3ff80"/>
                             <circle cx="340.82" cy="356.891" r="36.321" fill="#cfa"/>
-                        </g>
+                        </g> -->
                         <g transform="matrix(-1 0 0 1 586.862 -20)">
                             <path fill="#5992c7" d="M315.94 491.242l-6.397.405c-9.182-.33-10.964 8.232-10.93 12.89v83.938c0 .23.855.417 1.917.417s1.918-.186 1.918-.417v-83.937c.441-7.209 4.554-8.93 7.176-8.923l6.073-.162z" opacity=".8"/>
                             <rect width="10.609" height="3.158" x="316.507" y="494.562" fill="#39506a" rx="26.075" ry=".417"/>
@@ -493,9 +493,6 @@
                 margin: {
                     top: 100, right: 50, bottom: 50, left: 100
                 }
-            },
-            variables: {
-                peoplePerHousehold:     2.5
             }
         }
 
@@ -606,8 +603,8 @@
                 annotationLayer = svg.append('g').classed('annotation-group', true).attr('transform', `translate(${xTransform}, ${yTransform})`),
                 infographicLayer = annotationLayer.append('g') 
 
-            const recyclingInsert = {x: settings.dims.width * 0.78, y: settings.dims.height * 0.6},
-                diversionInsert = {x: settings.dims.width * 0.2, y: settings.dims.height * 0.6}
+            const recyclingInsert = {x: settings.dims.width * 0.8, y: settings.dims.height * 0.65},
+                diversionInsert = {x: settings.dims.width * 0.2, y: settings.dims.height * 0.65}
 
                 // c. Iconograph settings 
                 const iconWidth = 20,  iconHeight = 22.5, iconBinHeight = 19.3, iconScale = 1.15, binColour = '#252d2f'
@@ -617,8 +614,8 @@
                     organicsContaminationRate = 0
 
             // 7. Recycling breakdown "Bin breakdown graphic"
-            const recycleBinScale = 4.5, 
-                chartBgRadius = 90,
+            const recycleBinScale = 6, 
+                chartBgRadius = 120,
                 recyclingBreakdownChart = annotationLayer.append('g').classed('icon-chart destination', true).attr('id', 'recycling-breakdown-icon-chart')
                     .attr('transform', `translate(${recyclingInsert.x}, ${recyclingInsert.y})`)
 
@@ -712,7 +709,7 @@
                 // c. Headline diversion rate label
                 diversionCallout.append('text').classed('recycling-rate-label', true)
                     .attr('transform', `translate(${-chartBgRadius*0.25}, 0)`)
-                    .attr('x', 0).attr('y', -82).attr('dy', 0)
+                    .attr('x', 0).attr('y', -106).attr('dy', 0)
                     .text(`Diversion rate of`)	
                 diversionCallout.append('text').classed('recycling-rate-main', true)
                     .text(`${helpers.numberFormatters.formatPct1dec(1 - ((yearData.Garbage_volume + yearData.Recycling_volume * recycleContaminationRate + yearData.Organics_volume * organicsContaminationRate) / totalCollection))}`)	
@@ -720,7 +717,7 @@
                     .attr('transform', `translate(${-chartBgRadius*0.25}, ${-chartBgRadius *0.5})`)
                 diversionCallout.append('text').classed('recycling-rate-label', true)
                     .attr('transform', `translate(${-chartBgRadius*0.25}, 0)`)
-                    .attr('x', 0).attr('y', -12).attr('dy', 0)
+                    .attr('x', 0).attr('y', -16).attr('dy', 0)
                     .text(`after contamination`)	
 
         
