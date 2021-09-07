@@ -543,7 +543,7 @@
                 </div>
                 <div></div>
                 <div></div>
-                <div class="diversion-footnote">Diversion rate shown is the proportion (by volume), of recyclables and organics vs total waste collected</div>
+                <div class="diversion-footnote">Diversion rate shown is the proportion (by volume) of recyclables and organics vs total waste collected</div>
                 <div id = "waste-per-household-container" class = 'headline-figure-container'>
                     <div class = 'headline-label'>Waste per household</div>
                     <div class = 'headline-figure-label-container'>
@@ -841,7 +841,7 @@
                     costPerHouseholdContainer = tableContainer.append('div').classed('service-summary-table-cost-per-household-container service-summary-table-row', true)
                 
                 headerContainer.append('div').classed('service-summary-table-header metric-header', true).html('Metric')
-                headerContainer.append('div').classed('service-summary-table-header trend-header', true).html('Five year trend')
+                headerContainer.append('div').classed('service-summary-table-header trend-header', true).html('5-year trend')
                 headerContainer.append('div').classed('service-summary-table-header year-header', true).html(`in ${settings.year}`)
                 headerContainer.append('div').classed('service-summary-table-header lastYear-header', true).html(`vs last year <br>${lastYearLabel}`)
                 headerContainer.append('div').classed('service-summary-table-header fiveYear-header', true).html(`vs five years ago <br>${fiveYearLabel}`)
@@ -1009,7 +1009,7 @@
                     .classed('sparkline-annotation', true)
                     .attr('x', dims.margin.left + xScale(0))
                     .attr('y', dims.height - dims.margin.bottom)
-                    .text('Five year trendline')
+                    .text('5-year trendline')
                 bg.append('text')
                     .classed('sparkline-annotation large', true)
                     .attr('x', dims.margin.left + xScale(3) + 2)
