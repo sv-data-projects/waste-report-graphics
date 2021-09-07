@@ -442,7 +442,8 @@
                     getInnerRadius = (index) => settings.geometry.arcMinRadius + (chartData.length - (index + 1)) * (arcWidth + settings.geometry.arcPadding) 
         
             // 2. Setup SVG
-                const svg= d3.select(`#${settings.svgID}`).attr("viewBox", `0 0 ${settings.dims.width} ${settings.dims.height}`)
+                const viewBoxHeight = settings.layout !== 'chart-only' ? settings.dims.height : settings.dims.width * 1.1
+                const svg= d3.select(`#${settings.svgID}`).attr("viewBox", `0 0 ${settings.dims.width} ${viewBoxHeight}`)
 
                 const defs = svg.append('defs'),
                     svgTitle = svg.append('title').attr('id', 'svg-title'),
