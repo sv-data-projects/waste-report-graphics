@@ -13,7 +13,7 @@
             /***********************************************************/
             /***********************************************************/
             /****                                                   ****/
-            /**** VICTORRINA WRRG WASTE DATA MAP  | CUSTOM CSS      ****/
+            /**** VICTORIAN WASTE TREND TABLES  | CUSTOM CSS        ****/
             /**** -----------------------------------------------   ****/
             /**** - CSS Variables and loaded fonts from core.css    ****/
             /****                                                   ****/
@@ -146,6 +146,17 @@
                 text-transform: uppercase;
                 margin-block-end: 0.5vw;
             }
+            .materials .title-container{
+                border: none;
+            }
+            .materials .section-title{
+                border: none;
+                border-bottom: 2px solid #000;
+            }
+            .materials .annotation{
+                padding-top: 1vw;
+            }
+
             .headline-label,
             .headline-unit{
                 font-weight: 500;
@@ -188,6 +199,7 @@
             .annotation{
                 font-size: 1.1vw;
                 padding-bottom: 2vw;
+                font-weight: 300;
             }
             .material-summary-label{
                 font-size: 1.75vw;
@@ -630,6 +642,7 @@
         // Instantiate settings and data objects
         const settings = {
             year:                   '2019-20', 
+            layout:                  'all', 
             dims: {
                 major_sparkline: {
                     width: 200,
@@ -707,6 +720,9 @@
             if (settings.queryParameters.has('year')) { 
                 settings.year = settings.queryParameters.get('year')  
             }
+            if (settings.queryParameters.has('layout')) { 
+                settings.layout = settings.queryParameters.get('layout')  
+            }
         };
 
         async function transformData(dataTable) {   
@@ -726,7 +742,24 @@
         /////////////////////////////////////
 
         async function renderVis(dataTable, settings){ 
-            d3.select('.main-title').html(`Victorian waste management trends to  ${settings.year}`)
+            // 0. Set headers and layout visibility 
+                d3.select('.main-title').html(`Victorian waste management trends to  ${settings.year}`)
+                switch(settings.layout){
+                    case 'headlines':
+                        d3.selectAll('.headline-tables-container, .divider-block')
+                            .style('display', 'none')
+                        d3.select('.main-container').classed(settings.layout, true)
+                        break
+                    case 'materials':
+                        d3.selectAll('.headline-figures-container, .divider-block, .main-title')
+                            .style('display', 'none')
+                        d3.select('.main-container').classed(settings.layout, true)
+                        break
+                    case 'all':
+                    default: 
+                        // Default or 'all' will show headline and materials tables
+                }
+
             // 1. Build the headline containers
             // a. Get data
             const yearData =   dataTable.filter(d => d.year === settings.year)[0],
