@@ -874,7 +874,7 @@
                 headerContainer.append('div').classed('material-summary-table-header local-recovery', true).html("Local recovery")
                 headerContainer.append('div').classed('material-summary-table-header export', true).html("Export")
                 headerContainer.append('div').classed('material-summary-table-header total', true).html("Total recovery")
-                headerContainer.append('div').classed('material-summary-table-header trend', true).html("5 year trend for total recovery")
+                headerContainer.append('div').classed('material-summary-table-header trend', true).html("5-year trend for total recovery")
 
                 const performanceTable = tableContainer.append('div').classed(`material-summary-table-performance ${helpers.slugify(material)}`, true)
 
@@ -966,7 +966,7 @@
                     .classed('sparkline-annotation', true)
                     .attr('x', dims.margin.left + xScale(0))
                     .attr('y', dims.height - dims.margin.bottom)
-                    .text('Five year trendline')
+                    .text('5-year trendline')
 
                 bg.append('text')
                     .classed('sparkline-annotation large', true)

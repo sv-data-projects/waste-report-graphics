@@ -1119,7 +1119,7 @@
                 .attr('transform', `translate(${xMargin} , ${collectionGroupY})`)
                 // a. Recycling volume label
                 recyclingGroup.append('text').classed('lga-data-label large recycling', true)
-                    .html(`A total of <tspan class = "bold">${helpers.numberFormatters.formatComma2dec(yearData.Recycling_volume/1000000)} million tonnes</tspan> were `)
+                    .html(`A total of <tspan class = "bold">${helpers.numberFormatters.formatComma2dec(yearData.Recycling_volume/1000000)} million tonnes</tspan> was `)
                 recyclingGroup.append('text').classed('lga-data-label large recycling', true)
                     .text(`collected from ${helpers.numberFormatters.formatComma2dec(yearData.Recycling_properties/1000000)} million households`)
                         .attr('y', 20)
@@ -1186,7 +1186,7 @@
 
                 // a. Garbage volume label
                 garbageGroup.append('text').classed('lga-data-label large garbage', true)
-                    .html(`A total of <tspan class = "bold">${helpers.numberFormatters.formatComma2dec(yearData.Garbage_volume/1000000)} million tonnes</tspan> were`)
+                    .html(`A total of <tspan class = "bold">${helpers.numberFormatters.formatComma2dec(yearData.Garbage_volume/1000000)} million tonnes</tspan> was`)
                 garbageGroup.append('text').classed('lga-data-label large garbage', true)
                     .text(`collected from ${helpers.numberFormatters.formatComma2dec(yearData.Garbage_properties/1000000)} million households`)
                     .attr('transform', `translate(${0}, ${20})`)
@@ -1233,7 +1233,7 @@
 
                 // a. Volume label
                 organicsGroup.append('text').classed('lga-data-label large organics', true)
-                    .html(`A total of <tspan class ="bold">${helpers.numberFormatters.formatComma2dec(yearData.Organics_volume/1000000)} million tonnes</tspan> were`)
+                    .html(`A total of <tspan class ="bold">${helpers.numberFormatters.formatComma2dec(yearData.Organics_volume/1000000)} million tonnes</tspan> was`)
                 organicsGroup.append('text').classed('lga-data-label large organics', true)
                     .text(`collected from ${helpers.numberFormatters.formatComma2dec(yearData.Organics_properties/1000000)} million households`)
                     .attr('transform', `translate(${0}, ${20})`)
@@ -1392,7 +1392,7 @@
                 .attr('x', 50)
                 .attr('y', 60)
             annotationLayer.append('text').classed('lga-label-small street', true)
-                .text("Council's collected a total of")
+                .text("Councils collected a total of")
                 .attr('x', xMargin)
                 .attr('y', headlineOffsetY)
             annotationLayer.append('text').classed('lga-label-headline street', true)
@@ -1410,7 +1410,7 @@
                 .attr('x', councilSpendLabel.x)
                 .attr('y', councilSpendLabel.y)
             annotationLayer.append('text').classed('lga-label-small council', true)
-                .html(`spent by Councils on waste services in ${settings.year}, to collect`)
+                .html(`spent by councils on waste services in ${settings.year}, to collect`)
                 .attr('x', councilSpendLabel.x)
                 .attr('y', councilSpendLabel.y + 24)
 
@@ -1419,7 +1419,7 @@
                 .attr('x', councilSpendLabel.x)
                 .attr('y', councilSpendLabel.y + 44)
             annotationLayer.append('text').classed('lga-label-small council', true)
-                .html(`at average cost to Council of <tspan class ="bold">${helpers.numberFormatters.formatCostInteger(totalCouncilCost/totalCollection)} per tonne collected</tspan> `)
+                .html(`at average cost to council of <tspan class ="bold">${helpers.numberFormatters.formatCostInteger(totalCouncilCost/totalCollection)} per tonne collected</tspan> `)
                 .attr('x', councilSpendLabel.x)
                 .attr('y', councilSpendLabel.y + 64)
 
