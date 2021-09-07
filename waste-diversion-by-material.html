@@ -39,6 +39,22 @@
                 font-size: 26px;
                 text-anchor: middle;
             }
+            .diversion-sub-label,
+            .diversion-main-label, 
+            #material-info-label{
+                text-anchor: middle;
+                fill: #000;
+            }
+            .diversion-sub-label{
+                font-size: 20px;
+            }
+            #material-info-label{
+                font-size: 16px;
+            }
+            .diversion-main-label{
+                font-size:  70px;
+                font-weight: 600;
+            }
             .bg-rect{
                 fill: none
             }
@@ -163,7 +179,10 @@
             .dark .table-header,
             .dark .radialBar-title-label,
             .dark .table-header,
-            .dark .radialBar-subtitle-label{
+            .dark .radialBar-subtitle-label,
+            .dark .diversion-sub-label,
+            .dark .diversion-main-label, 
+            .dark #material-info-label{
                 fill: #fff;
             }
             .dark .material-data-table.plastics{
@@ -367,7 +386,6 @@
                                 top: 50, right: 50, bottom: 50, left: 50
                             }
                         }
-
                         settings.geometry = {
                             arcPadding:     2,
                             chartRadius:    300,
@@ -457,7 +475,7 @@
                         .attr("width", settings.dims.width - settings.dims.margin.left - settings.dims.margin.right)
                         .attr('transform', `translate(${settings.geometry.circlePos.x}, ${settings.geometry.circlePos.y})`),
                     annotationLayer = svg.append('g').classed('annotation-group', true)        // Annotation layer
-                
+
             // 3. Add the chart arcs
                 const arcs = canvas.append('g')
                     .attr('class', 'arc-group')
@@ -465,17 +483,8 @@
                     .data(chartData)
                         .join('path')
                         .attr('class', d => `${d.class} arc`)
-                    .on('mouseover', function(){
-                        d3.selectAll(`.arc, .radialBar-material-label:not(.${this.classList[0]}), .radialBar-pct-label:not(.${this.classList[0]})`).style('opacity', 0.2)  
-                        d3.select(this)
-                            .style('opacity', 1)  
-                            .style('filter', 'grayscale(0) brightness(1)')          
-                    })
-                    .on('mouseout', function(){
-                        d3.selectAll('.arc, .radialBar-material-label, .radialBar-pct-label')
-                            .style('filter', null)  
-                            .style('opacity',null)  
-                    })
+                    .on('mouseover', barMouseover)
+                    .on('mouseout', barMouseout)
 
                     arcs.transition()            // Random fun on load
                         .delay((d, i) => i * 500)
@@ -607,8 +616,89 @@
                     .attr('startOffset', '49.5%')
                     .text(`- comparing recovery rates for Victorian waste materials in ${settings.year}`)	
 
+            // 8. Add chart interactions
+                // Central label overall recovery date
+                const totalDiversion = d3.sum(chartData.map(d => d.diverted)),
+                    totalWaste =  d3.sum(chartData.map(d => d.total))
 
-            // 8. Add UI toggle for dark theme with shift key
+                const totalDiversionLabel = annotationLayer.append('g')
+                    .attr('id', 'diversion-label-group')
+                    .attr('transform', `translate(${settings.geometry.circlePos.x}, ${settings.geometry.circlePos.y})`)
+
+                totalDiversionLabel.append("text")
+                    .classed('diversion-sub-label', true)
+                    .attr('x', 0)
+                    .attr('y', -40)
+                    .text('Overall recovery rate')
+
+                totalDiversionLabel.append("text")
+                    .classed('diversion-main-label', true)
+                    .attr('x', 0)
+                    .attr('y', 20)
+                    .text(helpers.numberFormatters.formatPct1dec(totalDiversion/totalWaste))
+
+                totalDiversionLabel.append("text")
+                    .classed('diversion-sub-label', true)
+                    .attr('x', 0)
+                    .attr('y', 40)
+                    .text('across all materials')
+
+                // Central label with materials details
+                const materialsLabel = annotationLayer.append('g')
+                    .attr('id', 'materials-label-group')
+                    .classed('diversion-main', true)
+                    .attr('transform', `translate(${settings.geometry.circlePos.x}, ${settings.geometry.circlePos.y})`)
+
+                materialsLabel.append("text")
+                    .attr('id', 'material-info-label')
+                    .attr('x', 0)
+                    .attr('y', -40)
+                    .attr('dy', 0)
+
+            // Animate in
+            d3.select(`#${settings.svgID}`).style('pointer-events', 'none')                 // Block pointer events
+            totalDiversionLabel
+                .style('opacity', 0)
+                .transition().duration(1500).delay(chartData.length * 500)
+                    .style('opacity', null)
+            setTimeout(() => {
+                d3.select(`#${settings.svgID}`).style('pointer-events', null)    
+            }, 5000);
+
+
+            function barMouseover(){
+                d3.selectAll(`.arc, .radialBar-material-label:not(.${this.classList[0]}), .radialBar-pct-label:not(.${this.classList[0]})`).style('opacity', 0.2)  
+                d3.select(this)
+                    .style('opacity', 1)  
+                    .style('filter', 'grayscale(0) brightness(1)')    
+                d3.select('#diversion-label-group')
+                    .style('opacity', 0)
+                d3.select('#materials-label-group')
+                    .style('opacity', null)
+
+                const material = this.__data__.material,
+                    landfill = this.__data__.landfill,
+                    diverted = this.__data__.diverted,
+                    total = this.__data__.total
+
+                d3.select('#material-info-label')
+                    .text(d => `In ${settings.year} total of  ${helpers.numberFormatters.formatComma(total)} tonnes of ${material.toLowerCase()} waste was collected 
+                        . ${helpers.numberFormatters.formatComma(landfill)} tonnes were send to to landfill, while
+                         ${helpers.numberFormatters.formatComma(diverted)} tonnes were diverted.`
+                    )
+                    .call(helpers.wrap, settings.geometry.chartRadius * 0.8, 1.1)
+                    .style('opacity', null)
+            };
+
+            function barMouseout(){
+                d3.selectAll('.arc, .radialBar-material-label, .radialBar-pct-label, #diversion-label-group')
+                    .style('filter', null)  
+                    .style('opacity',null)  
+                d3.select('#material-info-label')
+                    .style('opacity', 0)
+            };
+
+            // 9. Add UI toggle for dark theme with shift key
             document.body.onkeyup = function(e){
                 if(e.keyCode == 16){
                     d3.selectAll(`.svg-container`).classed("dark", !d3.selectAll('.svg-container').classed("dark"))
