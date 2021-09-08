@@ -508,7 +508,7 @@
                     .attr('y', 0)
                     .attr('dy', 0)
                     .text(destination.slice(0 , destination.indexOf(' ')))
-                    .call(helpers.wrap, settings.geometry.container.width - settings.geometry.container.height * 1.75, 1.1)
+                    .call(helpers.wrap, settings.geometry.container.width - settings.geometry.container.height * 0 , 1.1)
 
                 label.append('text')
                     .classed(`destination-data data-label ${helpers.slugify(destination)} ${data.byType.destination[destination].class}`, true)
@@ -547,7 +547,7 @@
                     .attr('y', 0)
                     .attr('dy', 0)
                     .text(product)
-                    .call(helpers.wrap, settings.geometry.container.width - settings.geometry.container.height, 1.1)
+                    .call(helpers.wrap, settings.geometry.container.width - settings.geometry.container.height* 0.5, 1.1)
 
                 label.append('text')
                     .classed(`product-data data-label ${helpers.slugify(product)} ${data.byType.product[product].class}`, true)
