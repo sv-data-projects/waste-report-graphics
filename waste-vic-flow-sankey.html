@@ -257,6 +257,9 @@
 
         // Load data from TSV files from GSheet
         function buildFromGSheetData(settings) {
+            // 0. Prepare scene for fade in animation
+            d3.select(`#${settings.svgID}`).style('opacity', 0)
+
             // 1. Specify data table links for each table used (tsv published output from each separate sheet/table)
             const gsTableLinks =   {
                 byMaterialFlow:    'https://docs.google.com/spreadsheets/d/e/2PACX-1vSimVJWCqYLTijgqeU-SPGdAFT6wpGprHgjPdpxEElWurVvl28JYr7dHGE3OCSjF4VYH2_QggJUnveO/pub?gid=272100684&single=true&output=tsv',
@@ -271,9 +274,10 @@
                 return data
             }).then( async (data) => {
                 // 3. Initiate vis build sequence with data now loaded
-                await applyQuerySettings(settings)              // a. Update settings if a query string is passed in
+                await applyQuerySettings(settings)                  // a. Update settings if a query string is passed in
                 await transformData(data.table.byMaterialFlow)      // b. Parse data
-                await renderVis()                               // c. Render visualisation(s)
+                await renderVis()                                   // c. Render visualisation(s)
+                await addInteractions()                             // d. Set additional interactions and animation(s)
             })
 
             // X. Table data parsing function: trim() header white space and prase numbers with "$" and "," stripped. 
@@ -595,17 +599,25 @@
                         .style('stroke-dasharray', d =>  d.targetClass === 'recovered' ? null : `${flowScale(d.value)*0.25} ${flowScale(d.value)*0.5}`)
                         .attr('d', d => {
                             const source = [settings.geometry.nodePos[d.source].x, settings.geometry.nodePos[d.source].y + d.dy],
-                                target = [settings.geometry.nodePos[d.target].x, settings.geometry.nodePos[d.target].y]
+                                target = [settings.geometry.nodePos[d.target].x + 5, settings.geometry.nodePos[d.target].y]
                             return link({source, target})
                         })
 
             // 4. ADD ANNOTATIONS
+            // a. Main title
             annotationGroup.append('text').classed('main-title', true)
                 .text('Key waste flows in Victoria')
                 .attr('transform', `translate(${30}, ${50})`)
             annotationGroup.append('text').classed('main-subtitle', true)
-                .text('Tonnes of collected waste to destination and recycled products in '+settings.year)
+                .text(`Tonnes of collected waste to destination and recycled products in ${settings.year}`)
                 .attr('transform', `translate(${30}, ${70})`)
+
+            // b. Title and description
+            svgTitle.html(`A diagram of key waste flows in Victoria by tonnes of collected waste to destination and recycled products in ${settings.year}`)
+            svgDescription.html(`Flows of collected waste are shown, by material, to their destination (landfill or recovery), and then on to recovered products types. 
+                Flows are shown as curved paths with line weight scaled to their volume (in tonnes for ${settings.year}
+            `)
+
 
             // Function to render diversion donut chart
             function renderDonut(container, coords, dims, data ){
@@ -634,6 +646,14 @@
             };
 
         }; // end renderMap()
+
+        async function addInteractions(){
+            // Fade in graphic when rendered
+            d3.select(`#${settings.svgID}`)
+                .transition().duration(500)
+                .style('opacity', null)
+        }; // end addInteractions()
+
 
 
         /////////////////////////////

@@ -629,8 +629,6 @@
 
         // Load data from TSV files from GSheet
         function buildFromGSheetData(config){  
-            // d3.select('.main-container').style('opacity', 0)        // Set for fade in
-
             // 1. Specify data table links for each table used (tsv published output from each separate sheet/table)
             const gsTableLinks =  {
                 kerbsideCollectionData5yr:                  'https://docs.google.com/spreadsheets/d/e/2PACX-1vSimVJWCqYLTijgqeU-SPGdAFT6wpGprHgjPdpxEElWurVvl28JYr7dHGE3OCSjF4VYH2_QggJUnveO/pub?gid=558277010&single=true&output=tsv'
@@ -699,7 +697,9 @@
         /////////////////////////////////////
 
         async function renderVis(dataTable, settings){ 
+            // 0. Add main title
             d3.select('.main-title').html(`Victorian local government waste services <br><span class='sub-title'>trends to  ${settings.year}</span>`)
+
             // 1. Build the headline containers
             // a. Get data
             const yearData = dataTable.filter(d => d.year === settings.year)[0],
@@ -882,18 +882,6 @@
                     recoveryContainer.append('div').classed('service-summary-table-data pct-change lastYear-vs-data', true).html(recoveryVsLastYearPct)
                     recoveryContainer.append('div').classed('service-summary-table-data pct-change fiveYear-vs-data', true).html(wasteVsFiveYearPct)
                     renderSparkline(`recovery-sparkline-${helpers.slugify(service)}`, serviceRecoveryData, settings.dims.minor_sparkline)                
-
-                    // diversionContainer.append('div').classed('service-summary-table-header metric-label', true).html(`Diversion rate (%)` )
-                    // diversionContainer.append('div').classed('service-summary-table-header sparkline-container', true)
-                    //     .append('svg').attr('id', `diversion-sparkline-${helpers.slugify(service)}`).classed('minor-sparkline', true)
-                    // diversionContainer.append('div').classed('service-summary-table-data year-data', true).html(helpers.numberFormatters.formatPct1dec(yearDiversionRate))
-                    // diversionContainer.append('div').classed('service-summary-table-data lastYear-data', true).html(helpers.numberFormatters.formatPct1dec(lastYearDiversionRate))
-                    // diversionContainer.append('div').classed('service-summary-table-data fiveYear-data', true).html(helpers.numberFormatters.formatPct1dec(fiveYearDiversionRate))
-                    // diversionContainer.append('div').classed('service-summary-table-header', true)
-                    // diversionContainer.append('div').classed('service-summary-table-data pct-change performance-label', true).html('% change &rarr;')
-                    // diversionContainer.append('div').classed('service-summary-table-data pct-change lastYear-vs-data', true).html(diversionRateVsLastYearPct)
-                    // diversionContainer.append('div').classed('service-summary-table-data pct-change fiveYear-vs-data', true).html(diversionRateVsFiveYearPct)
-                    // renderSparkline(`diversion-sparkline-${helpers.slugify(service)}`, serviceDiversionRateData, settings.dims.minor_sparkline)
                 }
 
                 volumePerHouseholdContainer.append('div').classed('service-summary-table-header metric-label', true).html(`Collected per serviced household (kg)` )
@@ -947,8 +935,6 @@
                 binLidShadow.append('path').attr('d',"M5.61-18.436c-1.144-.09-1.398.408-1.58 1.275-.182-.711-.247-1.39.664-1.541.81-.04.701.018.917.266z")
                 binLidShadow.append('path').attr('d',"M9.917-18.557c-.596.237-.48.483-.468 1.321-.182-.711-.633-1.137.353-1.482.81-.04.58.14.115.161z")
                 binLidShadow.append('path').attr('d',"M.52-15.134l11.01.028c.199.006 3.684-1.513 3.591-.999-.124.69-.225.615-3.662 1.81H.521z")
-
-
             })
 
             // 4. Fade in vis

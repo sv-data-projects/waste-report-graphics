@@ -243,6 +243,8 @@
             svgID:        'radial-bar-vis',
             year:         '2019-20', 
             layout:       'landscape',           // Options are 'portrait', 'landscape' and 'chart-only'
+            theme:          'light',        // default "light" or "dark" mode
+            themeChange:    false,          // boolean for whether the theme can be changed with keypress (assigned to 'Shift' key) 
         }
 
         const state = {
@@ -309,6 +311,15 @@
             }
             if (settings.queryParameters.has('layout')) { 
                 settings.layout = settings.queryParameters.get('layout') 
+            }
+            if (settings.queryParameters.has('themeChange')) { 
+                settings.themeChange = settings.queryParameters.get('themeChange')  
+            }
+            if (settings.queryParameters.has('theme')) { 
+                settings.mode = settings.queryParameters.get('theme')
+                if(settings.mode === 'dark'){
+                    d3.selectAll(`.svg-container`).classed("dark", true)
+                }  
             }
         };
 

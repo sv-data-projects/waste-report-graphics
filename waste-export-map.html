@@ -195,6 +195,9 @@
         buildFromGSheetData(settings)
 
         function buildFromGSheetData(settings) {
+            // 0. Prepare scene for fade in animation
+            d3.select(`#${settings.svgID}`).style('opacity', 0)
+
             // 1. Specify data table links for each table used (tsv published output from each separate sheet/table)
             const gsTableLinks =   {
                 exportWasteData:               'https://docs.google.com/spreadsheets/d/e/2PACX-1vSimVJWCqYLTijgqeU-SPGdAFT6wpGprHgjPdpxEElWurVvl28JYr7dHGE3OCSjF4VYH2_QggJUnveO/pub?gid=660443265&single=true&output=tsv',
@@ -210,9 +213,10 @@
                 return rawData
             }).then( async (rawData) => {
                 // 4. Initiate vis build sequence with data now loaded
-                await applyQuerySettings(settings)                      // a. Update settings if a query string is passed in
+                await applyQuerySettings(settings)                          // a. Update settings if a query string is passed in
                 await transformData(data.table.exportWasteData)             // b. Parse data used in visualisation
-                await renderMap(settings, rawData[1], rawData[2])	    // c. Renders map and export data annotation
+                await renderMap(settings, rawData[1], rawData[2])	        // c. Renders map and export data annotation
+                await addInteractions()                                     // d. Set additional interactions and animation(s)
             })
 
             // X. Table data parsing function: trim() header white space and prase numbers with "$" and "," stripped. 
@@ -269,6 +273,11 @@
             data.inputData.export = exportData.filter(d => d.year === settings.year)
         }; // end parseData()
 
+
+        ///////////////////////////////////////
+        /// 2. MAP VIS RENDERING FUNCTION   ///
+        ///////////////////////////////////////
+
         // Render the map visualisation, using the map shape data and parse export data 
         async function renderMap(settings, worldShapeData, statesShapeData){
             // 1. SPECIFY LAYOUT GROUPS: Layers appended in rendering order
@@ -312,7 +321,7 @@
             // 4. COLOR EXPORT COUNTRIES *(BY TOTAL) AND ADD COUNTY LABELS
             const colourScale = d3.scaleLinear()
                 .domain(d3.extent(data.inputData.export.map(d => d.Total)))
-                .range(['#A0D6E9', '#93CCB9'])
+                .range(['#A0D6E9', '#93CCB9'])  // tertiaryBlueLight to  tertiaryEmeraldLight
 
             const exportPathScale = d3.scaleLinear()
                 .domain(d3.extent(data.inputData.export.map(d => d.Total)))
@@ -480,7 +489,7 @@
                 .attr('y', 74)
                 .text(`volumes by exported material`)
 
-            // Add materials             
+            // c. Add materials             
             data.schema.list.materials.forEach((material, i) => {
                 const  materiaVol = d3.sum(data.inputData.export.map(d => d[material])),
                     materialYSpace = 20
@@ -499,12 +508,25 @@
                     .text(`${helpers.numberFormatters.formatComma(materiaVol)} tonnes`)                    
             })
 
-            // Toggle bars
+            // d. Title and description
+            svgTitle.html(`Victorian recycled material exports: a breakdown by export destination and materials in ${settings.year}`)
+            svgDescription.html(`A map of the Asia-pacific region showing destinations (countries) where Victorian recovered resources have been exported to`)
+
+
+            // 7. APPLY LAYOUT SETTINGS: 
+            // a. Toggle display of sparkline bars  
             if(!settings.showSparklines){
                 d3.selectAll('.bar').attr('display', 'none')
             }
+        }; // end renderMap()
 
-    }; // end renderMap()
+        async function addInteractions(){
+            // Fade in graphic when rendered
+            d3.select(`#${settings.svgID}`)
+                .transition().duration(500)
+                .style('opacity', null)
+        }; // end addInteractions()
+
 
 
         /////////////////////////////

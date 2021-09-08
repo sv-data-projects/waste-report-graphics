@@ -13,7 +13,7 @@
             /***********************************************************/
             /***********************************************************/
             /****                                                   ****/
-            /**** SUMMARY VIC FLOWS INFOGRAPHIC |++   CUSTOM CSS    ****/
+            /**** SUMMARY RECYCLING INDUSTRY FLOWS INFOGRAPHIC      ****/
             /**** -----------------------------------------------   ****/
             /**** - CSS Variables and loaded fonts from core.css    ****/
             /****                                                   ****/
@@ -28,7 +28,6 @@
                     font-family: 'DIN Next LT Pro';
                     margin: 0;
                 }
-
 
                 .paper-and-paperboard.node{
                     fill: var(--tertiaryYellow);
@@ -334,8 +333,7 @@
 
     <body>
         <div class = "svg-container">
-            <svg id = "summary-vis">
-            </svg>
+            <svg id = "summary-vis"></svg>
         </div>
     </body>
 
@@ -358,6 +356,8 @@
         const settings = {
             svgID:          'summary-vis',
             year:           '2019-20', 
+            theme:          'light',        // default "light" or "dark" mode
+            themeChange:    false,          // boolean for whether the theme can be changed with keypress (assigned to 'Shift' key) 
             dims: {
                 height:     720, 
                 width:      1080,
@@ -404,10 +404,13 @@
             }
         }
 
-        // Build from GSheet data
+        // Build from GSheet (tsv) data
         buildFromGSheetData(settings)
 
         function buildFromGSheetData(settings) {
+            // 0. Prepare scene for fade in animation
+            d3.select(`#${settings.svgID}`).style('opacity', 0)
+
             // 1. Specify data table links for each table used (tsv published output from each separate sheet/table)
             const gsTableLinks =   {
                 wasteByStream:                       'https://docs.google.com/spreadsheets/d/e/2PACX-1vSimVJWCqYLTijgqeU-SPGdAFT6wpGprHgjPdpxEElWurVvl28JYr7dHGE3OCSjF4VYH2_QggJUnveO/pub?gid=0&single=true&output=tsv',
@@ -422,9 +425,10 @@
 
             }).then( async (data) => {
                 // 3. Initiate vis build sequence with data now loaded
-                await applyQuerySettings(settings)                                               // a. Apply query string settings
-                await transformData(data.table.wasteByStream)    // b. Parse data
-                await renderVis(data, settings)                                 // c. Render visualisation(s)
+                await applyQuerySettings(settings)                  // a. Apply query string settings
+                await transformData(data.table.wasteByStream)       // b. Parse data
+                await renderVis(data, settings)                     // c. Render visualisation(s)
+                await addInteractions()                             // d. Set interactions and animation(s)
             })
 
             // X. Table data parsing function: trim() header white space and prase numbers with "$" and "," stripped. 
@@ -455,6 +459,15 @@
             settings.queryParameters = new URLSearchParams(window.location.search)
             if (settings.queryParameters.has('year')) { 
                 settings.year = settings.queryParameters.get('year')  
+            }
+            if (settings.queryParameters.has('themeChange')) { 
+                settings.themeChange = settings.queryParameters.get('themeChange')  
+            }
+            if (settings.queryParameters.has('theme')) { 
+                settings.mode = settings.queryParameters.get('theme')
+                if(settings.mode === 'dark'){
+                    d3.selectAll(`.svg-container`).classed("dark", true)
+                }  
             }
         };
 
@@ -797,6 +810,7 @@
                         .text('Diversion')
                 })
 
+
             // 6. ADD THE LANDFILL SECTION: DATA LABEL AND ICON
                 // i. Render the landfill end point group
                 landfillEndLayer.append('rect').classed('landfill-label-bg', true)
@@ -826,7 +840,8 @@
                         .attr('x', 0).attr('y', 0).attr('dy', 0)
                         .call(helpers.wrap, 170, 1)
 
-            // 8. ADD background elements,  elements and MAIN TITLE 
+
+            // 8. ADD background elements and MAIN TITLE 
                 bgLayer.append('rect').classed('bg-rect', true)
                     .attr('width', settings.dims.width)
                     .attr('height', settings.dims.height)
@@ -839,95 +854,84 @@
                     .text(`Where did Victoria's waste go in ${settings.year}?`) 
                     .attr('x', 50)
                     .attr('y', 30)
-        };
+
+            // X. Helper method for rendering donut chart
+             function renderDonut(container, coords, dims, data ){
+                // Setup shape generator and data
+                const arc = d3.arc().innerRadius(dims.r * 0.67).outerRadius(dims.r - 1),
+                    pie = d3.pie().padAngle(0.005)
+                        .sort(null)
+                        .value(d => d.value),
+                    chartData = pie([
+                        {value: data.pct,    class: 'diversion '+data.materialClass},
+                        {value: 1- data.pct, class: 'landfill'}
+                    ])
+
+                const donutGroup = container.append('g')
+                donutGroup.append('circle').classed('donut-chart-bg', true)
+                    .attr('r', dims.r )
+                        .style("transform", `translate(${coords.x}px, ${coords.y}px)` )
+                donutGroup.append('g').classed('arc-group', true)
+                    .selectAll("path.donut-arc")
+                    .data(chartData)
+                    .join("path").attr('class', d => `${d.data.class} donut-arc`)            
+                        .attr("d", arc)
+                        .style("transform", `translate(${coords.x}px, ${coords.y}px) scale(-1, 1)` )
+                
+                donutGroup.append('text')
+                    .attr('class', `${data.materialClass} donut-diversion-pct`)  
+                    .text(helpers.numberFormatters.formatPct(data.pct))
+                    .style("transform", `translate(${coords.x}px, ${coords.y}px)` )
+            };
+
+        }; // end renderVis()
+
+        async function addInteractions(){
+            // Fade in graphic when rendered
+            d3.select(`#${settings.svgID}`)
+                .transition().duration(500)
+                .style('opacity', null)
+
+            // Add keyboard toggle dark theme with shift key
+            if(settings.themeChange){
+                document.body.onkeyup = function(e){
+                    if(e.keyCode == 16){
+                        d3.selectAll(`.svg-container`).classed("dark", !d3.selectAll('.svg-container').classed("dark"))
+
+                        // Update flow gradients
+                        const collectionColor = d3.selectAll(`.svg-container`).classed("dark") ? '#fff' : settings.palette.collection
+
+                        settings.streamOrder.forEach((streamName, i) => {
+                            // Remove then re-specify gradient stops
+                            settings.palette.gradients.diversion[streamName].selectAll('stop').remove()
+                            settings.palette.gradients.landfill[streamName].selectAll('stop').remove()
+                            
+                            settings.palette.gradients.diversion[streamName].append("stop")                                  // Start colour
+                                .attr("offset", "0%")
+                                .attr("stop-color", collectionColor);       // For collected waste => diversion
+                            settings.palette.gradients.diversion[streamName].select('stop')
+                                .append("stop")                                  // Start colour
+                                .attr("offset", "10%")
+                                .attr("stop-color", collectionColor);       // For collected waste => diversion
+                            settings.palette.gradients.landfill[streamName].append("stop")
+                                .attr("offset", "0%")
+                                .attr("stop-color", collectionColor);       // For collected waste => landfill                    
+                            settings.palette.gradients.diversion[streamName].append("stop")                                  // End colour
+                                .attr("offset", "100%")
+                                .attr("stop-color", settings.palette.diversionByStream[streamName]);      // For diversion
+                            settings.palette.gradients.landfill[streamName].append("stop")
+                                .attr("offset", "100%")
+                                .attr("stop-color", settings.palette.landfill);                    // Colour for landfill
+                        })
+                    }
+                }
+            }
+        }; // end addInteractions()
 
 
         ////////////////////////////////////
         /// X. HELPER FUNCTIONS |        ///
         ////////////////////////////////////
-
-        // Toggle dark theme with spacebar
-        document.body.onkeyup = function(e){
-        if(e.keyCode == 16){
-            d3.selectAll(`.svg-container`).classed("dark", !d3.selectAll('.svg-container').classed("dark"))
-
-            // Update flow gradients
-            const collectionColor = d3.selectAll(`.svg-container`).classed("dark") ? '#fff' : settings.palette.collection
-
-            settings.streamOrder.forEach((streamName, i) => {
-                // Remove then re-specify gradient stops
-                settings.palette.gradients.diversion[streamName].selectAll('stop').remove()
-                settings.palette.gradients.landfill[streamName].selectAll('stop').remove()
-                
-                settings.palette.gradients.diversion[streamName].append("stop")                                  // Start colour
-                    .attr("offset", "0%")
-                    .attr("stop-color", collectionColor);       // For collected waste => diversion
-                settings.palette.gradients.diversion[streamName].select('stop')
-                    .append("stop")                                  // Start colour
-                    .attr("offset", "10%")
-                    .attr("stop-color", collectionColor);       // For collected waste => diversion
-                settings.palette.gradients.landfill[streamName].append("stop")
-                    .attr("offset", "0%")
-                    .attr("stop-color", collectionColor);       // For collected waste => landfill                    
-                settings.palette.gradients.diversion[streamName].append("stop")                                  // End colour
-                    .attr("offset", "100%")
-                    .attr("stop-color", settings.palette.diversionByStream[streamName]);      // For diversion
-                settings.palette.gradients.landfill[streamName].append("stop")
-                    .attr("offset", "100%")
-                    .attr("stop-color", settings.palette.landfill);                    // Colour for landfill
-            })
-
-        }
-    }
-
-
-        // ANIMATION HELPERS: FOR PLAY/TESTING ONLY
-        function animatePath(pathID, duration = 3000, delay = 3000){
-            const pathLength = document.getElementById(pathID).getTotalLength()
-            d3.select(`#${pathID}`)
-                .style('stroke-dasharray',  `${pathLength} ${pathLength}`)
-                .style('stroke-dashoffset',  pathLength)
-                .transition().duration(duration).delay(delay)
-                .style('stroke-dashoffset', 0)
-        };
-
-        function animateAllPaths(){
-            const arr = []
-            data.schema.lists.forEach(stream => {
-                const slugStreamName = helpers.slugify(stream)
-                arr.push(`flow-diversion-${slugStreamName}`)
-                arr.push(`flow-landfill-${slugStreamName}`)
-            })
-            arr.forEach( (id, i) => animatePath(id, 3000, i%2 *3000) )
-        };
-
-        function renderDonut(container, coords, dims, data ){
-            // Setup shape generator and data
-            const arc = d3.arc().innerRadius(dims.r * 0.67).outerRadius(dims.r - 1),
-                pie = d3.pie().padAngle(0.005)
-                    .sort(null)
-                    .value(d => d.value),
-                chartData = pie([
-                    {value: data.pct,    class: 'diversion '+data.materialClass},
-                    {value: 1- data.pct, class: 'landfill'}
-                ])
-
-            const donutGroup = container.append('g')
-            donutGroup.append('circle').classed('donut-chart-bg', true)
-                .attr('r', dims.r )
-                    .style("transform", `translate(${coords.x}px, ${coords.y}px)` )
-            donutGroup.append('g').classed('arc-group', true)
-                .selectAll("path.donut-arc")
-                .data(chartData)
-                .join("path").attr('class', d => `${d.data.class} donut-arc`)            
-                    .attr("d", arc)
-                    .style("transform", `translate(${coords.x}px, ${coords.y}px) scale(-1, 1)` )
-            
-            donutGroup.append('text')
-                .attr('class', `${data.materialClass} donut-diversion-pct`)  
-                .text(helpers.numberFormatters.formatPct(data.pct))
-                .style("transform", `translate(${coords.x}px, ${coords.y}px)` )
-        };
 
         const helpers= {
             numberFormatters: {

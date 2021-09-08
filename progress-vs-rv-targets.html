@@ -142,7 +142,7 @@
                 font-weight: 300
             }
             .label.current{
-                font-size: 10px;
+                font-size: 12px;
                 text-shadow: #fff 4px 4px 2px;
             }
             .current{
@@ -326,14 +326,14 @@
                 infoContainer.append('div').classed('target-definition', true)
                     .html(settings.display.showDefinitions ? obj.Definition : '')
 
-
                 // b. Add "Performance " graphic
                 const svg = svgContainer.append('svg').attr('id', `vis-target-${i+ 1}`)
                         .attr('viewBox', `0 0 ${settings.dims.width} ${settings.dims.height}`)
                         .attr('width', `100%`)
                 const defs = svg.append('defs'),
-                    svgTitle = svg.append('title').attr('id', 'svg-title'),
+                    svgTitle = svg.append('title').attr('id', 'svg-title').html(`Comparison actual performance up to ${settings.year.Baseline} vs target to ${obj.Label.toLowerCase()} by ${settings.year.Target} `),
                     svgDescription = svg.append('title').attr('id', 'svg-description')
+                        .html(`A diagram actual performance up to ${settings.year.Baseline} vs a trajectory to the target to ${obj.Label.toLowerCase()} by ${settings.year.Target} `)
 
                 const radius = settings.dims.height * 0.425
 

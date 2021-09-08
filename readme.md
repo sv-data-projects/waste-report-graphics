@@ -78,9 +78,10 @@ Each data visualisation is connected to 'source data' to create visual marks and
 > Data is currently 'hosted' as tab separated values files from a Google Sheets spreadsheet. 
 > - The link to the current Google sheet is [here](https://docs.google.com/spreadsheets/d/1V5HL7zCHGETUCDT8-3ZiDm9XncmOTEo9WDSP1Xe3wd0/edit#gid=0). 
 > - The reference URLs are contained either directly in each visualisation's script, or in the case of the Market Bulletin graphics, in a shared data URLs object in 'core' folder (as a single object to update).
+> - These URLs can simply be changed over to another URL hosting the same .tsv file (e.g. Excel with Sharepoint may be a more preferred (and secure) option if it can publish .tsv files to the web)
+> - The tsv format was preferred here to avoid issues with commas in cells causing issues with .csv file structures. JSON files are another alternative however tsv was chosen as a more intuitive format for those coming from a spreadsheet background. 
 
-
-Connections to these tables is made using the [D3.js library's](https://d3js.org/) [Fetch API-based](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) date loaders. This setup means that URL links can be easily switched over to more secure hosting arrangement in the future. The trade off is that the Google Sheet based files can be easily shared, accessed and updated without knowledge of a host database.
+Connections to these tables is made using the [D3.js library's](https://d3js.org/) [Fetch API-based](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) data loaders. This setup means that URL links can be easily switched over to more secure hosting arrangement in the future. The trade off is that the Google Sheet based files can be easily shared, accessed and updated without knowledge of a host database. D3 loaders are available for tsv, csv and json formats and can be easily changed over in the code for each visualisation (search for d3.tsv())
 
 *Side note: Data as originally connected via the more convenient and full featured [Tabletop.js](https://github.com/jsoma/tabletop) library however this was deprecated alongside the Google Sheets API (v3 to v4) migration in early August, 2021. The [PapaParse.js](https://www.papaparse.com/) library was then successfully implemented but introduced a further dependency (alongside D3.js), and so D3.js as eventually used as the simplest solution with least library dependencies (as its generally used here for most data visualisations).*
 
@@ -208,17 +209,19 @@ In most cases, graphics are designed to be flexible enough for use in print and 
 | Victorian waste flow illustrative graphic (full page) | [waste-vic-flow-infographic.html](https://sv-data-projects.github.io/waste-report-graphics/waste-vic-flow-infographic.html) | year | YYYY-YY |  2019-20 | Specifies FY data to display
 | | | extended-typography | true, false | true |  Show title text with with handwriting typeface
 | Victorian waste flows summary graphic (half page 'flow loop')| [waste-vic-flow-summary-graphic.html](https://sv-data-projects.github.io/waste-report-graphics/waste-vic-flow-summary-graphic.html) |  year | YYYY-YY | 2019-20 | Specifies FY data to display
-| | | mode | dark, light | light | Show the graphic with dark mode colour scheme
+| | | theme | dark, light | light | Show the graphic with 'dark mode' option
+| | | themeChange | true, false | true | Whether the theme can be changed by pressing the 'Shift' key
 | Kerbside waste illustrative summary infographic (half page)| [kerbside-flow-infographic.html](https://sv-data-projects.github.io/waste-report-graphics/kerbside-summary-infographic.html) |  year  | YYYY-YY | 2019-20 | Specifies FY data to display
 | Kerbside waste illustrative infographic (full page)| [kerbside-summary-infographic.html](https://sv-data-projects.github.io/waste-report-graphics/kerbside-flow-infographic.html) | YYYY-YY |  year | 2019-20 | Specifies FY data to display
 | | | extended-typography | true, false | true | Show title text with with handwriting typeface
 | Kerbside bin composition graphic (single bin)| [kerbside-bin-composition.html](https://sv-data-projects.github.io/waste-report-graphics/kerbside-bin-composition.html) | year | YYYY-YY | 2019-20
-| | | yellow-bin-lid | true, false | false | Whether to colour bin lid yellow (note: default is false colour clashes with material colour)
+| | | yellow-bin-lid | true, false | false | Whether to colour bin lid yellow (note: default is false colour clashes with a material colour)
 | Victorian waste flow (sankey) diagram (full page)| [waste-vic-flow-sankey.html](https://sv-data-projects.github.io/waste-report-graphics/waste-vic-flow-sankey.html) |  year | YYYY-YY | 2019-20 | Specifies FY data to display
 | Waste metrics trends tables (headlines and by material summary) | waste-trends-summary-table.html |  year | YYYY-YY | 2019-20 | Specifies FY data to display
 | Kerbside trends summary tables (headlines and by services summary) | kerbside-trends-summary-table.html |  year | YYYY-YY | 2019-20 | Specifies FY data to display
 | Waste diversion radial bar chart and table | [waste-diversion-by-material.html](https://sv-data-projects.github.io/waste-report-graphics/waste-diversion-by-material.html) | year |  YYYY-YY | 2019-20 | Specifies FY data to display
-| | | mode | dark, light | light | Show the graphic with dark mode colour scheme
+| | | theme | dark, light | light | Show the graphic with 'dark mode' option
+| | | themeChange | true, false | true | Whether the theme can be changed by pressing the 'Shift' key
 | | | layout | portrait, landscape, chart-only | portrait | Layout options for chart and accompanying data table (or to not show the table)
 | Victorian recovered waste export map | [waste-export-map.html](https://sv-data-projects.github.io/waste-report-graphics/waste-export-map.html) | year | YYYY-YY | 2019-20 | Specifies FY data to display
 | | | showSparklines | true, false | true | Hides all bar chart sparklines
@@ -232,7 +235,7 @@ In most cases, graphics are designed to be flexible enough for use in print and 
 ## Further customisation of waste report graphics 
 Some visualisations can be tweaked and customised further:
 - **Victorian recovered waste export map:** Customisation of the country to country links can be made via the source data table ('exportWasteData'). This allows for the curved links to be adjusted by country, and for the 'path endpoint' to be adjusted
-- **Victorian waste flow (sankey) diagram:** The sankey layout is customised within using hte data fields of 'level' and 'sourceKey' (and fitered by the field 'sankey') in the source data table ('wasteByMaterialFlow'). These layout configurations reasonably complex and adjustments are likely to require some code changes.
+- **Victorian waste flow (sankey) diagram:** The sankey layout is customised within using hte data fields of 'level' and 'sourceKey' (and filtered by the field 'sankey') in the source data table ('wasteByMaterialFlow'). These layout configurations reasonably complex and adjustments are likely to require some code changes.
 
 ## Interactive waste report graphics
 Section TBA: this will cover any animation or customised interaction options for web-first graphics (currently being considered)
