@@ -150,7 +150,7 @@ A handful of global objects (variables) are consistently structured used in all 
     3. Call the `applyQuerySettings()` to apply any query string options sent as part of the URL request. This function looks for any specified settings and updates the settings object if they are present. If not, no updates are made (i.e. the visualisation defaults to the settings object)
     4.  Call the `transformData()` function that will perform any data wrangling, shaping  and merging tasks required, including generating uniques lists. Data is stored back to the `data` object.
     5. Call the `renderVis()` (or `renderMap()`) function which uses the `data` object to render the visualisation to the webpage. 
-    6. Call any other custom functions that might exist (e.g. `animateVis()`).  
+    6. Call any other custom functions that might exist (e.g. `addInteractions()`, `animateVis()` etc).  
 
 &nbsp;
 ***
