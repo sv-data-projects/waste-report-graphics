@@ -232,6 +232,7 @@
                 letter-spacing: -1.25px;
                 margin-bottom: -1.5vw;
                 margin-left: -2vw;
+                letter-spacing: -3.5px;
             }
             .headline-unit{
                 font-size: 2.5vw;
@@ -382,6 +383,7 @@
             #cost-per-household-container .sparkline{
                 stroke: var(--tertiaryBlue);
             }
+            #cost-per-household-sparkline text,
             #cost-per-household-container .marker{
                 fill: var(--tertiaryBlue);
             }
@@ -741,8 +743,8 @@
             d3.select('#total-recovery-container .headline-figure').html(helpers.numberFormatters.formatComma2dec(totalRecovery_mil))
             d3.select('#diversion-rate-container .headline-figure').html(helpers.numberFormatters.formatComma1dec(diversionRate * 100))
             d3.select('#total-cost-container .headline-figure').html(helpers.numberFormatters.formatInteger(totalCost_mil))
-            d3.select('#waste-per-household-container .headline-figure').html(helpers.numberFormatters.formatInteger(wastePerHousehold_kg))
-            d3.select('#cost-per-household-container .headline-figure').html(helpers.numberFormatters.formatInteger(costPerHousehold))
+            d3.select('#waste-per-household-container .headline-figure').html(helpers.numberFormatters.formatComma(wastePerHousehold_kg))
+            d3.select('#cost-per-household-container .headline-figure').html(helpers.numberFormatters.formatComma(costPerHousehold))
 
             // c. Add headline sparklines
             dataTable = dataTable.slice(0,5)
@@ -757,7 +759,7 @@
             renderSparkline(`total-recovery-sparkline`, totalRecoveryData, settings.dims.major_sparkline, true, 0.2)
             renderSparkline(`diversion-rate-sparkline`, diversionRateData, settings.dims.major_sparkline, true, 0.2, 'pct')
             renderSparkline(`total-cost-sparkline`, totalCostData, settings.dims.major_sparkline, true, 0.65)
-            renderSparkline(`waste-per-household-sparkline`, wastePerHouseholdData, settings.dims.major_sparkline, true, 0.5)
+            renderSparkline(`waste-per-household-sparkline`, wastePerHouseholdData, settings.dims.major_sparkline, true, 0.2)
             renderSparkline(`cost-per-household-sparkline`, costPerHouseholdData, settings.dims.major_sparkline, true, 0.65)
 
             // 3. Build DOM for each material
