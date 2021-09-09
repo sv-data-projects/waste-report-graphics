@@ -364,7 +364,7 @@
                 } 
 
                 // Append a sparkline
-                    // b. Setup SVG element for dimensions 
+                    // a. Setup SVG element for dimensions 
                     const chartMarginX = settings.dims.width * 0.35,
                         chartMarginY = settings.dims.width * 0.35,
                         chartWidth =   settings.dims.width - chartMarginX * 2, 
@@ -449,8 +449,6 @@
                         .text(`${numberFormatter(chartData[1].value)} ${unit} in ${settings.finYear.Current}`)
                         .call(helpers.wrap, settings.dims.width * 0.25, 1.1)
             })
-
-
 
             // 4. Fade in vis
             d3.select('.main-container').transition().duration(2000).style('opacity', null)  

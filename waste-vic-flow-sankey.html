@@ -410,7 +410,18 @@
                 productGroup = svg.append('g').classed('product-group', true),
                 annotationGroup = svg.append('g').classed('annotation-group', true)
 
-            // 2. ADD MATERIALS BOXES: Done prior to links as box locations are used for link connector points
+            // 2. Setup title and desc for screen reader accessibility
+            const svgTitleText = `A graphic showing the volumes of waste flows in ${settings.year})`,
+                svgDescText = `A graphic showing the volumes of waste flows in ${settings.year}) by materials:  ${data.list.material.toString()}`
+
+            d3.select('#svg-title').html(svgTitleText)
+            d3.select('#svg-description').html(svgDescText)
+
+            // Toggle title so that it doesn't appear as a default tooltip
+            svg.on('mouseover', () => document.getElementById('svg-title').innerHTML = null )
+                .on('mouseout', () =>  document.getElementById('svg-title').innerHTML = svgTitleText )
+
+            // 3. ADD MATERIALS BOXES: Done prior to links as box locations are used for link connector points
             data.list.material.forEach( (material, i) => {
                 const yPosIndex = materialIndex[i],
                     yPos = settings.dims.margin.top + yPosIndex * (settings.geometry.yGap + settings.geometry.container.height),
@@ -563,7 +574,7 @@
             })
 
 
-            // 3. ADD FLOWS 
+            // 4. ADD FLOWS 
                 // a. Filter flow data
                 const materialData = data.inputData.material.filter(d => d.year === settings.year && !isNaN(d.level))       
                 // b. Link shape generator

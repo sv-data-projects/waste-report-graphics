@@ -184,6 +184,8 @@
     <body>
         <div class = "svg-container" >
             <svg id = "scene-vis" viewBox="0 0 2481 3508" class ='extended-typography'>
+                <title id="svg-title"></title>
+                <desc id="svg-description"></desc>
                 <defs>
                     <clipPath id="_clip2">
                         <path d="M1032.93 3211.99h260.51v170.37h-260.51z"/>
@@ -1518,7 +1520,18 @@
                 exportLinkStartX = settings.geometry.exportStartPos.x - totalExportWidth / 2,
                 exportOffsetY = 0
 
-            // 1. Add generation graphic (top) from data
+            // 1. Setup title and desc for screen reader accessibility
+                const svgTitleText = `An illustrated data graphic showing Victorian waste flows in ${settings.year})`,
+                    svgDescText = `An illustrated data graphic showing Victorian waste flows in ${settings.year}). The graphic is split into three panes. The top pane shows the collection volumes by materials (${data.list.material.toString()}). The middle pane shows the breakdown of material flows by destination (landfill, local recovery and export). with a summary callout to describe teh overall diversion rate (from landfill), and the breakdown of recovered materials.  The final (bottom) pane is an illustration with examples of everyday products that might be made with recycled materials.`
+
+                svgTitle.html(svgTitleText)
+                svgDescription.html(svgDescText)
+
+                // Toggle title so that it doesn't appear as a default tooltip
+                svg.on('mouseover', () => document.getElementById('svg-title').innerHTML = null )
+                    .on('mouseout', () =>  document.getElementById('svg-title').innerHTML = svgTitleText )
+
+            // 2. Add generation graphic (top) from data
                 // a. Add Total node
                 const totalGenerationNode = generationNodes.append('g')
                     .attr('id', 'total-generation-node-group')
@@ -1693,7 +1706,7 @@
                 })
 
 
-            // GENERAL ANNOTATION
+            // 3. GENERAL ANNOTATION
                 // a. Main title
                 annotationLayer.append('text')
                     .attr('id', 'main-title')

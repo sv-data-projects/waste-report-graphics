@@ -72,7 +72,9 @@
 
     <body>
         <div class = "svg-container">
-            <svg id = "streetscene-vis" viewBox="0 0 1080 720" class =extended-typography''>
+            <svg id = "streetscene-vis" viewBox="0 0 1080 720" class ='extended-typography'>
+                <title id="svg-title"></title>
+                <desc id="svg-description"></desc>
                 <defs>
                     <clipPath id="clipPath205" clipPathUnits="userSpaceOnUse">
                         <rect width="115.155" height="116.277" x="361.85" y="57.914" ry="1.43"/>
@@ -386,6 +388,8 @@
                 annotationLayer = svg.append('g').classed('annotation-group', true),
                 headlineOffsetY = 140
 
+            // 1. Add annotation
+
             annotationLayer.append('text').classed('lga-label-title', true)
                 .text("A look at Local Government waste management in "+settings.year)
                 .attr('x', 50)
@@ -460,6 +464,17 @@
                 .attr('y', 368)
                 .attr('dy', 0)
                 .call(helpers.wrap, 160, 1.1)
+
+            // 2. Setup title and desc for screen reader accessibility
+            const svgTitleText = `An illustrated data graphic summarises household waste flows and costs in ${settings.year})`,
+                svgDescText = `An illustrated data graphic summarises household waste flows and costs in ${settings.year}). The graphic shows summary data by commingled recyclables, garbage and organics.`
+            d3.select('#svg-title').html(svgTitleText)
+            d3.select('#svg-description').html(svgDescText)
+
+            // Toggle title so that it doesn't appear as a default tooltip
+            svg.on('mouseover', () => document.getElementById('svg-title').innerHTML = null )
+                .on('mouseout', () =>  document.getElementById('svg-title').innerHTML = svgTitleText )
+
 
             // Animate in
             d3.select(`#${settings.svgID}`).transition().duration(1500)

@@ -201,7 +201,7 @@
                 .main-title,
                 .title-label,
                 .recovery.icon,
-                .recovery-headline,
+
                 .recovery-unit,
                 .landfill.icon,
                 .landfill-headline,
@@ -218,6 +218,7 @@
                 .generation-headline{
                     font-weight: 500;
                 }
+                .recovery-headline,
                 .diversion-main-label{
                     font-weight: 700;
                 }
@@ -245,6 +246,7 @@
                     stroke-width: 4px;
                     letter-spacing: -6px;
                     dominant-baseline: middle;
+                    font-weight: 700;
                 }
                 .diversion-main-label,
                 .diversion-pct-unit{
@@ -357,7 +359,7 @@
             svgID:          'summary-vis',
             year:           '2019-20', 
             theme:          'light',        // default "light" or "dark" mode
-            themeChange:    false,          // boolean for whether the theme can be changed with keypress (assigned to 'Shift' key) 
+            themeChange:    true,          // boolean for whether the theme can be changed with keypress (assigned to 'Shift' key) 
             dims: {
                 height:     720, 
                 width:      1080,
@@ -595,7 +597,18 @@
                     .domain([ dataStructure.minFlowVol, dataStructure.maxFlowVol]) 
                     .range([ settings.geometry.minFlowWidth, settings.geometry.maxFlowWidth])
 
-            /// 2. RENDER THE FLOWS FOR EACH WASTE STREAM 
+            /// 2. Setup title and desc for screen reader accessibility
+                const svgTitleText = `A graphic showing the volumes of waste flows in ${settings.year})`,
+                    svgDescText = `A graphic showing the volumes of waste flows in ${settings.year}) by waste streams: ${settings.streamOrder.toString()}`
+
+                d3.select('#svg-title').html(svgTitleText)
+                d3.select('#svg-description').html(svgDescText)
+
+                // Toggle title so that it doesn't appear as a default tooltip
+                vis.on('mouseover', () => document.getElementById('svg-title').innerHTML = null )
+                    .on('mouseout', () =>  document.getElementById('svg-title').innerHTML = svgTitleText )
+
+            /// 3. RENDER THE FLOWS FOR EACH WASTE STREAM 
                 let landfillPathLowerY = settings.dims.height - settings.dims.margin.bottom,        // For tracking the y position of the flows along the bottom of the page
                     diversionPathLowerY = landfillPathLowerY                                        // For tracking the y position of the flows along the bottom of the page
                         - d3.sum(dataStructure.landfillFlows.map(d => settings.scales.flows(d))) - settings.streamOrder.length *  settings.geometry.flowSpacing ,      // This offsetting accounts for the width/height of the landfill flows and spacing

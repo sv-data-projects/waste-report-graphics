@@ -13,7 +13,7 @@
             /***********************************************************/
             /***********************************************************/
             /****                                                   ****/
-            /**** WASTE DIVERSSON GRPAHIC AND TABLE  | CUSTOM CSS  ****/
+            /**** WASTE DIVERSION GRPAHIC AND TABLE  | CUSTOM CSS  ****/
             /**** ---------------------------------------------     ****/
             /**** - CSS Variables and loaded fonts from core.css    ****/
             /****                                                   ****/
@@ -487,7 +487,19 @@
                         .attr('transform', `translate(${settings.geometry.circlePos.x}, ${settings.geometry.circlePos.y})`),
                     annotationLayer = svg.append('g').classed('annotation-group', true)        // Annotation layer
 
-            // 3. Add the chart arcs
+
+            // 3. Setup title and desc for screen reader accessibility
+                const svgTitleText = `Recovery rates by materials in ${settings.year})`,
+                    svgDescText = `A chart detailing the recovery rates in ${settings.year}, for: ${chartData.map(d => `${d.material} (${helpers.numberFormatters.formatPct1dec(d.diversionRate)})`).toString()}`
+
+                svgTitle.html(svgTitleText)
+                svgDescription.html(svgDescText)
+
+                // Toggle title so that it doesn't appear as a default tooltip
+                svg.on('mouseover', () => document.getElementById('svg-title').innerHTML = null )
+                    .on('mouseout', () =>  document.getElementById('svg-title').innerHTML = svgTitleText )
+
+            // 4. Add the chart arcs
                 const arcs = canvas.append('g')
                     .attr('class', 'arc-group')
                     .selectAll('path')
@@ -502,7 +514,7 @@
                         .duration(1500)
                         .attrTween('d', arcTween)
 
-            // 4. Add table/axis group
+            // 5. Add table/axis group
                 if(settings.layout !== 'chart-only'){
                     const  tableHeaders = canvas.append('g').classed('table-headers', true),
                         tableAxis = canvas.append('g').classed('r axis table', true)
@@ -551,7 +563,7 @@
                         .text(d => `${helpers.numberFormatters.formatComma(d.diverted /1000)} kt`)
                 }
 
-            // 5. Add background layer and annotation
+            // 6. Add background layer and annotation
                 backgroundLayer.append('rect').classed('bg-rect', true)
                     .attr('width', settings.dims.width)
                     .attr('height', settings.dims.height)
@@ -561,7 +573,7 @@
                     .attr('transform', `translate(${settings.layout === 'landscape' ? settings.dims.margin.left : settings.dims.width * 0.5} , ${settings.dims.margin.top})`)
                     .text(`What materials did Victorians recover in ${settings.year}?`)
 
-            // 6. Add a curved labels for diversion radial chart 
+            // 7. Add a curved labels for diversion radial chart 
                 chartData.forEach((d, i) => {
                     const slugMaterialName =  helpers.slugify(d.material)
                         labelOffset = 6, 
@@ -602,7 +614,7 @@
                                 .style('opacity', null)
                 })
 
-            // 7. Add title labels
+            // 8. Add title labels
             const titleOffset = 10, 
                 titleLabelRadius = settings.geometry.chartRadius + titleOffset
                 titleStartPos = {
@@ -627,7 +639,7 @@
                     .attr('startOffset', '49.5%')
                     .text(`- comparing recovery rates for Victorian waste materials in ${settings.year}`)	
 
-            // 8. Add chart interactions
+            // 9. Add chart interactions
                 // Central label overall recovery date
                 const totalDiversion = d3.sum(chartData.map(d => d.diverted)),
                     totalWaste =  d3.sum(chartData.map(d => d.total))
@@ -666,7 +678,7 @@
                     .attr('y', -40)
                     .attr('dy', 0)
 
-            // Animate in
+            // 10. Animate in
             d3.select(`#${settings.svgID}`).style('pointer-events', 'none')                 // Block pointer events
             totalDiversionLabel
                 .style('opacity', 0)
@@ -709,7 +721,7 @@
                     .style('opacity', 0)
             };
 
-            // 9. Add UI toggle for dark theme with shift key
+            // 11. Add UI toggle for dark theme with shift key
             document.body.onkeyup = function(e){
                 if(e.keyCode == 16){
                     d3.selectAll(`.svg-container`).classed("dark", !d3.selectAll('.svg-container').classed("dark"))

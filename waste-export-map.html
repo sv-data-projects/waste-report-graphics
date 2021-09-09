@@ -293,7 +293,18 @@
                 titles = annotation.append('g').classed('titles-group', true),
                 infoPane = svg.append('g').classed('infopane-group', true)
 
-            // 2. SPECIFY MAP PROJECTION AND MAP PROJECTION PATH GENERATOR
+            // 2. Setup title and desc for screen reader accessibility
+                const svgTitleText = `A data map export volumes of recovered resources in ${settings.year})`,
+                    svgDescText = `A data map export volumes of recovered resources in ${settings.year}), by top ten countries: ${data.schema.list.country.filter(d => d !== 'All other countries').toString()}`
+
+                d3.select('#svg-title').html(svgTitleText)
+                d3.select('#svg-description').html(svgDescText)
+
+                // Toggle title so that it doesn't appear as a default tooltip
+                svg.on('mouseover', () => document.getElementById('svg-title').innerHTML = null )
+                    .on('mouseout', () =>  document.getElementById('svg-title').innerHTML = svgTitleText )
+
+            // 3. SPECIFY MAP PROJECTION AND MAP PROJECTION PATH GENERATOR
             const projection = settings.geometry.projection,				   // Specify map projection type
                 path = d3.geoPath().projection(projection)                     // Path generator function
 
@@ -303,7 +314,7 @@
 
             const exportPathGenerator = (d) =>  "M" + d[0].x + "," + d[0].y  + "S" + d[1].x + "," + d[1].y  + " " + d[2].x + "," + d[2].y       // Path generator for a curved line
 
-            // 3. ADD WORD AND VICTORIAN LGA MAP SHAPE
+            // 4. ADD WORD AND VICTORIAN LGA MAP SHAPE
             countries.selectAll('path')
                 .data(worldShapeData.features)
                 .join('path')
@@ -318,7 +329,7 @@
                     .attr('d', path)			
                     .attr('class',  d => `state ${helpers.slugify(d.properties.STATE_NAME)} `)    
             
-            // 4. COLOR EXPORT COUNTRIES *(BY TOTAL) AND ADD COUNTY LABELS
+            // 5. COLOR EXPORT COUNTRIES *(BY TOTAL) AND ADD COUNTY LABELS
             const colourScale = d3.scaleLinear()
                 .domain(d3.extent(data.inputData.export.map(d => d.Total)))
                 .range(['#A0D6E9', '#93CCB9'])  // tertiaryBlueLight to  tertiaryEmeraldLight
@@ -370,7 +381,7 @@
                     .style('stroke-width', exportPathScale(exportTotalVol))
             })
 
-            // 5. RENDER THE INFO PANE
+            // 6. RENDER THE INFO PANE
             const infoPaneWidth = settings.dims.width * 0.25,
                 infoPaneHeight = settings.dims.height,
                 infoPaneMargin = { top: infoPaneWidth * 0.1, bottom: infoPaneHeight * 0.1, left: infoPaneWidth * 0.1,  right: infoPaneWidth * 0.1}
@@ -460,7 +471,7 @@
                     countryGroupYpos += countryGroup.node().getBBox().height + 10
                 })
 
-            // 6. ADD ANNOTATION
+            // 7. ADD ANNOTATION
             const titleMargin = {left: 30, top: 30}
             // a. Main title
             titles.append('text').classed('main-title', true)
@@ -513,7 +524,7 @@
             svgDescription.html(`A map of the Asia-pacific region showing destinations (countries) where Victorian recovered resources have been exported to`)
 
 
-            // 7. APPLY LAYOUT SETTINGS: 
+            // 8. APPLY LAYOUT SETTINGS: 
             // a. Toggle display of sparkline bars  
             if(!settings.showSparklines){
                 d3.selectAll('.bar').attr('display', 'none')

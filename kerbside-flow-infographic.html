@@ -237,6 +237,8 @@
     <body>
         <div class = "svg-container">
             <svg id = "kerbside-graphic" class ='extended-typography'>
+                <title id="svg-title"></title>
+                <desc id="svg-description"></desc>
                 <!-- FULL PAGE GRAPHIC IS COMPOSED OF THREE SEPARATE ILLUSTRATIONS WITH DATA VIS AND ANNOTATIONS OVERLAID FROM A JS   -->
 
                 <!-- 1. UPPER SCENE BACKGOROUND ILLUSTRATION FOR THE MRF AND LANDFILL SCENE -->
@@ -1025,7 +1027,7 @@
         //////////////////////////////////////////////
 
         async function renderVis(collectionData, compositionData, settings){
-            // 0. Data
+            // 1. Data
             const yearData = collectionData.filter(d => d.year === settings.year)[0],
                 recycleBinData =  compositionData.filter(d => d.year === settings.year),
                 totalCouncilCost = d3.sum(Object.keys(yearData).filter(d => d.slice(d.indexOf('_') + 1) === 'cost').map( d => yearData[d])),
@@ -1080,7 +1082,18 @@
                 const facilityY = 385, mrfX = 110, mrfXOut = 340, organicsFacilityX = 160, organicsFacilityXOut = -80, landfillX = settings.dims.width / 2, 
                     landfillY = 430, flowRadius = 80, contaminationRadius = 50
         
-            // 1. Add Kerbside waste stream headers
+            // 2. Setup title and desc for screen reader accessibility
+            const svgTitleText = `An illustrated data graphic showing household waste flows in ${settings.year})`,
+                svgDescText = `An illustrated data graphic showing household waste flows in ${settings.year}). The graphic is split into three panes. The top pane shows the collection volumes by three bin types (commingled recyclables, garbage and organics). The middle pane shows how this collected waste is either recovered or sent to landfill, with a summary callout to describe the overall diversion rate (from landfill), and the breakdown of recovered materials.  The final (bottom) pane summarises the costs of each waste collection service for local governments. `
+
+            d3.select('#svg-title').html(svgTitleText)
+            d3.select('#svg-description').html(svgDescText)
+
+            // Toggle title so that it doesn't appear as a default tooltip
+            svg.on('mouseover', () => document.getElementById('svg-title').innerHTML = null )
+                .on('mouseout', () =>  document.getElementById('svg-title').innerHTML = svgTitleText )
+
+            // 3. Add Kerbside waste stream headers
             annotationLayer.append('text').classed('lga-stream-title recycling street', true)
                 .attr('x', settings.dims.width / 6)
                 .attr('y', streamLabelY)
@@ -1094,7 +1107,7 @@
                 .attr('y', streamLabelY)
                 .text('Organics')
 
-            // 2. Add Kerbside waste destinations headers
+            // 4. Add Kerbside waste destinations headers
             annotationLayer.append('text').classed('waste-destination-title recycling destination', true)
                 .attr('x', settings.dims.width / 6)
                 .attr('y', facilityLabelY)
@@ -1114,7 +1127,7 @@
                 .text('Organics reprocessing')
                 .call(helpers.wrap, 240, 1)
 
-            // 3. Recycling info group: 
+            // 5. Recycling info group: 
             const recyclingGroup = infographicLayer.append('g').classed('recycling-group street', true)
                 .attr('transform', `translate(${xMargin} , ${collectionGroupY})`)
                 // a. Recycling volume label
@@ -1180,7 +1193,7 @@
                     .attr('d', recyclingContaminationPath)
                     .style('stroke-width', flowScale(yearData.Recycling_volume * recycleContaminationRate))
 
-            // 4. Garbage Info group
+            // 6. Garbage Info group
             const garbageGroup = infographicLayer.append('g').classed('garbage-group street', true)
                     .attr('transform', `translate(${settings.dims.width / 2 - settings.dims.width / 6 + xMargin} , ${collectionGroupY})`)
 
@@ -1227,7 +1240,7 @@
                     .attr('d', garbagePath) 
                     .style('stroke-width', flowScale(yearData.Garbage_volume))
 
-            // 5. Organics group
+            // 7. Organics group
             const organicsGroup = infographicLayer.append('g').classed('organics-group street', true)
                 .attr('transform', `translate(${settings.dims.width * 2 / 3 + xMargin} , ${collectionGroupY})`)
 
@@ -1279,7 +1292,7 @@
                     .attr('d', organicsContaminationPath)
                     .style('stroke-width', flowScale(yearData.Recycling_volume * organicsContaminationRate))
 
-            // 7. Recycling breakdown "Bin breakdown graphic"
+            // 8. Recycling breakdown "Bin breakdown graphic"
             const recycleBinScale = 4.5, 
                 chartBgRadius = 90,
                 recyclingBreakdownChart = annotationLayer.append('g').classed('icon-chart destination', true).attr('id', 'recycling-breakdown-icon-chart')
@@ -1351,7 +1364,7 @@
                         .attr('d', icons.binLid)
                         .attr('transform', `translate(${0} , ${0})  scale(${recycleBinScale})`)
 
-            // 8. Diversion rate circular callout
+            // 9. Diversion rate circular callout
             const diversionCallout =  annotationLayer.append('g').classed('destination', true)
                 .attr('transform', `translate(${diversionInsert.x}, ${diversionInsert.y})`)
 
@@ -1386,7 +1399,7 @@
                     .attr('x', 0).attr('y', -12).attr('dy', 0)
                     .text(`after contamination`)	
 
-            // 9. Add main title and kerbside scene annotations and main title
+            // 10. Add main title and kerbside scene annotations and main title
             annotationLayer.append('text').classed('main-title street', true)
                 .text(`Household waste collection at a glance in ${settings.year}`)
                 .attr('x', 50)

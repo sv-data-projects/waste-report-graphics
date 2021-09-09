@@ -469,7 +469,19 @@
                     'Glass':                'M7.292 20.833H-3.125a1.041 1.041 0 01-1.042-1.041V-3.125a1.041 1.041 0 011.042-1.042H7.208a1.04 1.04 0 01.737.305 1.338 1.338 0 01.388.82v22.834a1.041 1.041 0 01-1.041 1.041zm-9.375-2.083H6.25V-2.083h-8.333zm4.166-37.5h-4.166a1.042 1.042 0 010-2.083h4.166a1.042 1.042 0 010 2.083zM5.134 25h-9.779a3.693 3.693 0 01-3.688-3.689V-2.083a10.398 10.398 0 012.725-5.699 29.42 29.42 0 002.386-3.433l.097-.162v-10.816c0-2.605 1.546-2.807 2.02-2.807h2.21a2.023 2.023 0 012.02 2.02v11.624l.226.374a24.995 24.995 0 002.46 3.357A9.369 9.369 0 018.24-3.27a6.513 6.513 0 01.093 1.187V21.8A3.203 3.203 0 015.134 25zM-1.01-22.92c.025.065-.032.288-.032.727v11.106a1.047 1.047 0 01-.15.538l-.246.41a31.309 31.309 0 01-2.557 3.675 8.426 8.426 0 00-2.255 4.38v23.395a1.607 1.607 0 001.605 1.606h9.78A1.117 1.117 0 006.25 21.8V-2.083a4.655 4.655 0 00-.065-.849A7.868 7.868 0 004.23-6.268a27.113 27.113 0 01-2.661-3.636l-.377-.622a1.039 1.039 0 01-.15-.539V-22.98z'
                 }
 
-                // 3. SPECIFY MAP PROJECTION AND MAP PROJECTION PATH GENERATOR
+                // 3. Setup title and desc for screen reader accessibility
+                    const svgTitleText = `A data map of Victorian WRRG regions showing a breakdown of collected waste in ${settings.year}.`,
+                        svgDescText = `A data map of Victorian WRRG regions showing a breakdown of collected waste in ${settings.year}.`
+
+                    d3.select('#svg-title').html(svgTitleText)
+                    d3.select('#svg-description').html(svgDescText)
+
+                    // Toggle title so that it doesn't appear as a default tooltip
+                    svg.on('mouseover', () => document.getElementById('svg-title').innerHTML = null )
+                        .on('mouseout', () =>  document.getElementById('svg-title').innerHTML = svgTitleText )
+
+
+                // 4. SPECIFY MAP PROJECTION AND MAP PROJECTION PATH GENERATOR
                 const projection = settings.geometry.projection,				   // Specify map projection type
                     path = d3.geoPath().projection(projection)                     // Path generator function
                 projection 																
@@ -477,14 +489,14 @@
                     .scale(settings.geometry.projectionScale)
                     .center([settings.geometry.centerLong, settings.geometry.centerLat]);
 
-                // 4. COLOUR SCALE (USED FOR ENCODING DATA IN REGION COLOURS)
+                // 5. COLOUR SCALE (USED FOR ENCODING DATA IN REGION COLOURS)
                 const diversionRate = {}
                 data.schema.list.wrrg.forEach( wrrg => diversionRate[wrrg] = d3.sum(Object.values(data.byWRRG[wrrg]).map(d => d.processed)) /d3.sum(Object.values(data.byWRRG[wrrg]).map(d => d.collected)) )
                 const wrrgColor = d3.scaleLinear()
                     .domain(d3.extent(Object.values(diversionRate)) )
                     .range(['#D5E0A1', '#174F37']) // SvLightGreen to Secondary Bottle Green 
 
-                // 5. ADD VICTORIAN LGA MAP SHAPE: this is a base layer with no fill but with an outline
+                // 6. ADD VICTORIAN LGA MAP SHAPE: this is a base layer with no fill but with an outline
                 lgas.selectAll('path')
                     .data(mapShapeData.features)
                     .join('path')
@@ -500,7 +512,7 @@
                         .on('mouseover', onWrrgMouseover)
                         .on('mouseout', onWrrgMouseout)
 
-                // 6. MAP ANNOTATION LAYER
+                // 7. MAP ANNOTATION LAYER
                 // a. Add LGA names (for testing or to show on hover)
                 lgaLabels.selectAll('text')
                     .data(mapMetaDataUnique)
@@ -521,7 +533,7 @@
                         .text(d => d.vic_lga__3)
                         .style('opacity', 0)        // Set as invisible
 
-                // 7. EVENT LISTENERS
+                // 8. EVENT LISTENERS
                 function onWrrgMouseover(){
                     const wrrgClass  = this.classList[2]  
                     // d3.selectAll(`.lga-label.${wrrgClass}`).style('opacity', null)           // Show LGA labels           
@@ -536,7 +548,7 @@
                         .classed('showStroke', false)  
                 }
 
-                // 8. ADD INFO PANES BY WRRG
+                // 9. ADD INFO PANES BY WRRG
                 data.schema.list.wrrg.forEach( wrrg => {
                     let headerLines
                     const garbageOffset = 90,
@@ -699,7 +711,7 @@
                     }
                 })
 
-            // 7. ADD TITLE ANNOTATION AND SVG TITLE / DESC FOR SCREEN READERS
+            // 10. ADD TITLE ANNOTATION AND SVG TITLE / DESC FOR SCREEN READERS
             annotation.append('text').classed('main-title', true)
                 .attr('transform', `translate(${settings.dims.margin.left}, ${settings.dims.margin.top})`)
                 .text('Victorian waste collection data')
