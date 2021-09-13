@@ -109,6 +109,13 @@ Colours are mostly referenced throughout the CSS using [CSS Variable names](http
 Some visualisations contain more illustrative graphic layers. These are SVG-based graphics and illustrations whose code is copied into HTML code (note: SVG is web-native HTML). This SVG code can be directly edited but for the most part, these illustration were created in a vector graphics editor, cleanup up in the [SVG OMG](https://jakearchibald.github.io/svgomg/) tool, and imported into the HTML code. 
 Further (data vis) SVG is added over the top using JavaScript and [D3.js](https://d3js.org/) 
 
+
+## A note on SVG (and general) accessibility
+Best efforts have been made to make data visualisations accessible - particularly for screen readers and keyboard-only users. On the positive side, SVG text elements are natively accessible through the DOM, and both `Title` and `Description` tags have been programmatically added as children to main SVG elements, as well appropriate reference attributes and [WCAG ARIA roles](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles). However providing optimised accessed to data encoded in visual forms (e.g. charts) - through listed elements for screen readers - and for hovered tooltips, is limited (although as mentioned, visible key text elements can be reached). More effort could be done here (and to improve accessibility in general). The rationale for not going further (at this time) is simply a lack of time, and the expectation that some design implications would take an unreasonable amount of time to resolve.
+
+For visual contrast accessibility, again best efforts have been made to reach the AA minium for text. Exceptions have been made in more illustrative graphics where (again), re-design efforts would take an unreasonable amount of time to resolve. See also, the [design proposal for extending and standardising the colour palette used for waste materials](https://docs.google.com/spreadsheets/u/1/d/1fLZHGZMFQR2Uky6g_XLiJ2T1a5aK5S29b-5Gr7N_9nY/edit#gid=918506449).
+
+
 &nbsp;
 ***
 &nbsp;
