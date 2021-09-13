@@ -2007,7 +2007,8 @@
                         .flow-link:not(.export),
                         .node:not(.export),
                         .nodeLabel:not(.export),
-                        .destination-label:not(.export)
+                        .destination-label:not(.export),
+                        #total-generation-node-group text
                    `).style('opacity', 0)
                     d3.selectAll('.nodeLabel.material.volume.export textPath').html(function(d){ return `${helpers.numberFormatters.formatComma3dec(+this.getAttribute('data-export')/1000000)} Mt`})
                 };
@@ -2021,13 +2022,14 @@
                         .node:not(.landfill),
                         .nodeLabel:not(.landfill),
                         .destination-label:not(.landfill),
-                        .product-text
+                        .product-text,
+                        #total-generation-node-group text
                    `).style('opacity', 0)
                     d3.selectAll('.nodeLabel.material.volume.landfill textPath').html(function(d){ return `${helpers.numberFormatters.formatComma3dec(+this.getAttribute('data-landfill')/1000000)} Mt`})
                 };
 
                 function destinationMouseout(){
-                    d3.selectAll('.flow-link, .building-group, .landfill-group, .node, .nodeLabel').style('opacity', null)
+                    d3.selectAll('.flow-link, .building-group, .landfill-group, .node, .nodeLabel, #total-generation-node-group text').style('opacity', null)
                     d3.selectAll('.nodeLabel.material.volume textPath').html(function(d){ return `${helpers.numberFormatters.formatComma1dec(+this.getAttribute('data-collection')/1000000)} Mt`})
                 };
 
