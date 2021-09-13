@@ -104,6 +104,9 @@
             .total-unit-label{
                 pointer-events: none;
             }
+            #total-generation-node-group{
+                transform-origin: 50% 50%;
+            }
             #total-generation-node{
                 stroke: var(--nightSky);
                 stroke-width: 12px;
@@ -1362,11 +1365,11 @@
             },
             animation: {
                 duration:  {
-                    'step-1':       1200,        // Bring SVG into view
-                    'step-2':       2000,       
-                    'step-3':       4000,
-                    'step-4':       4000,
-                    'step-pause':   2000
+                    'step-1':       1200 * 0,        // Bring SVG into view
+                    'step-2':       2000* 0,       
+                    'step-3':       4000* 0,
+                    'step-4':       4000* 0,
+                    'step-pause':   2000 * 0
                 }
             }
         }
@@ -1594,9 +1597,7 @@
                     .attr('id', `total-generation-node`)
                     .attr('cx', settings.geometry.generationPos.x )
                     .attr('cy', settings.geometry.generationPos.y )
-                    .attr('r', 0)
-                       .transition().duration(3000)
-                       .attr('r', settings.geometry.generationTotalRadius)
+                    .attr('r', settings.geometry.generationTotalRadius)
 
                 totalGenerationNode.append('text').classed('total-sub-label data-label total', true)
                     .text('Victoria')
@@ -1942,7 +1943,7 @@
                         mrfText         = mt_toMRF === 0 ? '' : `${helpers.numberFormatters.formatComma2dec(mt_toMRF)} Mt of recovered for reprocessing in Victoria`,
                         exportText      = mt_toExport === 0 ? '' : `${helpers.numberFormatters.formatComma2dec(mt_toExport)} Mt exported for reprocessing`
 
-                    // Create Materails infor text string
+                    // Create Materials infor text string
                     let materialsText = `In ${settings.year} a total of ${helpers.numberFormatters.formatComma(materialData.value)} tonnes of ${materialName.toLocaleLowerCase() !== 'other materials' ? `${materialName.toLocaleLowerCase()} waste materials` : `${materialName.toLocaleLowerCase()}}`}  
                         were collected in Victoria. ` 
                     if(materialData.diversion !== 0){
@@ -2000,6 +2001,27 @@
                 };
 
                 function exportMouseover(event){
+                    const  exportData     = data.table.byMaterialFlow.filter(d => d.year === settings.year && d.locationClass === 'export'),
+                        exportDataGroup     = d3.rollups(exportData,  v => d3.sum(v, d => d.value), d => d.source).sort((a,b) => b[1] - a[1]),
+                        exportedTonnes     = d3.sum(exportData.map(d => d.value )),
+                        exportedMaterials = [...new Set(exportData.map(d => d.materialClass))],
+                        exportText = `A total of ${helpers.numberFormatters.formatComma(exportedTonnes)} tonnes of recovered waste was exported in ${settings.year}.
+                            In total, ${exportedMaterials.length} types of materials were exported with ${exportDataGroup[0][0].toLowerCase()} (${helpers.numberFormatters.formatComma(exportDataGroup[0][1])} tonnes) and  ${exportDataGroup[1][0].toLowerCase()} (${helpers.numberFormatters.formatComma(exportDataGroup[1][1])} tonnes) 
+                            being the largest exports, making up ${ helpers.numberFormatters.formatPct1dec(d3.sum([exportDataGroup[0][1], exportDataGroup[1][1]]) / exportedTonnes)} of all exports (by volume).
+                        `
+                    materialInfoTitle
+                        .text('About exported materials')
+                        .call(helpers.wrap, 450, 1)
+                    materialInfoText
+                        .text(`${exportText}`)
+                        .call(helpers.wrap, 500, 1.1)
+
+                    const materialInfoTitleBBox = materialInfoTitle.node().getBBox(),
+                        materialInfoTextBBox = materialInfoText.node().getBBox()
+
+                    materialInfoText.attr('transform', `translate(0, -${materialInfoTextBBox.height * 0.25})`)
+                    materialInfoTitle.attr('transform', `translate(0, -${materialInfoTextBBox.height * 0.25 + materialInfoTitleBBox.height})`)
+
                     d3.selectAll(`
                         .building-group,
                         .landfill-group,
@@ -2008,12 +2030,34 @@
                         .node:not(.export),
                         .nodeLabel:not(.export),
                         .destination-label:not(.export),
-                        #total-generation-node-group text
+                        #total-generation-node-group text,
+                        #landfill-group
                    `).style('opacity', 0)
                     d3.selectAll('.nodeLabel.material.volume.export textPath').html(function(d){ return `${helpers.numberFormatters.formatComma3dec(+this.getAttribute('data-export')/1000000)} Mt`})
+                    d3.selectAll('#materials-info-group *').style('opacity', null)
                 };
 
                 function landfillMouseover(){
+                    const  landfillData     = data.table.byMaterialFlow.filter(d => d.year === settings.year && d.targetClass === 'landfill').sort((a,b) => b.value - a.value),
+                        landfillDataExOther     = landfillData.filter( d => d.source.toLowerCase() !== 'other materials'),
+                        landfillTonnes     = d3.sum(landfillData.map(d => d.value )),
+                        landfillText = `A total of ${helpers.numberFormatters.formatComma(landfillTonnes)} tonnes of of waste was sent to landfill in ${settings.year}.
+                        Of the, ${landfillDataExOther.length} material types recorded, ${landfillDataExOther[0].source.toLowerCase()} (${helpers.numberFormatters.formatComma(landfillDataExOther[0].value)} tonnes) and  ${landfillDataExOther[1].source.toLowerCase()} (${helpers.numberFormatters.formatComma(landfillDataExOther[1].value)} tonnes) 
+                        were the most sent to landfill (by volume), making up ${ helpers.numberFormatters.formatPct1dec(d3.sum([landfillDataExOther[0].value, landfillDataExOther[1].value]) / landfillTonnes)} of all waste to landfill.
+                    `
+                    materialInfoTitle
+                        .text('About landfilled materials')
+                        .call(helpers.wrap, 450, 1)
+                    materialInfoText
+                        .text(`${landfillText}`)
+                        .call(helpers.wrap, 500, 1.1)
+
+                    const materialInfoTitleBBox = materialInfoTitle.node().getBBox(),
+                        materialInfoTextBBox = materialInfoText.node().getBBox()
+
+                    materialInfoText.attr('transform', `translate(0, -${materialInfoTextBBox.height * 0.25})`)
+                    materialInfoTitle.attr('transform', `translate(0, -${materialInfoTextBBox.height * 0.25 + materialInfoTitleBBox.height})`)
+
                     d3.selectAll(`
                         .building-group,
                         .landfill-group,
@@ -2023,22 +2067,23 @@
                         .nodeLabel:not(.landfill),
                         .destination-label:not(.landfill),
                         .product-text,
-                        #total-generation-node-group text
+                        #total-generation-node-group text,
+                        #ship-group
                    `).style('opacity', 0)
+                    d3.selectAll('#materials-info-group *').style('opacity', null)
                     d3.selectAll('.nodeLabel.material.volume.landfill textPath').html(function(d){ return `${helpers.numberFormatters.formatComma3dec(+this.getAttribute('data-landfill')/1000000)} Mt`})
                 };
 
                 function destinationMouseout(){
-                    d3.selectAll('.flow-link, .building-group, .landfill-group, .node, .nodeLabel, #total-generation-node-group text').style('opacity', null)
+                    d3.selectAll('#materials-info-group *').style('opacity', 0)
+                    d3.selectAll('.flow-link, .building-group, .landfill-group, .node, .nodeLabel, #total-generation-node-group text, #ship-group, #landfill-group').style('opacity', null)
                     d3.selectAll('.nodeLabel.material.volume textPath').html(function(d){ return `${helpers.numberFormatters.formatComma1dec(+this.getAttribute('data-collection')/1000000)} Mt`})
                 };
 
                 function totalGenMouseover(){
-                    console.log('total gen mouseover')
                     d3.selectAll(`
                         .flow-link:not(.generation), 
                         .mrf-data-label,
-                        .building-group,
                         .product-text,
                         .destination-label,
                         #waste-destination-label,
@@ -2047,7 +2092,7 @@
 
                 };
                 function totalGenMouseout(){
-                    d3.selectAll('.flow-link, .mrf-data-label, .building-group, .product-text, .destination-label, #waste-destination-label, #waste-product-label').style('opacity', null)
+                    d3.selectAll('.flow-link, .mrf-data-label, .product-text, .destination-label, #waste-destination-label, #waste-product-label').style('opacity', null)
                     d3.selectAll('#materials-info-group *, .destination-label.material').style('opacity', 0)
                 };
         };
@@ -2081,9 +2126,10 @@
                 .transition().duration(duration['step-1'])
                     .style('opacity', null)
             // Animate in the total generation node
-            d3.select(`total-generation-node`)
+            d3.select(`#total-generation-node-group`)
+                .attr('transform', 'scale(0)')
                 .transition().duration(duration['step-1'])
-                .attr('r', settings.geometry.generationTotalRadius)
+                .attr('transform', 'scale(1)')
             // Show the annotation
             d3.select('#main-title').transition().duration(duration['step-1'])
                 .style('opacity', null)
@@ -2100,11 +2146,11 @@
                 // Animate in material nodes and flows
                 d3.selectAll('.material-node-group')
                     .transition().duration(250)
-                    .delay((d, i) =>  i * 80 + 1000)
+                    .delay((d, i) =>  i * 80 + 500)
                         .style('opacity', null)
                 // Animate flows  
                 document.querySelectorAll('.generation.flow-link')
-                    .forEach((node, i) => helpers.animatePath(node, 1500,  1000+ 80 * i) )
+                    .forEach((node, i) => helpers.animatePath(node, 500,  500+ 80 * i) )
                 // Show the annotation
                 d3.select('#waste-materials-label').transition().duration(duration['step-2'])
                     .style('opacity', null)
@@ -2122,7 +2168,7 @@
             setTimeout(() => {
                 // Clear overlay
                 d3.selectAll('#destination-scene-overlay')
-                    .transition().duration(duration['step-3'])
+                    .transition().duration(duration['step-3'] * 0.5)
                         .style('opacity', 0)
 
                 // Show the annotation
