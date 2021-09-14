@@ -418,8 +418,8 @@
                     const chart = svg.append('g').attr('transform', `translate(${0} , ${0})`);     // Group element for the chart 
 
                     // b. Setup x and y scales using targets data (actuals allowed to go outside the scale)
-                    const yDomain =  settings.dims.showY0 ? d3.max(targetChartData.map(d => d.value)) > 0 ? [0, d3.max(targetChartData.map(d => d.value))] : [d3.min(chartData.map(d => d.value), 0)]                             // If settings.y0 is specified as true, extend the domain to zero on the y xis (for both positive and negative series)
-                                    : d3.extent(targetChartData.map(d => d.value)),                                                              // Or else use the y data extent (min and max) to set the domain (this emphasises the 'trend' at the expense of showing changes relative to zero)         
+                    const yDomain =  settings.dims.showY0 ? d3.max(targetChartData.map(d => d.value)) > 0 ? [0, d3.max(targetChartData.map(d => d.value).concat(actualsChartData.map(d => d.value) )) ] : [d3.min(targetChartData.map(d => d.value).concat(actualsChartData.map(d => d.value)), 0)]                             // If settings.y0 is specified as true, extend the domain to zero on the y xis (for both positive and negative series)
+                                    : d3.extent(targetChartData.map(d => d.value).concat(actualsChartData.map(d => d.value))),                                                              // Or else use the y data extent (min and max) to set the domain (this emphasises the 'trend' at the expense of showing changes relative to zero)         
                         xScale = d3.scaleLinear()
                                     .domain(d3.extent(targetChartData.map(d => d.year)))
                                     .range([chartMarginX, chartMarginX + chartWidth]),
