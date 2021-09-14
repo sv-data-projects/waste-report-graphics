@@ -75,13 +75,6 @@
                     opacity: 0;
                     text-shadow: 2px 2px 3px #000;
                 }
-                .material-destination-label  > .name {
-                    dominant-baseline: text-after-edge;
-                }
-    
-                .material-destination-label >.value {
-                    dominant-baseline: text-before-edge;
-                }
                 .group-label{
                     font-size: 20px;
                     font-weight: 500;
@@ -385,6 +378,7 @@
                     
                     labels.append("text")
                         .classed("name", true)
+                        .attr('transform', d => `translate(0, -${settings.scales.fontScale(d.data.value)*1.05})`)
                         .html(d => d.data.value < 1 ? d.data.code : d.data.name )
 
                     labels.append("text")
