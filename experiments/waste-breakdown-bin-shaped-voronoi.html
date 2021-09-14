@@ -30,10 +30,9 @@
                 padding: 1rem 1rem 0;
                 color:var(--svGreen);
                 mix-blend-mode: color-dodge;
-
             }
             .main-subtitle{
-                padding: 0 1rem 1rem;
+                padding: 0.5rem 1rem;
                 font-size: 2vw;
                 color: #fff;
                 mix-blend-mode: color-dodge;
@@ -155,7 +154,7 @@
                     width:              720,
                     height:             720,
                     margin: {
-                        top:            240,
+                        top:            190,
                         bottom:         10,
                         left:           190,
                         right:          40
@@ -272,7 +271,7 @@
 
                 // Update heading
                 d3.select('.main-subtitle').style('opacity', 0)
-                    .html(`Collected waste in ${settings.year} by material type, and broken down by volume of recovered product and volume to landfill`)
+                    .html(`Collected waste in ${settings.year} by material type, broken down by volume of recovered product and volume to landfill (shown as darker tessellations)`)
                     .transition().duration(1000)
                     .style('opacity', null)
                 settings.el.svg.transition().duration(1000)

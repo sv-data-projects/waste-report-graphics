@@ -31,7 +31,7 @@
                 mix-blend-mode: color-dodge;
             }
             .main-subtitle{
-                padding: 0 1rem 1rem;
+                padding: 0.5rem 1rem;
                 font-size: 2vw;
                 color: #fff;
                 mix-blend-mode: color-dodge;
@@ -269,7 +269,7 @@
                 // Render sequence
                 const psSeedFunction = new Math.seedrandom(settings.seed);  // (from seedrandom's doc) Use "new" to create a local prng without altering Math.random
                 settings.dims.treemapCenter = [settings.dims.width * 0.55, settings.dims.height * 0.5 ]
-                settings.legend.minY        = settings.dims.height * 0.575  
+                settings.legend.minY        = settings.dims.height * 0.65  
                 settings.dims.treemapRadius = settings.dims.width * 0.3
 
                 initData(data)
@@ -285,7 +285,7 @@
 
                 // Update heading
                 d3.select('.main-subtitle').style('opacity', 0)
-                    .html(`Collected waste in ${settings.year} by material type, and broken down by volume of recovered product and volume to landfill`)
+                    .html(`Collected waste in ${settings.year} by material type, broken down by volume of recovered product and volume to landfill (shown as darker tessellations)`)
                     .transition().duration(1000)
                     .style('opacity', null)
                 settings.el.svg.transition().duration(1000)
@@ -295,7 +295,7 @@
                 function initData(data) {
                     circlingPolygon = computeCirclingPolygon(settings.dims.treemapRadius);
                     const leafValues = [].concat.apply([], data.children.map(d => d.children)).map(d => d.value)
-                    settings.scales.fontScale.domain(d3.extent(leafValues)).range([8, 20]).clamp(true);
+                    settings.scales.fontScale.domain(d3.extent(leafValues)).range([12, 30]).clamp(true);
                 };
                 
                 function computeCirclingPolygon(radius) {
@@ -330,7 +330,7 @@
                 
                 function drawLegends(data) {
                     const legendHeight = 20,
-                        interLegend = 4,
+                        interLegend = 8,
                         colorWidth = legendHeight * 2,
                         categories = data.children.reverse();
                     
