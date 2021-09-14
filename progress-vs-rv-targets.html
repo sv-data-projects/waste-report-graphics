@@ -94,9 +94,17 @@
             }
             .sparkline{
                 fill: none;
+
+            }
+            .sparkline.target-trajectory{
                 stroke-width: 1.5px;
                 stroke: var(--svGreen);
                 stroke-dasharray: 3px 3px;
+            }
+            .sparkline.performance{
+                stroke-width: 1.5px;
+                stroke: var(--secondaryBottleGreenLight);
+                /* stroke-dasharray: 3px 3px; */
             }
             .marker.baseline{
                 fill: #fff;
@@ -172,9 +180,16 @@
         ////////////////////////////////////////////////////////////////////////////////
 
         // Instantiate settings and data objects
-        const settings = {
-            year:   {},
-            finYear: {},
+        const settings = { 
+            finYearToShowTo:     '2024-25',         // Financial year to show actuals up to 
+            year:   {
+                milestones:     {},
+                actuals:        []
+            },
+            finYear: {
+                milestones:     {},
+                actuals:        []
+            },
             dims: { 
                 height: 360,
                 width: 360,
@@ -189,11 +204,13 @@
         }
 
         const data = {          // Initiate data object that populated by the parseData() function, 
-            table:     {},
+            table:              {},
             schema: {
-                list:  {},
-                targets: {},
-            }
+                list:           {},
+                targets:        {},
+                actuals:        {}
+            },
+            charts:             {}
         }
 
         // Call build function
@@ -261,10 +278,13 @@
             if (settings.queryParameters.has('showCircleLabels')) { 
                 settings.display.showCircleLabels = settings.queryParameters.get('showCircleLabels') === 'false' ? false : true
             }
+            if (settings.queryParameters.has('year')) { 
+                settings.finYearToShowTo = settings.queryParameters.get('year')
+            }
         };
 
         async function transformData(dataTable) {   
-            // 1. Create lists and meta info objects
+            // 1. Create lists and meta info objects: Milestones
             const milestoneHeaders = Object.keys(dataTable[0]).filter(d => d.indexOf('_') > 0)
             data.schema.targets = milestoneHeaders.map(d => {      // return an object to hold and define useful meta info
                 const label = d.slice(0, d.indexOf('_')),
@@ -278,18 +298,41 @@
 
             data.schema.list.labels         = data.schema.targets.map(d => d.label)
             data.schema.list.milestoneFYs   = data.schema.targets.map(d => d.finYear)
-            data.schema.list.years          = data.schema.targets.map(d => d.year)
+            data.schema.list.milestoneYears = data.schema.targets.map(d => d.year)
 
-            // 1. Create charting data
-            data.charts = dataTable.map((obj, i) => {
+            // 2. Create lists and meta info objects: Actuals
+            data.schema.list.actualsFYs = Object.keys(dataTable[0]).filter(d => !isNaN(d.slice(0,4)))
+            data.schema.list.actualsYears = data.schema.list.actualsFYs.map(d => +d.slice(0,4) + 1)
+            data.schema.actuals = data.schema.list.actualsFYs.map( (d,i) => {
+                const label = d === settings.finYearToShowTo ? 'Current' : null,
+                    finYear = data.schema.list.actualsYears[i],  
+                    year    = d
+                return { label, finYear, year}
+            })
+
+            // 3. Create charting data for target trajectory and actuals
+            data.charts.milestones = dataTable.map((obj, i) => {
                 const dataArray = []
-                data.schema.list.years.forEach(year => {
+                data.schema.list.milestoneYears.forEach(year => {
                     const milestoneKeys =  Object.keys(obj).filter(d => !isNaN(+d.slice(d.indexOf('-')+1))),
                         matchedKeyIndex = milestoneKeys.map( d => 2000 + (+d.slice(d.indexOf('-')+1))).indexOf(year),
                         matchedKey = milestoneKeys[matchedKeyIndex]
+
                     dataArray.push({
                         year:       year,
                         value:      obj[matchedKey]
+                    })
+                }) 
+                return  dataArray
+            })
+
+            data.charts.actuals = dataTable.map((obj, i) => {
+                const dataArray = [],
+                    dateToFYtoData = data.schema.list.actualsFYs.slice(0, data.schema.list.actualsFYs.indexOf(settings.finYearToShowTo)+1)
+                dateToFYtoData.forEach((finYear, i) => {
+                    dataArray.push({
+                        year:       data.schema.list.actualsYears[i],
+                        value:      obj[finYear]
                     })
                 }) 
                 return  dataArray
@@ -313,7 +356,9 @@
 
             targetsData.forEach((obj, i) => {
                 const meta = data.schema.targets[i],        
-                    chartData = data.charts[i]
+                    targetChartData = data.charts.milestones[i],
+                    actualsChartData = data.charts.actuals[i]
+
                 // a. Setup DOM
                 const targetContainer = container.append('div').classed('progress-graphic-container', true),
                     infoContainer = targetContainer.append('div').classed(`${i%2 === 0 && settings.display.alternating ? 'left-container' : 'right-container'}`, true),
@@ -346,7 +391,7 @@
 
                 // Append circular label 
                 const labelRadius = radius * 1.05
-                const targetUp = chartData[chartData.length - 1].value > chartData[0].value ? true  : false
+                const targetUp = targetChartData[targetChartData.length - 1].value > targetChartData[0].value ? true  : false
 
                 if(settings.display.showCircleLabels){
                     const circularLabelPath = `M${0} ${0}  A${labelRadius}, ${labelRadius}, 0, 0, 1, ${0}, ${labelRadius * 2}
@@ -363,20 +408,20 @@
                         .attr('startOffset', targetUp ? '95%' : '5%')
                 } 
 
-                // Append a sparkline
+                // Append sparklines for target trajectory and actuals
                     // a. Setup SVG element for dimensions 
                     const chartMarginX = settings.dims.width * 0.35,
                         chartMarginY = settings.dims.width * 0.35,
                         chartWidth =   settings.dims.width - chartMarginX * 2, 
                         chartHeight =   settings.dims.height - chartMarginY * 2
 
-                    const chart = svg.append('g').attr('transform', `translate(${0} , ${0} )`);     // Group element for the chart 
+                    const chart = svg.append('g').attr('transform', `translate(${0} , ${0})`);     // Group element for the chart 
 
-                    // b. Setup x and y scales.  
-                    const yDomain =  settings.dims.showY0 ? d3.max(chartData.map(d => d.value)) > 0 ? [0, d3.max(chartData.map(d => d.value))] : [d3.min(chartData.map(d => d.value), 0)]                             // If settings.y0 is specified as true, extend the domain to zero on the y xis (for both positive and negative series)
-                                    : d3.extent(chartData.map(d => d.value)),                                                              // Or else use the y data extent (min and max) to set the domain (this emphasises the 'trend' at the expense of showing changes relative to zero)         
+                    // b. Setup x and y scales using targets data (actuals allowed to go outside the scale)
+                    const yDomain =  settings.dims.showY0 ? d3.max(targetChartData.map(d => d.value)) > 0 ? [0, d3.max(targetChartData.map(d => d.value))] : [d3.min(chartData.map(d => d.value), 0)]                             // If settings.y0 is specified as true, extend the domain to zero on the y xis (for both positive and negative series)
+                                    : d3.extent(targetChartData.map(d => d.value)),                                                              // Or else use the y data extent (min and max) to set the domain (this emphasises the 'trend' at the expense of showing changes relative to zero)         
                         xScale = d3.scaleLinear()
-                                    .domain(d3.extent(chartData.map(d => d.year)))
+                                    .domain(d3.extent(targetChartData.map(d => d.year)))
                                     .range([chartMarginX, chartMarginX + chartWidth]),
                         yScale = d3.scaleLinear().domain(yDomain)
                                     .range([settings.dims.height - chartMarginY, chartMarginY]);
@@ -391,26 +436,32 @@
                         unit = obj.Unit === "pct" ? '' : obj.Unit
 
                     // d. Render trajectory path
-                    chart.append('path').classed('sparkline', true)                                 // Append an SVG path for the sparkline
-                        .datum(chartData.filter(d => d.year !== settings.year.Current && d.value !== 'na'))                                                                // ..using the supplied data array
+                    const trajectoryData = targetChartData.filter(d => d.value !== 'na')
+                    chart.append('path').classed('sparkline target-trajectory', true)                                 // Append an SVG path for the sparkline
+                        .datum(trajectoryData)                                                                // ..using the supplied data array
                         .attr('d', line);             
+
+                    // d. Render actuals path
+                    chart.append('path').classed('sparkline performance', true)                                 // Append an SVG path for the sparkline
+                        .datum(actualsChartData)                                                                // ..using the supplied data array
+                        .attr('d', line);   
 
                     // e. Render markers                                           
                     chart.append('circle').classed('baseline marker', true)            // Append circle marker at the start of the line
-                        .attr('cx', xScale(chartData[0].year))
-                        .attr('cy', yScale(chartData[0].value))
+                        .attr('cx', xScale(targetChartData[0].year))
+                        .attr('cy', yScale(targetChartData[0].value))
                     chart.append('circle').classed('current marker', true)                // Append circle marker at current year
-                        .attr('cx', xScale(chartData[1].year))
-                        .attr('cy', yScale(chartData[1].value))
+                        .attr('cx', xScale(actualsChartData[data.schema.list.actualsFYs.indexOf(settings.finYearToShowTo)].year))
+                        .attr('cy', yScale(actualsChartData[data.schema.list.actualsFYs.indexOf(settings.finYearToShowTo)].value))
                     chart.append('circle').classed('target marker outer', true)              // Append circle marker at the end of the line
-                        .attr('cx', xScale(chartData[chartData.length - 1].year))
-                        .attr('cy', yScale(chartData[chartData.length - 1].value))
+                        .attr('cx', xScale(targetChartData[targetChartData.length - 1].year))
+                        .attr('cy', yScale(targetChartData[targetChartData.length - 1].value))
                     chart.append('circle').classed('target marker spacer', true)              // Append circle marker at the end of the line
-                        .attr('cx', xScale(chartData[chartData.length - 1].year))
-                        .attr('cy', yScale(chartData[chartData.length - 1].value))
+                        .attr('cx', xScale(targetChartData[targetChartData.length - 1].year))
+                        .attr('cy', yScale(targetChartData[targetChartData.length - 1].value))
                     chart.append('circle').classed('target marker center', true)              // Append circle marker at the end of the line
-                        .attr('cx', xScale(chartData[chartData.length - 1].year))
-                        .attr('cy', yScale(chartData[chartData.length - 1].value))
+                        .attr('cx', xScale(targetChartData[targetChartData.length - 1].year))
+                        .attr('cy', yScale(targetChartData[targetChartData.length - 1].value))
 
                     // f. Render labels    
                     chart.append('text').classed('label header', true)
@@ -421,32 +472,32 @@
                         .call(helpers.wrap, settings.dims.width * 0.45, 1.1)
 
                     chart.append('text').classed('label baseline', true)
-                        .attr('x', xScale(chartData[0].year) - 40)
-                        .attr('y', yScale(chartData[0].value) - 12)
+                        .attr('x', xScale(targetChartData[0].year) - 40)
+                        .attr('y', yScale(targetChartData[0].value) - 12)
                         .text('Baseline')
                     chart.append('text').classed('label baseline unit', true)
-                        .attr('x', xScale(chartData[0].year) - 40)
-                        .attr('y', yScale(chartData[0].value) + 0)
+                        .attr('x', xScale(targetChartData[0].year) - 40)
+                        .attr('y', yScale(targetChartData[0].value) + 0)
                         .attr('dy', 0)
-                        .text(`${numberFormatter(chartData[0].value)} ${unit} in ${settings.finYear.Baseline}` )
+                        .text(`${numberFormatter(targetChartData[0].value)} ${unit} in ${settings.finYear.Baseline}` )
                         .call(helpers.wrap, settings.dims.width * 0.15, 1.1)
 
                     chart.append('text').classed('label target', true)
-                        .attr('x', xScale(chartData[chartData.length - 1].year) + 40)
-                        .attr('y', yScale(chartData[chartData.length - 1].value) - 6)
+                        .attr('x', xScale(targetChartData[targetChartData.length - 1].year) + 40)
+                        .attr('y', yScale(targetChartData[targetChartData.length - 1].value) - 6)
                         .text(`Targeting` )
                     chart.append('text').classed('label target unit', true)
-                        .attr('x', xScale(chartData[chartData.length - 1].year) + 40)
-                        .attr('y', yScale(chartData[chartData.length - 1].value) + 6 )
+                        .attr('x', xScale(targetChartData[targetChartData.length - 1].year) + 40)
+                        .attr('y', yScale(targetChartData[targetChartData.length - 1].value) + 6 )
                         .attr('dy', 0)
-                        .text(`${numberFormatter(chartData[chartData.length - 1].value)}  ${unit} by ${settings.finYear.Target}` )
+                        .text(`${numberFormatter(targetChartData[targetChartData.length - 1].value)}  ${unit} by ${settings.finYear.Target}` )
                         .call(helpers.wrap, settings.dims.width * 0.15, 1.1)
 
                     chart.append('text').classed('label current', true)
-                        .attr('x', xScale(chartData[1].year) + 8)
-                        .attr('y', yScale(chartData[1].value) + 3 )
+                        .attr('x', xScale(actualsChartData[data.schema.list.actualsFYs.indexOf(settings.finYearToShowTo)].year) + 8)
+                        .attr('y', yScale(actualsChartData[data.schema.list.actualsFYs.indexOf(settings.finYearToShowTo)].value) + 3 )
                         .attr('dy', 0)
-                        .text(`${numberFormatter(chartData[1].value)} ${unit} in ${settings.finYear.Current}`)
+                        .text(`${numberFormatter(actualsChartData[data.schema.list.actualsFYs.indexOf(settings.finYearToShowTo)].value)} ${unit} in ${settings.finYearToShowTo}`)
                         .call(helpers.wrap, settings.dims.width * 0.25, 1.1)
             })
 
