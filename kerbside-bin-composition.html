@@ -217,7 +217,6 @@
             svg.on('mouseover', () => document.getElementById('svg-title').innerHTML = null )
                 .on('mouseout', () =>  document.getElementById('svg-title').innerHTML = svgTitleText )
 
-
             // 3. Render Recycling breakdown "Bin breakdown graphic"
             const recycleBinScale = 15, chartBgRadius = 90,
                 recyclingBreakdownChart = svg.append('g').classed('icon-chart', true).attr('id', 'recycling-breakdown-icon-chart')

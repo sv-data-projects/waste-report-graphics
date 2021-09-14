@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="Experimental bin-shaped voronoi">
+        <meta name="author" content="Little Sketches">
+        <script src="https://d3js.org/d3.v7.min.js" charset="utf-8"></script>
+        <script src="https://rawcdn.githack.com/Kcnarf/d3-weighted-voronoi/v1.0.1/build/d3-weighted-voronoi.js"></script>
+        <script src="https://rawcdn.githack.com/Kcnarf/d3-voronoi-map/v2.0.1/build/d3-voronoi-map.js"></script>
+        <script src="https://rawcdn.githack.com/Kcnarf/d3-voronoi-treemap/v1.1.1/build/d3-voronoi-treemap.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/seedrandom/2.4.3/seedrandom.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="../css/core.css"></link>
+        <style>
+ 
+            /***************************/
+            /*****  TYPOGRAPHY       ***/
+            /***************************/
+
+            body{
+                font-family: 'DIN Next LT Pro';
+                margin: 0;
+                background: radial-gradient(circle,  var(--tertiaryCard) 0%,  var(--xCharcoal) 100%);
+                height: 100vh;
+            }
+            .main-title{
+                font-size: 5vw;
+                font-weight: 500;
+                text-transform: uppercase;
+                padding: 1rem 1rem 0;
+                color:var(--svGreen);
+                mix-blend-mode: color-dodge;
+
+            }
+            .main-subtitle{
+                padding: 0 1rem 1rem;
+                font-size: 2vw;
+                color: #fff;
+                mix-blend-mode: color-dodge;
+            }
+            .outline {
+                stroke: #fff;   
+                fill: transparent;
+            }
+            .cell {
+                stroke: white;
+                stroke-width: 1px;
+                mix-blend-mode: overlay;
+            }
+            .cell.landfill {
+                opacity: 0.7;
+                mix-blend-mode: multiply;
+            }
+            .cell.blur{
+                mix-blend-mode: luminosity;
+            }
+            .cell.highlight{
+                mix-blend-mode: difference;
+            }
+            .material-destination-label {
+                text-anchor: middle;
+                fill: white;
+                font-weight: normal;
+                font-size: 8px;
+                pointer-events: none;
+                opacity: 0;
+                text-shadow: 2px 2px 3px #000;
+            }
+            .material-destination-label > .name {
+                dominant-baseline: text-after-edge;
+            }
+            .material-destination-label > .value {
+                dominant-baseline: text-before-edge;
+            }   
+            .group-label{
+                font-size: 16px;
+                font-weight: 500;
+                text-anchor: middle;
+                dominant-baseline: middle;
+                fill: white;
+                text-shadow: 3px 3px 5px #000;
+                pointer-events: none;
+            }
+            .hoverer {
+                fill: transparent;
+                stroke: white;
+                stroke-width:0px;
+            }
+            .bin-element{
+                fill: #fff;
+                pointer-events: none;
+            }
+            .paper-and-cardboard.cell{
+                fill: var(--xBlueCyan);
+            }
+            .plastics.cell{
+                fill: var(--tertiaryYellow);
+            }
+            .metals.cell{
+                fill: var(--xMidBlue);
+            }
+            .glass.cell{
+                fill: var(--tertiaryPurpleLight);
+            }
+            .organics.cell{
+                fill: var(--xGreen);
+            }
+            .aggregates-masonry-and-soil.cell{
+                fill: var(--tertiaryRedLight);
+            }
+            .rubber.cell{
+                fill: var(--xMagenta);
+            }
+            .textiles.cell{
+                fill: var(--xOrange);
+            }
+            .other-materials.cell{
+                fill: var(--secondaryGrey);
+            }
+        </style>
+    </head>
+
+
+    <body>
+        <div class = 'main-title'>Victorian waste breakdown</div>
+        <div class = 'main-subtitle'></div>
+        <div class = "vis-container">
+            <svg id ="vis"></svg>
+        </div>
+
+        <script>
+
+            /////////////////////////////////////////////////////////////////////////////////
+            /// 0. BUILD SEQUENCE: INIT SETTINGS AND DATA OBJECTS AND LOADING => RENDER  ///
+            ////////////////////////////////////////////////////////////////////////////////
+
+            // Instantiate settings and data objects
+            const settings = { 
+                year:                   '2019-20',
+                el: {
+                    svg:    d3.select('#vis'),
+                },
+                scales: {
+                    fontScale: d3.scaleLinear()
+                },
+                // seed:       300,               // Layout seed number: if not specified tesselation seed will be random
+                clipPoly: [
+                    [0,     0 ],
+                    [0,     400],
+                    [70,    540],
+                    [300,   540 ],
+                    [380,   0 ]
+                ],
+                dims: {
+                    width:              720,
+                    height:             720,
+                    margin: {
+                        top:            240,
+                        bottom:         10,
+                        left:           190,
+                        right:          40
+                    }
+                },          
+            }
+
+            const data = {
+                table:                  {},
+                list:                   {},
+                nestedData:             {}
+            }
+
+            // Call build function
+            buildFromGSheetData(settings)
+
+            function buildFromGSheetData(settings) {
+                // 0. Prepare scene for fade in animation
+                settings.el.svg.style('opacity', 0)
+
+                // 1. Specify data table links for each table used (tsv published output from each separate sheet/table)
+                const gsTableLinks =   {
+                    byMaterialFlow:    'https://docs.google.com/spreadsheets/d/e/2PACX-1vSimVJWCqYLTijgqeU-SPGdAFT6wpGprHgjPdpxEElWurVvl28JYr7dHGE3OCSjF4VYH2_QggJUnveO/pub?gid=272100684&single=true&output=tsv',
+                }
+
+                // 2. Asynchronous data load (with Promise.all) and D3 (Fetch API) 
+                Promise.all(
+                    Object.values(gsTableLinks).map(link => d3.tsv(link))       // Pass in array of d3.tsv loaders with each link
+                ).then( rawData => {
+                    // a. Parse each loaded data table and store in data.tables object, using the parseTable helper 
+                    rawData.forEach((tableData, i) => {  parseTable(Object.keys(gsTableLinks)[i], tableData) })
+                    return data
+                }).then( async (data) => {
+                    // 3. Initiate vis build sequence with data now loaded
+                    await applyQuerySettings(settings)                   // a. Update settings if a query string is passed in
+                    await transformData(data.table.byMaterialFlow)          // b. Parse data
+                    await renderVis(data.nestedData)                        // c. Render visualisation(s)
+                })
+
+                // X. Table data parsing function: trim() header white space and prase numbers with "$" and "," stripped. 
+                const parseTable = (tableName, tableData) => {
+                    data.table[tableName] = tableData.map(row => {
+                        const newObj = {}
+                        Object.entries(row).forEach(([key, value]) => {
+                            switch(key.trim().toLowerCase()){
+                                case 'year':
+                                    newObj[key.trim()] =  value
+                                    break     
+                                default:
+                                    newObj[key.trim()] = isNaN(parseFloat(value.replace(/\$|,/g, ''))) ? value : parseFloat(value.replace(/\$|,/g, '')) 
+                            }
+                        })
+                        return newObj
+                    })
+                };                 
+            };
+
+
+            //////////////////////////////////
+            // 1. PARSE AND WRANGLE DATA   ///
+            //////////////////////////////////
+
+            async function applyQuerySettings(settings){
+                // i. Check for query parameters and update material. A date set by the query selector is set while parsing input data 
+                settings.queryParameters = new URLSearchParams(window.location.search)
+                if (settings.queryParameters.has('year')) { 
+                    settings.year = settings.queryParameters.get('year')  
+                }
+            };
+
+            async function transformData(wasteData){
+                // Creates a nested dataset
+                data.nestedData = {
+                    name: "waste",
+                    children: []
+                }
+                data.list.materials = [...new Set(wasteData.filter(d => d.year === settings.year && d.level === 1).map(d => d.source))]
+                data.list.materials.forEach(material => {
+                    const materialObj = {
+                        name:       material,
+                        children:   []
+                    }
+                    const materialChildrenData = wasteData.filter(d => d.year === settings.year && d.materialClass === helpers.slugify(material) && (d.level === 2 || (d.level === 1 && d.targetClass === 'landfill') ) )
+                    materialChildrenData.forEach(mChildObj => {
+                        materialObj.children.push({
+                            name:   mChildObj.targetClass === 'landfill' ? 'Landfilled' : mChildObj.target,
+                            type:   mChildObj.targetClass,
+                            value:  mChildObj.value
+                        })
+                    })
+                    data.nestedData.children.push(materialObj)
+                })
+            };
+
+
+            /////////////////////////////////
+            // 2. RENDER THE VORONOI VIS  ///
+            /////////////////////////////////
+
+            async function renderVis(data){
+                // Render sequence
+                let hierarchy, polygonClip
+                const psSeedFunction = new Math.seedrandom(settings.seed);  // (from seedrandom's doc) Use "new" to create a local prng without altering Math.random
+                initData(data)
+                initLayout(data)
+
+                hierarchy = d3.hierarchy(data).sum( d => d.value)
+
+                d3.voronoiTreemap()
+                    .prng(psSeedFunction)       // Pass a psuedo-random seed function to produce a stable layout ()
+                    .clip(settings.clipPoly)(hierarchy) 
+
+                drawTreemap(hierarchy)
+
+                // Update heading
+                d3.select('.main-subtitle').style('opacity', 0)
+                    .html(`Collected waste in ${settings.year} by material type, and broken down by volume of recovered product and volume to landfill`)
+                    .transition().duration(1000)
+                    .style('opacity', null)
+                settings.el.svg.transition().duration(1000)
+                    .style('opacity', null)
+                
+                // Supporting functions
+                function initData(data) {
+                    const leafValues = [].concat.apply([], data.children.map(d => d.children)).map(d => d.value)
+                    settings.scales.fontScale.domain(d3.extent(leafValues)).range([8, 20]).clamp(true);
+                };
+                
+                function initLayout(data) {
+                    settings.dims.treemapCenter = [settings.dims.width * 0.5, settings.dims.height * 0.35]
+
+                    settings.el.svg 
+                        .attr("viewBox", `0 0 ${settings.dims.width} ${settings.dims.height}`)
+                    
+                    settings.el.drawingArea = settings.el.svg.append("g")
+                        .classed("drawingArea", true)
+                        .attr("transform", `translate(${[settings.dims.margin.left, settings.dims.margin.top]})` )
+                    
+                    settings.el.treemapContainer = settings.el.drawingArea.append("g")
+                        .classed("treemap-container", true)
+                        .attr("transform", "translate("+settings.dims.treemapCenter+")");
+                    
+                    settings.el.treemapContainer.append("path")
+                        .classed("outline", true)
+                        .attr("transform", `translate(${[-settings.dims.width * 0.5, -settings.dims.height * 0.5]})`)
+                        .attr("d", "M"+settings.clipPoly.join(",")+"Z");
+                }; 
+                
+                function drawTreemap(hierarchy) {
+                    const leaves = hierarchy.leaves();
+
+                    const cells = settings.el.treemapContainer.append("g")
+                        .classed('cells', true)
+                        .attr("transform", `translate(${[-settings.dims.width * 0.5, -settings.dims.height * 0.5]})`)
+                        .selectAll(".cell")
+                        .data(leaves)
+                        .enter()
+                        .append("path")
+                            .attr("class", (d, i) => `cell ${helpers.slugify(d.parent.data.name)} ${helpers.slugify(d.data.type)} idx-${i}`)
+                            .attr("d", d => "M"+d.polygon.join(",")+"z")
+
+                    const labels = settings.el.treemapContainer.append("g")
+                        .classed('labels', true)
+                        .attr("transform", `translate(${[-settings.dims.width * 0.5, -settings.dims.height * 0.5]})`)
+                        .selectAll(".material-destination-label")
+                        .data(leaves)
+                        .enter()
+                            .append("g")
+                            .attr('class', (d,i) => `material-destination-label idx-${i}`)
+                            .attr("transform", d => `translate(${[d.polygon.site.x, d.polygon.site.y]})` )
+                            .style("font-size", d => settings.scales.fontScale(d.data.value) )
+                    
+                    labels.append("text")
+                        .classed("name", true)
+                        .html(d => d.data.value < 1 ? d.data.code : d.data.name )
+
+                    labels.append("text")
+                        .classed("value", true)
+                        .text(d => helpers.numberFormatters.formatComma(d.data.value)+' kt' )
+                    
+                    const hoverers = settings.el.treemapContainer.append("g")
+                        .classed('hoverers', true)
+                        .attr("transform", `translate(${[-settings.dims.width * 0.5, -settings.dims.height * 0.5]})`)
+                        .selectAll(".hoverer")
+                        .data(leaves)
+                        .enter()
+                            .append("path")
+                            .attr("class", (d,i) => `${helpers.slugify(d.parent.data.name)} idx-${i} hoverer`)
+                            .attr("d", d => "M"+d.polygon.join(",")+"z" )
+                            .on('mouseover', function(){
+                                const idxClass = this.classList[1]
+                                d3.selectAll(`.group-label`).style('opacity', 0)
+                                d3.selectAll(`.cell:not(.${idxClass})`).classed('blur', true)
+                                d3.select(`.cell.${idxClass}`).classed('highlight', true)
+                                d3.select(`.material-destination-label.${idxClass}`).style('opacity', 1)
+                            })
+                            .on('mouseout', () => {
+                                d3.selectAll(`.group-label, .cell`).style('opacity', null).classed('highlight', false).classed('blur', false)
+                                d3.selectAll(`.material-destination-label`).style('opacity', 0)
+                            })
+                    
+                    const grouplabels = settings.el.treemapContainer.append("g")
+                        .classed('material-group-label', true)
+                        .attr("transform", `translate(${[-settings.dims.width * 0.5, -settings.dims.height * 0.5]})`)
+
+                    hierarchy.data.children.forEach( obj => {
+                        const materialName = obj.name,
+                            materialClass = helpers.slugify(materialName)
+                        let xMin, xMax, yMin, yMax
+
+                        document.querySelectorAll('.hoverer.'+materialClass).forEach((cell, i) => {
+                            const bbox = cell.getBBox()
+                            if(i === 0){ // Initiate to first polygon
+                                xMin = bbox.x
+                                xMax = bbox.x + bbox.width
+                                yMin = bbox.y
+                                yMax = bbox.y + bbox.height
+                            } else {
+                                xMin = bbox.x < xMin ? bbox.x : xMin
+                                xMax = bbox.x + bbox.width > xMax ? bbox.x + bbox.width : xMax
+                                yMin = bbox.y < yMin ? bbox.y : yMin
+                                yMax = bbox.y + bbox.height > yMax ? bbox.y + bbox.height : yMax
+                            }
+                        })
+                        grouplabels.append('text').classed(`${materialClass} group-label`, true)
+                            .attr('x', d3.mean([xMin, xMax]) )
+                            .attr('y', d3.mean([yMin, yMax]) )
+                            .attr('dy', 0)
+                            .text(materialName)
+                            .call(helpers.wrap, 120, 0.9)
+                    })
+
+                    // Add bin graphic lements
+                    const iconEls = {
+                        bin:        "M16.444-2.62a.889.864 0 01-.888.864.889.864 0 01-.89-.864.889.864 0 01.89-.865.889.864 0 01.888.865M15.4-6.07l.582-12.974H1.796l.8 17.776c.028.693.615 1.24 1.328 1.24h9.29A3.386 3.386 0 0112.2-3.77c.482-1.33 1.75-2.242 3.199-2.3zm4.156-15.567h-1.334v.865h1.334a.438.438 0 00.444-.432.438.438 0 00-.444-.433zM15.809-5.2h-.005a2.348 2.348 0 00-.248-.013c-1.456-.008-2.652 1.116-2.694 2.531-.042 1.415 1.085 2.604 2.539 2.678 1.453.075 2.702-.993 2.813-2.404.111-1.412-.957-2.651-2.405-2.792zm-.253 4.308c-.982 0-1.778-.773-1.778-1.728s.796-1.729 1.778-1.729c.981 0 1.777.774 1.777 1.729 0 .458-.187.898-.52 1.222a1.803 1.803 0 01-1.257.506zm1.333-19.015a.439.439 0 00.444-.432v-.432H.444A.438.438 0 000-20.34c0 .239.199.432.444.432zm.444-2.16c0-.24-.199-.433-.444-.433H2.667c-.565 0-1.069.347-1.258.864h15.924z",
+                        binBody:    "M15.4-6.069l.582-12.974H1.796l.8 17.776c.028.693.615 1.24 1.328 1.24h9.29A3.386 3.386 0 0112.2-3.77c.482-1.33 1.75-2.242 3.199-2.3z",
+                        binWheel:   "M16.444-2.62a.877.877 0 01-.888.864.877.877 0 01-.89-.864c0-.478.399-.865.89-.865.49 0 .888.387.888.865M15.81-5.2h-.005a2.348 2.348 0 00-.248-.013c-1.456-.008-2.652 1.116-2.694 2.531-.042 1.415 1.085 2.604 2.539 2.678 1.453.075 2.702-.993 2.813-2.404.111-1.412-.957-2.651-2.405-2.792zm-.253 4.308c-.982 0-1.778-.773-1.778-1.728s.796-1.729 1.778-1.729c.981 0 1.777.774 1.777 1.729 0 .458-.187.898-.52 1.222a1.803 1.803 0 01-1.257.506z",
+                        binLid:     "M19.556-21.636h-1.334v.865h1.334a.438.438 0 00.444-.432.438.438 0 00-.444-.433zm-2.667 1.729a.439.439 0 00.444-.432v-.432H.444A.438.438 0 000-20.34c0 .239.199.432.444.432zm.444-2.16c0-.24-.199-.433-.444-.433H2.667c-.565 0-1.069.347-1.258.864h15.924z",
+                    }
+
+                    const binEls = settings.el.treemapContainer.append("g").classed('bin-elements', true),
+                        binElScale = 23
+                    binEls.append('path').classed('bin-element', true)
+                        .attr('d', iconEls.binLid)
+                        .attr('transform', `translate(${30}, ${95}) scale(${-binElScale}, ${binElScale})`)
+                    binEls.append('path').classed('bin-element', true)
+                        .attr('d', iconEls.binWheel)
+                        .attr('transform', `translate(${-10}, ${190}) scale(${-binElScale}, ${binElScale})`)
+                };
+            }; // end renderVis()           
+
+
+            //////////////////////////////////////////////////////////////////////////////////////////
+            /// X HELPER FUNCTIONS | Formatting and text manipulations helper functions            ///
+            //////////////////////////////////////////////////////////////////////////////////////////
+
+            const helpers= {
+                numberFormatters: {
+                    formatComma:           	d3.format(",.0f"),
+                    formatComma1dec:       	d3.format(",.1f"),
+                    formatComma2dec:       	d3.format(",.2f"),
+                    formatInteger:         	d3.format(".0f"),   
+                    formatCostInteger:     	d3.format("$,.0f"),  
+                    formatCost1dec:        	d3.format("$,.1f"),  
+                    formatPct:          	d3.format(".0%"), 
+                    formatPct1dec:          d3.format(".1%")  
+                },
+                numberParsers: {
+                    parseDateSlash: d3.timeParse("%d/%m/%Y")
+                },
+                slugify: function (str) {
+                    str = str.replace(/^\s+|\s+$/g, ''); // trim
+                    str = str.toLowerCase();
+                
+                    // remove accents, swap ñ for n, etc
+                    var from = "àáäâèéëêìíïîòóöôùúüûñç·/_,:;";
+                    var to   = "aaaaeeeeiiiioooouuuunc------";
+                    for (var i=0, l=from.length ; i<l ; i++) {
+                        str = str.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
+                    }
+
+                    str = str.replace(/[^a-z0-9 -]/g, '') // remove invalid chars
+                        .replace(/\s+/g, '-') // collapse whitespace and replace by -
+                        .replace(/-+/g, '-'); // collapse dashes
+
+                    return str;
+                },
+                wrap: function(text, width, lineHeight, centerVertical = false) {
+                    text.each(function() {
+                        let text = d3.select(this),
+                            words = text.text().split(/\s+/).reverse(),
+                            word,
+                            line = [],
+                            lineNumber = 0,
+                            y = text.attr("y"),
+                            x = text.attr("x"),
+                            fontSize = parseFloat(text.style("font-size")),
+                            dy = parseFloat(text.attr("dy")),
+                            tspan = text.text(null).append("tspan").attr("x", x).attr("y", y).attr("dy", dy + "em");
+
+                        while (word = words.pop()) {
+                            line.push(word);
+                            tspan.text(line.join(" "));
+
+                            if (tspan.node().getComputedTextLength() > width) {
+                                line.pop();
+                                tspan.text(line.join(" "));
+                                line = [word];
+                                tspan = text.append("tspan")
+                                    .attr("x", x)
+                                    .attr("y",  y)
+                                    .attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+                            }                    
+                        }            
+                        if(centerVertical){
+                            text.style("transform",  "translateY(-"+(10 * (lineNumber))+"px)")
+                        }
+                    })
+                }
+            }
+
+
+        </script>
+    </body>
+
+</html>
+
