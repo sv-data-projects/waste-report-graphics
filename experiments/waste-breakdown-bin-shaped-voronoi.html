@@ -265,7 +265,7 @@
 
                 // Update heading
                 d3.select('.main-subtitle').style('opacity', 0)
-                    .html(`Collected waste in ${settings.year} by material type, broken down by volume of recovered product and volume to landfill (shown as darker tessellations)`)
+                    .html(`Waste by material type in ${settings.year}, broken down by the volume of recovered product(s) and volume to landfill (shown as darker tessellations)`)
                     .transition().duration(1000)
                     .style('opacity', null)
                 settings.el.svg.transition().duration(1000)
@@ -324,7 +324,7 @@
                     labels.append("text")
                         .classed("name", true)
                         .attr('transform', d => `translate(0, -${settings.scales.fontScale(d.data.value)*1.05})`)
-                        .html(d => d.data.value < 1 ? d.data.code : d.data.name )
+                        .html(d => d.data.type === 'landfill' ? `${d.parent.data.name} waste to landfill` : `Recovered ${d.data.name.toLowerCase()}`)
 
                     labels.append("text")
                         .classed("value", true)
@@ -341,13 +341,13 @@
                             .attr("d", d => "M"+d.polygon.join(",")+"z" )
                             .on('mouseover', function(){
                                 const idxClass = this.classList[1]
-                                d3.selectAll(`.group-label`).style('opacity', 0)
+                                d3.selectAll(`.group-label, .bin-elements`).style('opacity', 0)
                                 d3.selectAll(`.cell:not(.${idxClass})`).classed('blur', true)
                                 d3.select(`.cell.${idxClass}`).classed('highlight', true)
                                 d3.select(`.material-destination-label.${idxClass}`).style('opacity', 1)
                             })
                             .on('mouseout', () => {
-                                d3.selectAll(`.group-label, .cell`).style('opacity', null).classed('highlight', false).classed('blur', false)
+                                d3.selectAll(`.group-label, .cell, .bin-elements`).style('opacity', null).classed('highlight', false).classed('blur', false)
                                 d3.selectAll(`.material-destination-label`).style('opacity', 0)
                             })
                     

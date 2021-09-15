@@ -155,12 +155,11 @@
                     width: 1080,
                     margin: {top: 10, right: 10, bottom: 10, left: 30}
                 },
-                legend: {
-
-                }, 
+                legend: {}, 
                 scales: {
                     fontScale: d3.scaleLinear()
                 },
+                showMaterialLabels: true,
                 // seed:       18,               // Layout seed number14, 300
             }
 
@@ -278,7 +277,7 @@
 
                 // Update heading
                 d3.select('.main-subtitle').style('opacity', 0)
-                    .html(`Collected waste in ${settings.year} by material type, broken down by volume of recovered product and volume to landfill (shown as darker tessellations)`)
+                    .html(`Waste by material type in ${settings.year}, broken down by the volume of recovered product(s) and volume to landfill (shown as darker tessellations)`)
                     .transition().duration(1000)
                     .style('opacity', null)
                 settings.el.svg.transition().duration(1000)
@@ -379,7 +378,7 @@
                     labels.append("text")
                         .classed("name", true)
                         .attr('transform', d => `translate(0, -${settings.scales.fontScale(d.data.value)*1.05})`)
-                        .html(d => d.data.value < 1 ? d.data.code : d.data.name )
+                        .html(d => d.data.type === 'landfill' ? `${d.parent.data.name} waste to landfill` : `Recovered ${d.data.name.toLowerCase()}` )
 
                     labels.append("text")
                         .classed("value", true)
@@ -406,37 +405,38 @@
                                 d3.selectAll(`.material-destination-label`).style('opacity', 0)
                             })
 
-                    const grouplabels = settings.el.treemapContainer.append("g")
-                        .classed('material-group-label', true)
-                        .attr("transform", `translate(${[-settings.dims.treemapRadius, -settings.dims.treemapRadius]})`)
+                    if(settings.showMaterialLabels){
+                        const grouplabels = settings.el.treemapContainer.append("g")
+                            .classed('material-group-label', true)
+                            .attr("transform", `translate(${[-settings.dims.treemapRadius, -settings.dims.treemapRadius]})`)
 
-                    hierarchy.data.children.forEach( obj => {
-                        const materialName = obj.name,
-                            materialClass = helpers.slugify(materialName)
-                        let xMin, xMax, yMin, yMax
+                        hierarchy.data.children.forEach( obj => {
+                            const materialName = obj.name,
+                                materialClass = helpers.slugify(materialName)
+                            let xMin, xMax, yMin, yMax
 
-                        document.querySelectorAll('.hoverer.'+materialClass).forEach((cell, i) => {
-                            const bbox = cell.getBBox()
-                            if(i === 0){ // Initiate to first polygon
-                                xMin = bbox.x
-                                xMax = bbox.x + bbox.width
-                                yMin = bbox.y
-                                yMax = bbox.y + bbox.height
-                            } else {
-                                xMin = bbox.x < xMin ? bbox.x : xMin
-                                xMax = bbox.x + bbox.width > xMax ? bbox.x + bbox.width : xMax
-                                yMin = bbox.y < yMin ? bbox.y : yMin
-                                yMax = bbox.y + bbox.height > yMax ? bbox.y + bbox.height : yMax
-                            }
+                            document.querySelectorAll('.hoverer.'+materialClass).forEach((cell, i) => {
+                                const bbox = cell.getBBox()
+                                if(i === 0){ // Initiate to first polygon
+                                    xMin = bbox.x
+                                    xMax = bbox.x + bbox.width
+                                    yMin = bbox.y
+                                    yMax = bbox.y + bbox.height
+                                } else {
+                                    xMin = bbox.x < xMin ? bbox.x : xMin
+                                    xMax = bbox.x + bbox.width > xMax ? bbox.x + bbox.width : xMax
+                                    yMin = bbox.y < yMin ? bbox.y : yMin
+                                    yMax = bbox.y + bbox.height > yMax ? bbox.y + bbox.height : yMax
+                                }
+                            })
+                            grouplabels.append('text').classed(`${materialClass} group-label`, true)
+                                .attr('x', d3.mean([xMin, xMax]) )
+                                .attr('y', d3.mean([yMin, yMax]) )
+                                .attr('dy', 0)
+                                .text(materialName)
+                                .call(helpers.wrap, 120, 0.9)
                         })
-                        grouplabels.append('text').classed(`${materialClass} group-label`, true)
-                            .attr('x', d3.mean([xMin, xMax]) )
-                            .attr('y', d3.mean([yMin, yMax]) )
-                            .attr('dy', 0)
-                            .text(materialName)
-                            .call(helpers.wrap, 120, 0.9)
-                    })
-
+                    }
                 };
             }; // end renderVis()
 

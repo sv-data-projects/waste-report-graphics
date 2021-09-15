@@ -184,7 +184,7 @@
                     const materialChildrenData = wasteData.filter(d => d.year === settings.year && d.materialClass === helpers.slugify(material) && (d.level === 2 || (d.level === 1 && d.targetClass === 'landfill') ) )
                     materialChildrenData.forEach(mChildObj => {
                         materialObj.children.push({
-                            name:   mChildObj.targetClass === 'landfill' ? 'Landfilled' : mChildObj.target,
+                            name:   mChildObj.targetClass === 'landfill' ? `Landfilled ${material.toLowerCase()}` : mChildObj.target,
                             type:   mChildObj.targetClass,
                             value:  mChildObj.value
                         })
@@ -200,7 +200,7 @@
 
         async function renderCirclePack(data, settings) {
             d3.select('.main-subtitle').style('opacity', 0)
-                .html(`Collected waste in ${settings.year} by material type, and broken down by volume of recovered product and volume to landfill`)
+                .html(`Waste by material type in ${settings.year}, broken down by the volume of recovered product(s) and volume to landfill`)
                 .transition().duration(1000)
                 .style('opacity', null)
 
