@@ -160,7 +160,7 @@
                     fontScale: d3.scaleLinear()
                 },
                 showMaterialLabels: true,
-                // seed:       18,               // Layout seed number14, 300
+                seed:       null,               // Layout seed number: if null tesselation seed will be random. Can be set via queryString parameter of 'seed'
             }
 
             const data = {
@@ -226,6 +226,12 @@
                 if (settings.queryParameters.has('year')) { 
                     settings.year = settings.queryParameters.get('year')  
                 }
+                if (settings.queryParameters.has('seed')) { 
+                    settings.seed = +settings.queryParameters.get('seed')  
+                }
+                if (settings.queryParameters.has('showMaterialLabels')) { 
+                    settings.showMaterialLabels = settings.queryParameters.get('showMaterialLabels') === 'false' ? false : true 
+                }
             };
 
             async function transformData(wasteData){
@@ -277,7 +283,7 @@
 
                 // Update heading
                 d3.select('.main-subtitle').style('opacity', 0)
-                    .html(`Waste by material type in ${settings.year}, broken down by the volume of recovered product(s) and volume to landfill (shown as darker tessellations)`)
+                    .html(`Waste by material type in ${settings.year}, broken down by volumes of recovered products and volumes to landfill (shown as darker tessellations)`)
                     .transition().duration(1000)
                     .style('opacity', null)
                 settings.el.svg.transition().duration(1000)

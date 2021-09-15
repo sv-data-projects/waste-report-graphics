@@ -82,6 +82,7 @@
             .bin-element{
                 fill: #fff;
                 pointer-events: none;
+                mix-blend-mode: overlay;
             }
             .paper-and-cardboard.cell{
                 fill: var(--xBlueCyan);
@@ -136,7 +137,7 @@
                 scales: {
                     fontScale: d3.scaleLinear()
                 },
-                // seed:       300,               // Layout seed number: if not specified tesselation seed will be random
+                seed:       null,               // Layout seed number: if null tesselation seed will be random. Can be set via queryString parameter of 'seed'
                 clipPoly: [
                     [0,     0 ],
                     [0,     400],
@@ -217,6 +218,9 @@
                 if (settings.queryParameters.has('year')) { 
                     settings.year = settings.queryParameters.get('year')  
                 }
+                if (settings.queryParameters.has('seed')) { 
+                    settings.seed = +settings.queryParameters.get('seed')  
+                }
             };
 
             async function transformData(wasteData){
@@ -265,7 +269,7 @@
 
                 // Update heading
                 d3.select('.main-subtitle').style('opacity', 0)
-                    .html(`Waste by material type in ${settings.year}, broken down by the volume of recovered product(s) and volume to landfill (shown as darker tessellations)`)
+                    .html(`Waste by material type in ${settings.year}, broken down by volumes of recovered products and volumes to landfill (shown as darker tessellations)`)
                     .transition().duration(1000)
                     .style('opacity', null)
                 settings.el.svg.transition().duration(1000)
@@ -341,7 +345,8 @@
                             .attr("d", d => "M"+d.polygon.join(",")+"z" )
                             .on('mouseover', function(){
                                 const idxClass = this.classList[1]
-                                d3.selectAll(`.group-label, .bin-elements`).style('opacity', 0)
+                                d3.selectAll(`.group-label`).style('opacity', 0)
+                                d3.selectAll(`.bin-elements`).style('opacity', 0.2)
                                 d3.selectAll(`.cell:not(.${idxClass})`).classed('blur', true)
                                 d3.select(`.cell.${idxClass}`).classed('highlight', true)
                                 d3.select(`.material-destination-label.${idxClass}`).style('opacity', 1)
