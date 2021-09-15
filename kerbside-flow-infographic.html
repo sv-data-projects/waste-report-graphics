@@ -1409,7 +1409,7 @@
                 .attr('x', xMargin)
                 .attr('y', headlineOffsetY)
             annotationLayer.append('text').classed('lga-label-headline street', true)
-                .text(`${helpers.numberFormatters.formatComma1dec(totalCollection/1000000)} million tonnes`)
+                .text(`${helpers.numberFormatters.formatComma2dec(totalCollection/1000000)} million tonnes`)
                 .attr('x', xMargin)
                 .attr('y', headlineOffsetY + 30)
             annotationLayer.append('text').classed('lga-label-small street', true)

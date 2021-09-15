@@ -57,8 +57,7 @@
         }
         rect.paper-and-cardboard.material,
         path.paper-and-cardboard.landfill-icon,
-        path.paper-and-cardboard.donut-arc.diversion,
-        text.paper-and-cardboard.donut-diversion-pct{
+        path.paper-and-cardboard.donut-arc.diversion{
             fill: var(--xBlueCyan);
         }
         rect.paper-and-cardboard,
@@ -67,7 +66,8 @@
         }
         .material-icon.paper-and-cardboard,
         .material-data.data-label.paper-and-cardboard,
-        .material-label.paper-and-cardboard{
+        .material-label.paper-and-cardboard,
+         text.paper-and-cardboard.donut-diversion-pct{
             fill: var(--xDarkBlueCyan);
         }
         rect.plastics.material,
@@ -200,10 +200,11 @@
             fill: var(--secondaryGreyLightest);
         }
         .donut-diversion-pct{
-            font-size: 10px;
+            font-size: 9px;
             font-weight: 500;
             text-anchor: middle;
             dominant-baseline: middle;
+            letter-spacing: -0.5px;
         }
     </style>
 </head>
@@ -652,7 +653,7 @@
                 
                 donutGroup.append('text')
                     .attr('class', `${data.materialClass} donut-diversion-pct`)  
-                    .text(helpers.numberFormatters.formatPct(data.pct))
+                    .text(helpers.numberFormatters.formatPct1dec(data.pct))
                     .style("transform", `translate(${coords.x}px, ${coords.x}px)` )
             };
 

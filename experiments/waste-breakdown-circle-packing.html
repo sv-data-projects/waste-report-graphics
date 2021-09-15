@@ -271,7 +271,7 @@
                     .attr("class", d =>  `circle-label-small ${helpers.slugify(d.data.name)} ${(typeof d.data.type === 'undefined' || d.data.type === '' )  ? 'material-group' : helpers.slugify(d.data.type)}` )
                     .style("fill-opacity", d => d.parent === root ? 1 : 0)
                     .style("display", d => d.parent === root ? "inline" : "none")   
-                    .text(d =>`${helpers.numberFormatters.formatComma(d.value)} kt`)
+                    .text(d =>`${helpers.numberFormatters.formatComma(d.value)} tonnes`)
 
             zoomTo([root.x, root.y, root.r * 2]);
 

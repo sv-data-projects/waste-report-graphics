@@ -642,7 +642,7 @@
             // 9. Add chart interactions
                 // Central label overall recovery date
                 const totalDiversion = d3.sum(chartData.map(d => d.diverted)),
-                    totalWaste =  d3.sum(chartData.map(d => d.total))
+                    totalWaste =  d3.sum(chartData.map(d => d.total)) + data['Other materials'].value
 
                 const totalDiversionLabel = annotationLayer.append('g')
                     .attr('id', 'diversion-label-group')

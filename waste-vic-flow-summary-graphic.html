@@ -786,7 +786,7 @@
             // 5. ADD TOTAL GENERATION HEADLINE AND WASTE STREAM SECTION (top left)
                 // i. Headline generation group
                 const totalGenUnit = totalsGenLayer.append('text').classed('generation-unit', true)
-                    .text(`Victorians generated ${helpers.numberFormatters.formatComma1dec(d3.sum([dataset.byStream.Total.Diverted, dataset.byStream.Total.Landfilled])/1000)} million tonnes of waste across three waste streams`)
+                    .text(`Victorians generated ${helpers.numberFormatters.formatComma2dec(d3.sum([dataset.byStream.Total.Diverted, dataset.byStream.Total.Landfilled])/1000)} million tonnes of waste across three waste streams`)
                     .attr('x', 0).attr('y', 0).attr('dy', 0)
                     .call(helpers.wrap, 325, 1)
 
@@ -813,7 +813,7 @@
                     // c. Add the waste stream total collection volume label
                     streamData.append('text').classed(`data-label waste-stream ${slugStreamName}`, true)   
                         .attr('transform', `translate(${offsetX}, ${0})`)
-                        .text(`${helpers.numberFormatters.formatComma1dec(d3.sum([dataStream.Diverted, dataStream.Landfill])/ 1000 )} Mt` )
+                        .text(`${helpers.numberFormatters.formatComma2dec(d3.sum([dataStream.Diverted, dataStream.Landfill])/ 1000 )} Mt` )
 
                     // d. Add the diversion donut chart and label
                     const group = streamDonuts.append('g').attr('transform', `translate(${offsetX}, 0)`)
@@ -833,10 +833,10 @@
 
                 landfillEndLayer.append('text').classed('landfill-headline landfill', true)
                     .attr('transform', `translate(${20}, ${0}) `)
-                    .text(`${helpers.numberFormatters.formatComma1dec(dataset.byStream.Total.Landfilled / 1000)}`)
+                    .text(`${helpers.numberFormatters.formatComma2dec(dataset.byStream.Total.Landfilled / 1000)}`)
 
                 landfillEndLayer.append('text').classed('landfill-unit landfill', true)
-                    .attr('transform', `translate(${100}, ${-8}) `)
+                    .attr('transform', `translate(${120}, ${-8}) `)
                     .text(`million tonnes of waste was sent to landfill`)
                         .attr('x', 0).attr('y', 0).attr('dy', 0)
                         .call(helpers.wrap, 130, 0.95)
@@ -845,12 +845,12 @@
             // 7. RECOVERY LABEL GROUP 
                 recoveryLayer.append('text').classed('recovery-headline recovery', true)
                     .attr('transform', `translate(${-50}, ${0}) `)
-                    .text(`${helpers.numberFormatters.formatComma1dec(dataset.byStream.Total.Diverted / 1000)}`)
+                    .text(`${helpers.numberFormatters.formatComma2dec(dataset.byStream.Total.Diverted / 1000)}`)
 
                 recoveryLayer.append('text').classed('recovery-unit recovery', true)
                     .attr('transform', `translate(${135}, ${-6}) `)
                     .text(`million tonnes of waste was recovered for use in new recycled products`)
-                        .attr('x', 0).attr('y', 0).attr('dy', 0)
+                        .attr('x', 40).attr('y', 0).attr('dy', 0)
                         .call(helpers.wrap, 170, 1)
 
 
@@ -893,7 +893,7 @@
                 
                 donutGroup.append('text')
                     .attr('class', `${data.materialClass} donut-diversion-pct`)  
-                    .text(helpers.numberFormatters.formatPct(data.pct))
+                    .text(helpers.numberFormatters.formatPct1dec(data.pct))
                     .style("transform", `translate(${coords.x}px, ${coords.y}px)` )
             };
 

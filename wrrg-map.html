@@ -54,6 +54,7 @@
                     font-weight: 500;
                     text-anchor: middle;
                     dominant-baseline: middle;
+                    letter-spacing: -0.5px;
                 }
                 .lga-label{
                     font-size: 8px; 
@@ -742,7 +743,7 @@
                         .style("transform", `translate(${coords.x}px, ${coords.y}px) scale(-1, 1)` )
                 donutGroup.append('text')
                     .attr('class', `${data.materialClass} donut-diversion-pct`)  
-                    .text(helpers.numberFormatters.formatPct(data.pct))
+                    .text(helpers.numberFormatters.formatPct1dec(data.pct))
                     .style("transform", `translate(${coords.x}px, ${coords.y}px)` )
             };
         }; // end renderMap()

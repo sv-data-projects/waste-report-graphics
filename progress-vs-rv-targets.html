@@ -430,15 +430,15 @@
                     const line = d3.line()
                         .x((d, i) => xScale(d.year))
                         .y(d => yScale(d.value));
-                    const numberFormatter = obj.UnitType ==='pct' ? helpers.numberFormatters.formatPct 
+                    const numberFormatter = obj.UnitType ==='pct' ? helpers.numberFormatters.formatPct1dec 
                         : obj.UnitType ==='float2' ? helpers.numberFormatters.formatComma2dec 
                             : helpers.numberFormatters.formatInteger
                         unit = obj.Unit === "pct" ? '' : obj.Unit
 
                     // d. Render trajectory path
                     const trajectoryData = targetChartData.filter(d => d.value !== 'na')
-                    chart.append('path').classed('sparkline target-trajectory', true)                                 // Append an SVG path for the sparkline
-                        .datum(trajectoryData)                                                                // ..using the supplied data array
+                    chart.append('path').classed('sparkline target-trajectory', true)                           // Append an SVG path for the sparkline
+                        .datum(trajectoryData)                                                                  // ..using the supplied data array
                         .attr('d', line);             
 
                     // d. Render actuals path
@@ -490,7 +490,7 @@
                         .attr('x', xScale(targetChartData[targetChartData.length - 1].year) + 40)
                         .attr('y', yScale(targetChartData[targetChartData.length - 1].value) + 6 )
                         .attr('dy', 0)
-                        .text(`${numberFormatter(targetChartData[targetChartData.length - 1].value)}  ${unit} by ${settings.finYear.Target}` )
+                        .text(`${(obj.UnitType === 'pct' && targetChartData[targetChartData.length - 1].value === 1) ? helpers.numberFormatters.formatPct(1) : numberFormatter(targetChartData[targetChartData.length - 1].value)}  ${unit} by ${settings.finYear.Target}` )
                         .call(helpers.wrap, settings.dims.width * 0.15, 1.1)
 
                     chart.append('text').classed('label current', true)

@@ -57,7 +57,7 @@
                 text-transform: uppercase;
             }
             .vis-title{
-                font-size: 80px;
+                font-size: 60px;
             }
             .destination-title,
             .product-title{
@@ -124,7 +124,7 @@
                 pointer-events: none;
             }
             .total-label{
-                font-size: 300px;
+                font-size: 250px;
                 font-weight: 700;
                 letter-spacing: -15px;
             }
@@ -1610,7 +1610,7 @@
                     .attr('y', settings.geometry.generationPos.y - settings.geometry.generationTotalRadius * 0.5)
 
                 totalGenerationNode.append('text').classed('total-label data-label total', true)
-                    .text(helpers.numberFormatters.formatComma1dec(totalGeneration / 1000000))
+                    .text(helpers.numberFormatters.formatComma2dec(totalGeneration / 1000000))
                     .attr('x', settings.geometry.generationPos.x )
                     .attr('y', settings.geometry.generationPos.y + settings.geometry.generationTotalRadius * 0.1)
 
@@ -1683,7 +1683,7 @@
                             .style('text-anchor',  'middle')    // place the text halfway on the arc
                             .style('letter-spacing', 2.5)       
                             .attr('data-collection', value)  
-                            .text(`${helpers.numberFormatters.formatComma1dec(value/1000000)} Mt`)
+                            .text(`${helpers.numberFormatters.formatComma2dec(value/1000000)} Mt`)
 
                     // c. Add Landfill links
                     const landfillValue = materialsToLandfillData.filter(d => d.materialClass === className)[0].value
@@ -1817,7 +1817,7 @@
                     .attr('x', settings.dims.width * 0.10)
                     .attr('y', settings.dims.height * 0.535)
                     .attr('dy', 0)
-                    .text(`${helpers.numberFormatters.formatComma1dec(totalLandfill/1000000)} Mt of waste was sent to landfill`)
+                    .text(`${helpers.numberFormatters.formatComma2dec(totalLandfill/1000000)} Mt of waste was sent to landfill`)
                     .call(helpers.wrap,  350, 1,1)
 
                 annotationLayer.append('text').attr('id', 'waste-to-export-label')
@@ -1825,7 +1825,7 @@
                     .attr('x', settings.dims.width * 0.90)
                     .attr('y', settings.dims.height * 0.535)
                     .attr('dy', 0)
-                    .text(`${helpers.numberFormatters.formatComma1dec(totalExport/1000000)} Mt of waste was exported for reprocessing`)
+                    .text(`${helpers.numberFormatters.formatComma2dec(totalExport/1000000)} Mt of waste was exported for reprocessing`)
                     .call(helpers.wrap,  350, 1,1)
 
                 annotationLayer.append('text').attr('id', 'waste-to-mrf-label')
@@ -1833,7 +1833,7 @@
                     .attr('x', settings.dims.width * 0.5)
                     .attr('y', settings.dims.height * 0.5)
                     .attr('dy', 0)
-                    .text(`${helpers.numberFormatters.formatComma1dec(totalMRF/1000000)} Mt of waste was recovered for reprocessing in Victoria`)
+                    .text(`${helpers.numberFormatters.formatComma2dec(totalMRF/1000000)} Mt of waste was recovered for reprocessing in Victoria`)
                     .call(helpers.wrap,  550, 1,1)
 
                 // c. Lower scene
@@ -2075,7 +2075,7 @@
 
                 function destinationMouseout(){
                     d3.selectAll('#materials-info-group *').style('opacity', 0)
-                    d3.selectAll('.flow-link, .building-group, .landfill-group, .node, .nodeLabel, #total-generation-node-group text, #ship-group, #landfill-group').style('opacity', null)
+                    d3.selectAll('.flow-link, .building-group, .mrf-data-label, .landfill-group, .node, .nodeLabel, #total-generation-node-group text, #ship-group, #landfill-group').style('opacity', null)
                     d3.selectAll('.nodeLabel.material.volume textPath').html(function(d){ return `${helpers.numberFormatters.formatComma1dec(+this.getAttribute('data-collection')/1000000)} Mt`})
                 };
 
