@@ -797,7 +797,7 @@
 
             // b. Fill out metrics in DOM
             d3.select('#total-waste-container .headline-figure').html(helpers.numberFormatters.formatComma2dec(wasteManaged_mil))
-            d3.select('#diversion-rate-container .headline-figure').html(helpers.numberFormatters.formatComma(totalRecovery_mil / wasteManaged_mil * 100))
+            d3.select('#diversion-rate-container .headline-figure').html(helpers.numberFormatters.formatComma1dec(totalRecovery_mil / wasteManaged_mil * 100))
             d3.select('#landfill-waste-container .headline-figure').html(helpers.numberFormatters.formatComma2dec(landfilled_mil))
             d3.select('#total-recovery-container .headline-figure').html(helpers.numberFormatters.formatComma2dec(totalRecovery_mil))
             d3.select('#local-recovery-container .headline-figure').html(helpers.numberFormatters.formatComma2dec(localRecovery_mil))

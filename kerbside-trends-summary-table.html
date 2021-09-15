@@ -869,7 +869,7 @@
                 costContainer.append('div').classed('service-summary-table-header', true)
                 costContainer.append('div').classed('service-summary-table-data pct-change performance-label', true).html('% change &rarr;')
                 costContainer.append('div').classed('service-summary-table-data pct-change lastYear-vs-data', true).html(costVsLastYearPct)
-                costContainer.append('div').classed('service-summary-table-data pct-change fiveYear-vs-data', true).html(costVsLastYearPct)
+                costContainer.append('div').classed('service-summary-table-data pct-change fiveYear-vs-data', true).html(costVsFiveYearPct)
                 renderSparkline(`cost-sparkline-${helpers.slugify(service)}`, serviceCostData, settings.dims.minor_sparkline)
 
                 if(service.toLowerCase() !== 'garbage'){

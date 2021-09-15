@@ -1426,9 +1426,8 @@
                 .html(`spent by councils on waste services in ${settings.year}, to collect`)
                 .attr('x', councilSpendLabel.x)
                 .attr('y', councilSpendLabel.y + 24)
-
             annotationLayer.append('text').classed('lga-label-small council', true)
-                .html(`<tspan class='bold'>${helpers.numberFormatters.formatComma1dec(totalCollection/1000000)} million tonnes</tspan> of <tspan class='garbage bold shadow'>garbage</tspan>, <tspan class ="recycling bold shadow">recyclables</tspan> and <tspan class ="organics bold shadow">organics</tspan>`)
+                .html(`<tspan class='bold'>${helpers.numberFormatters.formatComma2dec(totalCollection/1000000)} million tonnes</tspan> of <tspan class='garbage bold shadow'>garbage</tspan>, <tspan class ="recycling bold shadow">recyclables</tspan> and <tspan class ="organics bold shadow">organics</tspan>`)
                 .attr('x', councilSpendLabel.x)
                 .attr('y', councilSpendLabel.y + 44)
             annotationLayer.append('text').classed('lga-label-small council', true)
