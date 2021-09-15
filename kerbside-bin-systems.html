@@ -10,7 +10,6 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/4.3.2/iframeResizer.contentWindow.js" integrity="sha512-cJ7aOLpXbec1Km9craM6xL6UOdlWf9etIz7f+cwQv2tuarLm3PLb3dv3ZqIK++SE4ui+EE0nWqKB0dOaAOv9gQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>  
 
         <style>
-
             /***********************************************************/
             /***********************************************************/
             /****                                                   ****/
@@ -34,6 +33,7 @@
             .bin-system-vis-container{
                 display: grid;
                 grid-template-columns: 3fr 1fr;
+                padding-top: 3vw;
             }
             .bin-system-table-container{
                 grid-area: 1 / 1 / 2 / 2;
@@ -43,21 +43,35 @@
             }
 
             .spark-container{
-                width: 11vw;
+                width: 10vw;
             }
+            .spark-container,
+            .lga-bar-container,
             .bar-container{
-                /* width: 10vw; */
+                display: grid;
+                align-self:center;
             }
 
-            .spark-container svg{
-                vertical-align: middle;
-            }
             .table-row{
                 border-top: var(--secondaryGreyLight) 0.5px solid;
             }
             /************************/
             /*****  TYPOGRAPHY    ***/
             /************************/
+            .title-container{
+                font-size: 1.5vw;
+                padding-bottom: 1vw;
+                border-bottom: 2px solid #000;
+            }
+            .main-title{
+                font-size: 3.25vw;
+                font-weight: 500;
+                fill: #000;
+                mix-blend-mode: multiply;
+                text-transform: uppercase;
+                margin-block-end: 0.5vw;
+            }
+
             .table-header{
                 font-weight: 500;
                 font-size: 1.5vw;
@@ -67,16 +81,39 @@
             }
             .bin-size-label, 
             .lga-total-label{
-                /* vertical-align: bottom; */
                 font-size: 1.25vw;
+                text-align: right;
+                font-weight: 300;
+            }
+            .bin .bin-size-label{
+                vertical-align: bottom;
+            }
+            .bin-size-label{
+                vertical-align: bottom;
             }
             .bin-system-annotation-container{
-                display: grid;
-                font-weight: 300;
+                padding: 0vw 2vw;
+            }
+            .annotation-header{
+                font-size: 1.5vw;
+                font-weight: 500;
+            }
+            .annotation-text{
                 font-style: italic;
-                align-self: center;
-                padding: 1vw;
+                font-weight: 300;
                 font-size: 1.25vw;
+            }
+            li.annotation-text{
+                margin-bottom: 0.5rem;    
+            }
+            ul{
+                padding-inline-start: 1rem;
+            }
+            .footnote{
+                font-size: 1vw;
+                font-weight: 300;
+                margin-top: 2vw;
+                height: 5vw;
             }
             /*******************************/
             /*****  COLOUR ASSIGNMENT    ***/
@@ -116,13 +153,12 @@
             <!-- Main title -->
             <div class = 'title-container'>
                 <h1 class = 'main-title'></h1>
+                <div class = 'sub-title'></div>
             </div>
             <!-- Bin system table -->
             <div class = 'bin-system-vis-container'>
                 <div class='bin-system-table-container'></div>
-                <div class='bin-system-annotation-container'>
-
-                </div>
+                <div class='bin-system-annotation-container'></div>
             </div>
         </main>
     </body>
@@ -137,19 +173,20 @@
             svgID:          'bin-vis',
             year:           '2019-20', 
             tableName:      'binSystemData',
+            icon:           'bin',
+            title:          true,
             dims: {
                 sparkColumn: {            // For each svg collection frequency graphic
-                    height:     50, 
+                    height:     60, 
                     width:      200,
                     blockGap:   10,
-                    margin:     {top: 5, bottom: 5, left: 20, right: 70}
+                    margin:     {top: 10, bottom: 2.5, left: 10, right: 50}
                 },
                 sparkBar: {            // For each svg LGA usage  graphic
                     height:     50, 
                     width:      300,
-                    margin:     {top: 15, bottom: 5, left: 20, right: 0}
-                },
-
+                    margin:     {top: 10, bottom: 10, left: 5, right: 0}
+                }
             } 
         }
 
@@ -180,10 +217,10 @@
 
             }).then( async (data) => {
                 // 3. Initiate vis build sequence with data now loaded
-                await applyQuerySettings(settings)                                // a. Update settings if a query string is passed in
-                await transformData(data.table[settings.tableName])                                     // b. Extract data schema
-                await renderTable(data.chartData, settings)       // c. Render table visualisation(s)
-
+                d3.select('.main-container').style('opacity', 0)
+                await applyQuerySettings(settings)                          // a. Update settings if a query string is passed in
+                await transformData(data.table[settings.tableName])         // b. Extract data schema
+                await renderTable(data.chartData, settings)                 // c. Render table visualisation(s)
             })
 
             // X. Table data parsing function: trim() header white space and prase numbers with "$" and "," stripped. 
@@ -215,6 +252,12 @@
             if (settings.queryParameters.has('year')) { 
                 settings.year = settings.queryParameters.get('year')  
             }
+            if (settings.queryParameters.has('icon')) { 
+                settings.icon = settings.queryParameters.get('icon')  
+            }
+            if (settings.queryParameters.has('showTitle')) { 
+                settings.title = settings.queryParameters.get('showTitle') === 'true' ? true : false
+            }
         };
 
         async function transformData(binSystemData) {   
@@ -228,103 +271,124 @@
         };
 
 
-        /////////////////////////////////
-        // 2. RENDER THE BIN GRAPHIC  ///
-        /////////////////////////////////
+        //////////////////////////////////////
+        // 2. RENDER THE BIN SYSTEM TABLE  ///
+        //////////////////////////////////////
 
         async function renderTable(binSystemData, settings){
-            // 0. Data and icon setup
+            // 0. Data, icon and title setup
             const visData = binSystemData.filter(d => d.year === settings.year)         // Filter for set year
-console.log(visData)
-console.log(data.schema.list)
+            const icons = {
+                bin:        "M16.444-2.62a.889.864 0 01-.888.864.889.864 0 01-.89-.864.889.864 0 01.89-.865.889.864 0 01.888.865M15.4-6.07l.582-12.974H1.796l.8 17.776c.028.693.615 1.24 1.328 1.24h9.29A3.386 3.386 0 0112.2-3.77c.482-1.33 1.75-2.242 3.199-2.3zm4.156-15.567h-1.334v.865h1.334a.438.438 0 00.444-.432.438.438 0 00-.444-.433zM15.809-5.2h-.005a2.348 2.348 0 00-.248-.013c-1.456-.008-2.652 1.116-2.694 2.531-.042 1.415 1.085 2.604 2.539 2.678 1.453.075 2.702-.993 2.813-2.404.111-1.412-.957-2.651-2.405-2.792zm-.253 4.308c-.982 0-1.778-.773-1.778-1.728s.796-1.729 1.778-1.729c.981 0 1.777.774 1.777 1.729 0 .458-.187.898-.52 1.222a1.803 1.803 0 01-1.257.506zm1.333-19.015a.439.439 0 00.444-.432v-.432H.444A.438.438 0 000-20.34c0 .239.199.432.444.432zm.444-2.16c0-.24-.199-.433-.444-.433H2.667c-.565 0-1.069.347-1.258.864h15.924z"
+            }
+            d3.select('.bin-system-vis-container').classed(settings.icon, true)
+            if(settings.title){
+                d3.select('.main-title').html(`Victorian bin systems in ${settings.year}`)
+                d3.select('.sub-title').html('a visual representation of the different combinations of bin collection services offered by LGAs ')
+            } else {
+                d3.select('.title-container').style('display', 'none')
+            }
 
-            // 1. Setup HTML table
+            // 1. Add HTML table with icon frequency graphics
             const table = d3.select('.bin-system-table-container')
                             .append('table').attr('id', 'bin-system-table')
 
             const tableHeader = table.append('thead'),
                 tableBody =       table.append('tbody')
 
-            // Table  header
-            const tableHeadings = tableHeader.append('tr').classed('table-row.header', true)
-            data.schema.list.service.forEach(service => {
-                tableHeadings.append('th').classed(`${helpers.slugify(service)} table-header`, true)
-                    .attr('colspan', 2)
-                    .html(service)
-            })
-            tableHeadings.append('th').classed(`lga-total table-header`, true)
-                .attr('colspan', 2)
-                .html('LGAs using each system')
-
-            // Table body: each row is a bin system
-            visData.forEach(obj => {
-                const rowContainer = tableBody.append('tr').classed('table-row', true)
-                // For each service..
+                // a. Table header
+                const tableHeadings = tableHeader.append('tr').classed('table-row.header', true)
                 data.schema.list.service.forEach(service => {
-                    // Add Bin size
-                    const binSize = obj[`${service}_binSize`] !== '' ? obj[`${service}_binSize`] : 0
-                    rowContainer.append('td')
-                        .classed('bin-size-label', true)
-                        .html(binSize > 0 ? `${helpers.numberFormatters.formatComma(binSize)}L` : '')
-
-                    // Add container for SVG blocks/bins collection frequency
-                    const sparkBinContainer = rowContainer.append('td')
-                        .append('div').classed('spark-container', true)
-
-                    const svgBin = sparkBinContainer.append('svg')
-                        .attr('viewBox',`0 0 ${settings.dims.sparkColumn.width} ${settings.dims.sparkColumn.height}`)
-                        .attr('width', '100%')
-                    
-                    const collectionChart = svgBin.append('g').classed('chart', true)
-                                    .attr('transform', `translate(${settings.dims.sparkColumn.margin.left} , ${settings.dims.sparkColumn.margin.top} )`),
-                        chartWidth  = settings.dims.sparkColumn.width - settings.dims.sparkColumn.margin.left - settings.dims.sparkColumn.margin.right,
-                        chartHeight = settings.dims.sparkColumn.height - settings.dims.sparkColumn.margin.top - settings.dims.sparkColumn.margin.bottom,
-                        maxBlocks   = 4,
-                        blockWidth  = (chartWidth - settings.dims.sparkColumn.blockGap * (maxBlocks - 1)) / maxBlocks,
-                        binScale = d3.scaleLinear()     // Use to scale block height to bin volume
-                            .domain([0, d3.max(data.schema.list.binSize)])
-                            .range([0, chartHeight])
-
-                    let blocksToPlot = 0        // Determine no blocks to plot based on frequency
-                    switch(obj[`${service}_collectionFrequency`]){
-                        case 'weekly': blocksToPlot =  4; break
-                        case 'fortnightly': blocksToPlot =  2;  break
-                        case 'monthly': blocksToPlot =  1;  break
-                        default: blocksToPlot = 0
-                    }
-
-                    for(i = 0; i < blocksToPlot; i++){
-                        collectionChart.append('rect')
-                            .attr('class', `block ${helpers.slugify(service)}` )
-                            .attr('x', i* (blockWidth + settings.dims.sparkColumn.blockGap) )
-                            .attr('y',  chartHeight - binScale(binSize))
-                            .attr('width',blockWidth )
-                            .attr('height', binScale(binSize) )
-                    }
+                    tableHeadings.append('th').classed(`${helpers.slugify(service)} table-header`, true)
+                        .attr('colspan', 2)
+                        .html(service)
                 })
-                // Add the LGA bar chart
-                    // Add No LGAs size
-                    const noLGAs = obj.noLGAs!== '' ? obj.noLGAs : 0
-                    rowContainer.append('td')
-                        .classed('lga-total-label', true)
-                        .html(noLGAs)
+                tableHeadings.append('th').classed(`lga-total table-header`, true)
+                    .attr('colspan', 2)
+                    .html('LGAs using each system')
 
-                    // Add the LGA bar
-                    const barContainer = rowContainer.append('td')
-                            .classed('lga-bar-container', true)
+                // b. Table body: each row is a bin system with graphics
+                visData.forEach(obj => {
+                    const rowContainer = tableBody.append('tr').classed('table-row', true)
+                    // For each service..
+                    data.schema.list.service.forEach(service => {
+                        // Add Bin size
+                        const binSize = obj[`${service}_binSize`] !== '' ? obj[`${service}_binSize`] : 0,
+                            binLabel = binSize > 0 ? (service === 'Recyclables' && obj[`${service}_type`] !== 'bin') 
+                                ? `${helpers.numberFormatters.formatComma(binSize)}L<sup>*</sup>` : 
+                                    `${helpers.numberFormatters.formatComma(binSize)}L` 
+                                :  ''
 
-                    const barSvg = barContainer.append('svg')
-                            .attr('viewBox',`0 0 ${settings.dims.sparkBar.width} ${settings.dims.sparkBar.height}`)
+                        rowContainer.append('td')
+                            .classed('bin-size-label', true)
+                            .html(binLabel)
+
+                        // Add container for SVG blocks/bins collection frequency
+                        const sparkBinContainer = rowContainer.append('td')
+                            .append('div').classed('spark-container', true)
+
+                        const svgBin = sparkBinContainer.append('svg')
+                            .attr('viewBox',`0 0 ${settings.dims.sparkColumn.width} ${settings.dims.sparkColumn.height}`)
                             .attr('width', '100%')
+                        
+                        const collectionChart = svgBin.append('g').classed('chart', true)
+                                        .attr('transform', `translate(${settings.dims.sparkColumn.margin.left} , ${settings.dims.sparkColumn.margin.top} )`),
+                            chartWidth  = settings.dims.sparkColumn.width - settings.dims.sparkColumn.margin.left - settings.dims.sparkColumn.margin.right,
+                            chartHeight = settings.dims.sparkColumn.height - settings.dims.sparkColumn.margin.top - settings.dims.sparkColumn.margin.bottom,
+                            maxBlocks   = 4,
+                            blockWidth  = (chartWidth - settings.dims.sparkColumn.blockGap * (maxBlocks - 1)) / maxBlocks,
+                            maxBinSize  = d3.max(data.schema.list.binSize),
+                            binScale    = d3.scaleSqrt()     // Use to scale block height to bin volume
+                                            .domain([0, maxBinSize])
+                                            .range([0, settings.icon === 'bin' ? 1.75 : chartHeight])
 
-                    const lgaChart = barSvg.append('g').classed('chart', true)
-                                    .attr('transform', `translate(${settings.dims.sparkBar.margin.left} , ${settings.dims.sparkBar.margin.top} )`),
-                        chartWidth  = settings.dims.sparkBar.width - settings.dims.sparkBar.margin.left - settings.dims.sparkBar.margin.right,
-                        chartHeight = settings.dims.sparkBar.height - settings.dims.sparkBar.margin.top - settings.dims.sparkBar.margin.bottom,
-                        lgaScale = d3.scaleLinear()     
-                            .domain([0, d3.max(data.schema.list.lgaFrequencies)])
-                            .range([0, chartWidth])
+                        let blocksToPlot = 0        // Determine no blocks to plot based on frequency
+                        switch(obj[`${service}_collectionFrequency`]){
+                            case 'weekly': blocksToPlot =  4; break
+                            case 'fortnightly': blocksToPlot =  2;  break
+                            case 'monthly': blocksToPlot =  1;  break
+                            default: blocksToPlot = 0
+                        }
 
+                        for(i = 0; i < blocksToPlot; i++){
+                            if(settings.icon === 'bin'){
+                                collectionChart.append('path')
+                                    .attr('class', `block ${helpers.slugify(service)}` )
+                                    .attr('transform', `translate(${i * (blockWidth + settings.dims.sparkColumn.blockGap)}, ${chartHeight}) scale(${binScale(binSize)})` )
+                                    .attr('d', icons.bin)  
+                            } else {
+                                collectionChart.append('rect')
+                                    .attr('class', `block ${helpers.slugify(service)}` )
+                                    .attr('x', i * (blockWidth + settings.dims.sparkColumn.blockGap) )
+                                    .attr('y',      chartHeight - binScale(binSize) )
+                                    .attr('width',  blockWidth )
+                                    .attr('height', binScale(binSize) )
+                            }
+                        }
+                    })
+
+                    // Add the LGA bar chart
+                        // Add No LGAs size
+                        const noLGAs = obj.noLGAs!== '' ? obj.noLGAs : 0
+                        rowContainer.append('td')
+                            .classed('lga-total-label', true)
+                            .html(noLGAs)
+
+                        // Add the LGA bar
+                        const barContainer = rowContainer.append('td')
+                                .classed('lga-bar-container', true)
+
+                        const barSvg = barContainer.append('svg')
+                                .attr('viewBox',`0 0 ${settings.dims.sparkBar.width} ${settings.dims.sparkBar.height}`)
+                                .attr('width', '100%')
+
+                        const lgaChart = barSvg.append('g').classed('chart', true)
+                                        .attr('transform', `translate(${settings.dims.sparkBar.margin.left} , ${settings.dims.sparkBar.margin.top} )`),
+                            chartWidth  = settings.dims.sparkBar.width - settings.dims.sparkBar.margin.left - settings.dims.sparkBar.margin.right,
+                            chartHeight = settings.dims.sparkBar.height - settings.dims.sparkBar.margin.top - settings.dims.sparkBar.margin.bottom,
+                            lgaScale = d3.scaleLinear()     
+                                .domain([0, d3.max(data.schema.list.lgaFrequencies)])
+                                .range([0, chartWidth])
 
                         lgaChart.append('rect')
                             .attr('class', `lga-bar` )
@@ -332,20 +396,77 @@ console.log(data.schema.list)
                             .attr('y',  0)
                             .attr('width', lgaScale(noLGAs))
                             .attr('height', chartHeight )
+                })
+            
+                // c. Add ootnote
+                tableBody.append('tr').classed('table-row footnote', true)
+                    .append('td').attr('colspan', 10)
+                    .html('<sup>*</sup> Recyclables collected as a tied bundle rather than in a commingled bin.')
 
-            })
+                // d. Add sidebar annotation
+                const iconType = settings.icon,
+                    noSystems = visData.length,
+                    mostCommonFrequency =  d3.max(data.schema.list.lgaFrequencies),
+                    mostCommonGarbageBinSize = visData[0]['Garbage_binSize'],
+                    mostCommonGarbageFrequency = visData[0]['Garbage_collectionFrequency'],     
+                    mostCommonRecyclablesBinSize = visData[0]['Recyclables_binSize'],
+                    mostCommonRecyclablesFrequency = visData[0]['Recyclables_collectionFrequency'],  
+                    mostCommonOrganicsBinSize = visData[0]['Organics_binSize'],
+                    mostCommonOrganicsFrequency = visData[0]['Organics_collectionFrequency'],  
+                    mostCommonGlassBinSize = visData[0]['Glass_binSize'],
+                    mostCommonGlassFrequency = visData[0]['Glass_collectionFrequency'],
+                    organicsSystems = visData.filter(d => d.Organics_binSize !== "").length,
+                    organicsLGAs = d3.sum(visData.filter(d => d.Organics_binSize !== "").map(d => d.noLGAs)),
+                    glassSystems = visData.filter(d => d.Glass_binSize !== "").length,
+                    glassLGAs = d3.sum(visData.filter(d => d.Glass_binSize !== "").map(d => d.noLGAs)),
+                    totalLGAs = d3.sum(visData.map(d => d.noLGAs))
 
-            // Add annotation
-            const noSystems = visData
-            d3.select('.bin-system-annotation-container')
-                .html(`In this table, each row represents one of the 26 different combinations of bin collection services ('i.e. a 'bin system') offered by Victorian LGAs.
-                    For each colour-coded collection service, bin sizes are labelled and service frequency 'per month' is represented by the coloured blocks. For example, a weekly collection is shown by four coloured blocks, and a monthly service with one coloured block.
-                    Bin systems are ranked (top to bottom) by the most widely used to least, meaning that the most common service is - offered by 12 LGAs: is a monthly garbage service with a 120L bin, coupled with a fortnightly commingled recyclables service (240L bin), and a fortnightly organics service (240L bin). 
-                    This table shows that garbage and commingled services are part of all bin systems offered by all councils. Organic collection services are part of 18 bin systems (offered by 57 out of 79 LGAs), and glass collection services are part of 4 bin systems (offered by 4 LGAs). 
-                `)
+                const annotationContainer = d3.select('.bin-system-annotation-container')
+                annotationContainer.append('div').classed('annotation-header', true)
+                    .html('How to read this graphic')
+                annotationContainer.append('p').classed('annotation-text', true)
+                    .html(`In this table, each row represents one of the ${noSystems} different combinations of bin collection services (a 'bin system') offered by Victorian LGAs.
+                        For each (colour-coded) collection service, bin volumes are labelled and represented by size, and service frequency 'per month' is represented by the number of coloured ${settings.icon}s. 
+                    `)
+                annotationContainer.append('p').classed('annotation-text', true)
+                    .html(`For example, a weekly collection is shown by four coloured ${settings.icon}s, and a monthly service with one coloured ${settings.icon}.
+                    `)
+                annotationContainer.append('p').classed('annotation-text', true)
+                    .html(`Bin systems are ranked (top to bottom) by the most widely used to least, meaning that the most common service 
+                        - offered by ${mostCommonFrequency} LGAs - is:
+                        a ${mostCommonGarbageFrequency} garbage service with a ${mostCommonGarbageBinSize}L bin, coupled with 
+                        a ${mostCommonRecyclablesFrequency} commingled recyclables service (${mostCommonRecyclablesBinSize}L bin), and 
+                        a ${mostCommonOrganicsFrequency} organics service (${mostCommonOrganicsBinSize}L bin). 
+                    `)
+                const serviceList = annotationContainer.append('ul')
+                if(mostCommonGarbageFrequency !== ""){
+                    serviceList.append('li').classed('annotation-text', true)
+                        .html(`a ${mostCommonGarbageFrequency} garbage service (${mostCommonGarbageBinSize}L bin`)
+                }
+                if(mostCommonRecyclablesFrequency !== ""){
+                    serviceList.append('li').classed('annotation-text', true)
+                        .html(`a ${mostCommonRecyclablesFrequency} commingled recyclables service (${mostCommonRecyclablesBinSize}L bin)`)
+                }
+                if(mostCommonOrganicsFrequency!== ""){
+                    serviceList.append('li').classed('annotation-text', true)
+                        .html(`a ${mostCommonOrganicsFrequency} organics service (${mostCommonOrganicsBinSize}L bin)`)
+                }
+                if(mostCommonGlassFrequency!== ""){
+                    serviceList.append('li').classed('annotation-text', true)
+                        .html(`a ${mostCommonGlassFrequency} glass service (${mostCommonGlassBinSize}L bin)`)
+                }
 
+                annotationContainer.append('p').classed('annotation-text', true)
+                    .html(`This table shows that garbage and commingled services are part of all bin systems offered by all councils. 
+                        Organic collection services are part of ${organicsSystems} bin systems (offered by ${organicsLGAs} out of ${totalLGAs} LGAs), 
+                        and glass collection services are part of ${glassSystems} bin systems (offered by ${glassLGAs} out of ${totalLGAs} LGAs). 
+                    `)
+
+            // 2. Reveal table
+            d3.select('.main-container')
+                .transition().duration(1000)
+                .style('opacity', null)
         };
-
 
         ////////////////////////////////
         /// X. HELPER FUNCTIONS      ///
@@ -356,12 +477,6 @@ console.log(data.schema.list)
                 formatComma:           	d3.format(",.0f"),
                 formatComma1dec:       	d3.format(",.1f"),
                 formatComma2dec:       	d3.format(",.2f"),
-                formatComma3dec:       	d3.format(",.3f"),
-                formatPct:          	d3.format(".0%"), 
-                formatPct1dec:          d3.format(".1%")  
-            },
-            numberParsers: {
-                parseDateSlash: d3.timeParse("%d/%m/%Y")
             },
             slugify: function (str) {
                 str = str.replace(/^\s+|\s+$/g, '').toLowerCase(); // trim           
@@ -375,38 +490,6 @@ console.log(data.schema.list)
                     .replace(/-+/g, '-'); // collapse dashes
                 return str;
             }, 
-            wrap: function(text, width, lineHeight, centerVertical = false) {
-                text.each(function() {
-                    let text = d3.select(this),
-                        words = text.text().split(/\s+/).reverse(),
-                        word,
-                        line = [],
-                        lineNumber = 0,
-                        y = text.attr("y"),
-                        x = text.attr("x"),
-                        fontSize = parseFloat(text.style("font-size")),
-                        dy = parseFloat(text.attr("dy")),
-                        tspan = text.text(null).append("tspan").attr("x", x).attr("y", y).attr("dy", dy + "em");
-
-                    while (word = words.pop()) {
-                        line.push(word);
-                        tspan.text(line.join(" "));
-
-                        if (tspan.node().getComputedTextLength() > width) {
-                            line.pop();
-                            tspan.text(line.join(" "));
-                            line = [word];
-                            tspan = text.append("tspan")
-                                .attr("x", x)
-                                .attr("y",  y)
-                                .attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
-                        }                    
-                    }            
-                    if(centerVertical){
-                        text.style("transform",  "translateY(-"+(10 * (lineNumber))+"px)")
-                    }
-                })
-            }
         }
 
     </script>
