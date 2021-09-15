@@ -706,7 +706,7 @@
 
                 d3.select('#material-info-label')
                     .text(d => `In ${settings.year}, a total of ${helpers.numberFormatters.formatComma(total)} tonnes of ${material.toLowerCase()} waste was collected.
-                         ${helpers.numberFormatters.formatComma(landfill)} tonnes were send to to landfill, while
+                         ${helpers.numberFormatters.formatComma(landfill)} tonnes were sent to landfill, while
                          ${helpers.numberFormatters.formatComma(diverted)} tonnes were diverted.`
                     )
                     .call(helpers.wrap, settings.geometry.chartRadius * 0.8, 1.1)
