@@ -962,6 +962,7 @@
             const gsTableLinks =   {
                 kerbsideCollectionData:         'https://docs.google.com/spreadsheets/d/e/2PACX-1vSimVJWCqYLTijgqeU-SPGdAFT6wpGprHgjPdpxEElWurVvl28JYr7dHGE3OCSjF4VYH2_QggJUnveO/pub?gid=204435756&single=true&output=tsv',
                 kerbsideComposition:            'https://docs.google.com/spreadsheets/d/e/2PACX-1vSimVJWCqYLTijgqeU-SPGdAFT6wpGprHgjPdpxEElWurVvl28JYr7dHGE3OCSjF4VYH2_QggJUnveO/pub?gid=1848611910&single=true&output=tsv',
+                kerbsideCollectionData5yr:      'https://docs.google.com/spreadsheets/d/e/2PACX-1vSimVJWCqYLTijgqeU-SPGdAFT6wpGprHgjPdpxEElWurVvl28JYr7dHGE3OCSjF4VYH2_QggJUnveO/pub?gid=558277010&single=true&output=tsv',
             }
 
             // 2. Asynchronous data load (with Promise.all) and D3 (Fetch API) 
@@ -1284,7 +1285,9 @@
                 // c.  Flow paths
                 const organicsPath = `M${-xMargin - settings.dims.width * 2/ 3 + settings.dims.width -xMargin} ${(rowNo + 1) * rowSpace + 40} V${facilityY - flowRadius}  q 0, ${flowRadius}  ${-flowRadius}, ${flowRadius}  H${organicsFacilityX}`,
                     organicsContaminationPath = `M${organicsFacilityXOut} ${facilityY}   H${-(settings.dims.width * 2 / 3 + xMargin) + settings.dims.width / 2  + flowScale(yearData.Garbage_volume)/2 + contaminationRadius + 5}  q ${-contaminationRadius},0  ${-contaminationRadius}, ${contaminationRadius} `,
-                    organicsContaminationRate = 0
+                    collectionDataYear = data.table.kerbsideCollectionData5yr.filter(d => d.year === settings.year)[0],
+                    organicsContaminationRate = 1 - (collectionDataYear['Organics_Tonnes recovered'] / collectionDataYear['Organics_Tonnes collected'])
+
                 organicsGroup.append('path').classed('flowPath organics destination', true)
                     .attr('d', organicsPath)
                     .style('stroke-width', flowScale(yearData.Organics_volume))
