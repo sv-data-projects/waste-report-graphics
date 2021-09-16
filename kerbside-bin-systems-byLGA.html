@@ -78,10 +78,9 @@
                 padding-bottom: 0.25vw;
                 border-bottom: 0.5vw solid var(--secondaryGrey);
             }
-            .bin-size-label, 
-            .lga-total-label{
+            .lga-label, 
+            .bin-size-label{
                 font-size: 1.25vw;
-                text-align: right;
                 font-weight: 300;
             }
             .bin .bin-size-label{
@@ -89,6 +88,7 @@
             }
             .bin-size-label{
                 vertical-align: bottom;
+                text-align: right;
             }
             .bin-system-annotation-container{
                 padding: 0vw 2vw;
@@ -281,61 +281,13 @@
             data.schema.list.lgas =    binSystemData.map(d => d.Council).sort() 
             data.schema.list.region =   [...new Set( binSystemData.map(d => d.Region))].sort() 
 
-            // 2. Add System combinations
-            data.schema.system.objects = []
-            data.schema.system.strings = []
-            data.schema.system.stringCount = {}
-            // a. Get unique systems 
-            const yearData = binSystemData.filter(d => d.year === settings.year)
-            yearData.forEach(obj => {
-                let unique = {},            //Object to hold result of testing  each service config individually
-                    systemObj = {},          // Object to hold system config (shortened, cleaner data object)
-                    systemString = ''
-                    testSystemString = ''
 
-                // Create the systemObj 
-                data.schema.list.service.forEach(service => {
-                    systemObj[`${service}_binSize`] = obj[`${service}_binSize`]
-                    systemObj[`${service}_collectionFrequency`] = obj[`${service}_collectionFrequency`]
-                    if(obj[`${service}_type`]){
-                        systemObj[`${service}_type`] = obj[`${service}_type`] ? obj[`${service}_type`] : null
-                    }
-                }) 
-                // Compare and add
-                systemString = Object.values(systemObj).toString()      // Stringify for comparison 
-                if(data.schema.system.strings.indexOf(systemString) === -1){
-                    data.schema.system.strings.push(systemString)
-                    data.schema.system.objects.push(systemObj)
-                    data.schema.system.stringCount[systemString] = 1
-                } else {
-                    data.schema.system.stringCount[systemString]++
-                }
-            })
-
-            // b. Add meta data and sort systems by hierarchy 
-            const monthlyCollections = {  weekly: 4, fortnightly: 2, monthly: 1 }
-
-            data.schema.system.objects.forEach((obj, i) => {
-                obj.noLGAs =  data.schema.system.stringCount[data.schema.system.strings[i]]
-                obj.monthlyCollectionVol = 0
-                obj.monthlyCollections = 0
-                obj.noCollectionServices = 0
-
-                data.schema.list.service.forEach(service => {
-                    obj.noCollectionServices += obj[`${service}_binSize`] ? 1 : 0
-                    obj.monthlyCollectionVol += obj[`${service}_binSize`] ? obj[`${service}_binSize`] * monthlyCollections[obj[`${service}_collectionFrequency`]] : 0
-                    obj.monthlyCollections   += obj[`${service}_binSize`] ? monthlyCollections[obj[`${service}_collectionFrequency`]] : 0
-                }) 
-            })
-
-            data.chartData = data.schema.system.objects             // Multiple sort hierarchy
-                .sort((a, b) => b.monthlyCollectionVol - a.monthlyCollectionVol )
-                .sort((a, b) => b.monthlyCollections - a.monthlyCollections )
-                .sort((a, b) => b.noCollectionServices - a.noCollectionServices )
-                .sort((a, b) => b.noLGAs - a.noLGAs )               // Last sort is the 'final' sort
-
-            // c. Add lists from transformed data
-            data.schema.list.lgaFrequencies  = data.schema.system.objects.map(d => d.noLGAs)
+            data.chartData = binSystemData.filter(d => d.year === settings.year)           
+                .sort((a, b) => {
+                    if(a.Council < b.Council) { return -1; }
+                    if(a.Council > b.Council) { return 1; }
+                    return 0;
+                })
         };
 
 
@@ -351,7 +303,7 @@
             d3.select('.bin-system-vis-container').classed(settings.icon, true)
             if(settings.title){
                 d3.select('.main-title').html(`Victorian bin systems in ${settings.year}`)
-                d3.select('.sub-title').html('a visual representation of the different combinations of monthly bin collection services offered by LGAs')
+                d3.select('.sub-title').html('a visual representation of the different combinations of monthly bin collection services offered by each LGA')
             } else {
                 d3.select('.title-container').style('display', 'none')
             }
@@ -365,18 +317,22 @@
 
                 // a. Table header
                 const tableHeadings = tableHeader.append('tr').classed('table-row.header', true)
+                tableHeadings.append('th').classed(`lga-total table-header`, true)
+                    .attr('colspan', 3)
+                    .html('Local Government Area')
                 data.schema.list.service.forEach(service => {
                     tableHeadings.append('th').classed(`${helpers.slugify(service)} table-header`, true)
                         .attr('colspan', 2)
                         .html(service)
                 })
-                tableHeadings.append('th').classed(`lga-total table-header`, true)
-                    .attr('colspan', 2)
-                    .html('LGAs using each system')
 
                 // b. Table body: each row is a bin system with graphics
                 visData.forEach(obj => {
                     const rowContainer = tableBody.append('tr').classed('table-row', true)
+                    // LGA ame
+                        rowContainer.append('td').classed('lga-label', true)
+                            .attr('colspan', 3)
+                            .html(obj.Council)
                     // For each service..
                     data.schema.list.service.forEach(service => {
                         // Add Bin size
@@ -433,36 +389,6 @@
                             }
                         }
                     })
-
-                    // Add the LGA bar chart
-                        // Add No LGAs size
-                        const noLGAs = obj.noLGAs!== '' ? obj.noLGAs : 0
-                        rowContainer.append('td')
-                            .classed('lga-total-label', true)
-                            .html(noLGAs)
-
-                        // Add the LGA bar
-                        const barContainer = rowContainer.append('td')
-                                .classed('lga-bar-container', true)
-
-                        const barSvg = barContainer.append('svg')
-                                .attr('viewBox',`0 0 ${settings.dims.sparkBar.width} ${settings.dims.sparkBar.height}`)
-                                .attr('width', '100%')
-
-                        const lgaChart = barSvg.append('g').classed('chart', true)
-                                        .attr('transform', `translate(${settings.dims.sparkBar.margin.left} , ${settings.dims.sparkBar.margin.top} )`),
-                            chartWidth  = settings.dims.sparkBar.width - settings.dims.sparkBar.margin.left - settings.dims.sparkBar.margin.right,
-                            chartHeight = settings.dims.sparkBar.height - settings.dims.sparkBar.margin.top - settings.dims.sparkBar.margin.bottom,
-                            lgaScale = d3.scaleLinear()     
-                                .domain([0, d3.max(data.schema.list.lgaFrequencies)])
-                                .range([0, chartWidth])
-
-                        lgaChart.append('rect')
-                            .attr('class', `lga-bar` )
-                            .attr('x', lgaScale(0) )
-                            .attr('y',  0)
-                            .attr('width', lgaScale(noLGAs))
-                            .attr('height', chartHeight )
                 })
             
                 // c. Add footnote
@@ -473,59 +399,24 @@
                 // d. Add sidebar annotation
                 const iconType = settings.icon,
                     noSystems = visData.length,
-                    mostCommonFrequency =  d3.max(data.schema.list.lgaFrequencies),
-                    mostCommonGarbageBinSize = visData[0]['Garbage_binSize'],
-                    mostCommonGarbageFrequency = visData[0]['Garbage_collectionFrequency'],     
-                    mostCommonRecyclablesBinSize = visData[0]['Recyclables_binSize'],
-                    mostCommonRecyclablesFrequency = visData[0]['Recyclables_collectionFrequency'],  
-                    mostCommonOrganicsBinSize = visData[0]['Organics_binSize'],
-                    mostCommonOrganicsFrequency = visData[0]['Organics_collectionFrequency'],  
-                    mostCommonGlassBinSize = visData[0]['Glass_binSize'],
-                    mostCommonGlassFrequency = visData[0]['Glass_collectionFrequency'],
-                    organicsSystems = visData.filter(d => d.Organics_binSize !== null).length,
-                    organicsLGAs = d3.sum(visData.filter(d => d.Organics_binSize !== null).map(d => d.noLGAs)),
-                    glassSystems = visData.filter(d => d.Glass_binSize !== null).length,
-                    glassLGAs = d3.sum(visData.filter(d => d.Glass_binSize !== null).map(d => d.noLGAs)),
-                    totalLGAs = d3.sum(visData.map(d => d.noLGAs))
+                    organicsLGAs = visData.filter(d => d.Organics_binSize !== null).length,
+                    glassLGAs = visData.filter(d => d.Glass_binSize !== null).length,
+                    totalLGAs = visData.length
                 const annotationContainer = d3.select('.bin-system-annotation-container')
                 annotationContainer.append('div').classed('annotation-header', true)
                     .html('How to read this graphic')
                 annotationContainer.append('p').classed('annotation-text', true)
-                    .html(`In this table, each row represents one of the ${noSystems} different combinations of bin collection services (a 'bin system') offered by Victorian LGAs.
+                    .html(`This table shows the different combinations of bin collection services (a 'bin system') offered by the ${totalLGAs} Victorian LGAs.
                         For each (colour-coded) collection service, bin volumes are labelled and represented by size, and service frequency 'per month' is represented by the number of coloured ${settings.icon}s. 
                     `)
                 annotationContainer.append('p').classed('annotation-text', true)
                     .html(`For example, a weekly collection is shown by four coloured ${settings.icon}s, and a monthly service with one coloured ${settings.icon}.
                     `)
-                annotationContainer.append('p').classed('annotation-text', true)
-                    .html(`Bin systems are ranked (top to bottom) by the most widely used to least, meaning that the most common service 
-                        - offered by ${mostCommonFrequency} LGAs - is:
-                        a ${mostCommonGarbageFrequency} garbage service with a ${mostCommonGarbageBinSize}L bin, coupled with 
-                        a ${mostCommonRecyclablesFrequency} commingled recyclables service (${mostCommonRecyclablesBinSize}L bin), and 
-                        a ${mostCommonOrganicsFrequency} organics service (${mostCommonOrganicsBinSize}L bin). 
-                    `)
-                const serviceList = annotationContainer.append('ul')
-                if(mostCommonGarbageFrequency !== ""){
-                    serviceList.append('li').classed('annotation-text', true)
-                        .html(`a ${mostCommonGarbageFrequency} garbage service (${mostCommonGarbageBinSize}L bin`)
-                }
-                if(mostCommonRecyclablesFrequency !== ""){
-                    serviceList.append('li').classed('annotation-text', true)
-                        .html(`a ${mostCommonRecyclablesFrequency} commingled recyclables service (${mostCommonRecyclablesBinSize}L bin)`)
-                }
-                if(mostCommonOrganicsFrequency!== ""){
-                    serviceList.append('li').classed('annotation-text', true)
-                        .html(`a ${mostCommonOrganicsFrequency} organics service (${mostCommonOrganicsBinSize}L bin)`)
-                }
-                if(mostCommonGlassFrequency!== ""){
-                    serviceList.append('li').classed('annotation-text', true)
-                        .html(`a ${mostCommonGlassFrequency} glass service (${mostCommonGlassBinSize}L bin)`)
-                }
 
                 annotationContainer.append('p').classed('annotation-text', true)
                     .html(`This table shows that garbage and commingled services are part of all bin systems offered by all councils. 
-                        Organic collection services are part of ${organicsSystems} bin systems (offered by ${organicsLGAs} out of ${totalLGAs} LGAs), 
-                        and glass collection services are part of ${glassSystems} bin systems (offered by ${glassLGAs} out of ${totalLGAs} LGAs). 
+                        Organic collection services are offered by ${organicsLGAs} 
+                        and glass collection services are offered by ${glassLGAs} LGAs. 
                     `)
 
             // 2. Reveal table
