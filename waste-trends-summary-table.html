@@ -885,9 +885,9 @@
                     sparklineContainer = performanceTable.append('div').classed('material-summary-table-trend-container', true)
 
                 volumesContainer.append('div').classed('material-summary-table-header year', true).html(`${settings.year} volume (tonnes)` )
-                volumesContainer.append('div').classed('material-summary-table-data local-recovery', true).html(helpers.numberFormatters.formatComma(yearLocalRecovery))
-                volumesContainer.append('div').classed('material-summary-table-data export', true).html(helpers.numberFormatters.formatComma(yearExport))
-                volumesContainer.append('div').classed('material-summary-table-data total', true).html(helpers.numberFormatters.formatComma(yearTotalRecovery))
+                volumesContainer.append('div').classed('material-summary-table-data local-recovery', true).html(helpers.numberFormatters.formatComma(helpers.roundToNearest.hundred(yearLocalRecovery)))
+                volumesContainer.append('div').classed('material-summary-table-data export', true).html(helpers.numberFormatters.formatComma(helpers.roundToNearest.hundred(yearExport)))
+                volumesContainer.append('div').classed('material-summary-table-data total', true).html(helpers.numberFormatters.formatComma(helpers.roundToNearest.hundred(yearTotalRecovery)))
 
                 perLabelsContainer.append('div').classed('performance-label-change performance-label', true).html('% change')
                 perLabelsContainer.append('div').classed('performance-label-1yr performance-label', true).html('vs last year')
@@ -1008,6 +1008,10 @@
                 formatCost2dec:        	d3.format("$,.2f"),  
                 formatPct:          	d3.format(".0%"), 
                 formatPct1dec:          d3.format(".1%")  
+            },
+            roundToNearest: {
+                hundred:      (d) => Math.round(d / 100) * 100,
+                thousand:     (d) => Math.round(d / 1000) *1000
             },
             slugify: function (str) {
                 str = str.replace(/^\s+|\s+$/g, '').toLowerCase(); // trim           

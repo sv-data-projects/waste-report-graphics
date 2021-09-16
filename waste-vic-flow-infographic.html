@@ -137,7 +137,9 @@
             .mrf-data-label{
                 font-size: 30px;
                 fill: #fff;
-                text-shadow: 2px 2px 0px var(--nightSky);
+                text-shadow: 3px 3px 5px rgb(0, 0, 0, 75%), 
+                    -3px -3px 5px rgb(0, 0, 0, 75%),
+                    0px 3px 5px rgb(0, 0, 0, 75%);
                 pointer-events: none;
             }
             .material-info-title,
@@ -2255,6 +2257,10 @@
             },
             numberParsers: {
                 parseDateSlash: d3.timeParse("%d/%m/%Y")
+            },
+            roundToNearest: {
+                hundred:      (d) => Math.round(d / 100) * 100,
+                thousand:     (d) => Math.round(d / 1000) *1000
             },
             slugify: function (str) {
                 str = str.replace(/^\s+|\s+$/g, '').toLowerCase(); // trim           

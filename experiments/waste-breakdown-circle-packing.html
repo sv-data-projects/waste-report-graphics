@@ -7,13 +7,10 @@
         <meta name="author" content="Little Sketches">
         <script src="https://d3js.org/d3.v7.min.js"></script>
         <link rel="stylesheet" type="text/css" href="../css/core.css"></link>
-
-
         <style>
             /***************************/
             /*****  TYPOGRAPHY       ***/
             /***************************/
-
             body{
                 font-family: 'DIN Next LT Pro';
                 margin: 0;
@@ -22,14 +19,7 @@
             /***************************/
             /*****  GENERAL STYLING  ***/
             /***************************/
-            body{ 
-            }
-            .hidden{ 
-                display: none;
-            }
-            text { 
-                font-family: 'DIN Next LT Pro';
-            }
+
             .main-title{
                 font-size: 5vw;
                 font-weight: 500;
@@ -72,12 +62,10 @@
             .circle-icon{
                 fill:  #fff;
                 stroke:  none;
-                opacity: 0.5
-
+                opacity: 0.5;
             }
         </style>
     </head>
-
 
     <body>
         <div class = 'main-title'>Victorian waste breakdown</div>
@@ -111,10 +99,10 @@
             nestedData:         {}
         }
 
-            // Call build function
-            buildFromGSheetData(settings)
+        // Call build function
+        buildFromGSheetData(settings)
 
-            function buildFromGSheetData(settings) {
+        function buildFromGSheetData(settings) {
                 // 0. Prepare scene for fade in animation
                 d3.select(`#${settings.svgID}`).style('opacity', 0)
 
@@ -199,11 +187,13 @@
         //////////////////////////////////////////////
 
         async function renderCirclePack(data, settings) {
+            // Transition in
             d3.select('.main-subtitle').style('opacity', 0)
                 .html(`Waste by material type in ${settings.year}, broken down by volumes recovered products and volumes to landfill`)
                 .transition().duration(1000)
                 .style('opacity', null)
 
+            // Setup data an SVG element
             const root = pack(data)
             let focus = root;
             let view;
@@ -214,7 +204,8 @@
                 .on("click", (event) => zoom(event, root))
             svg.transition().duration(1000)
                 .style('opacity', null)
-            // Add Pattern fills
+
+            // Add pattern fills as defs
             const defs = svg.append('defs')
             defs.append('pattern')
                 .attr('id', 'diagonalHatch')
@@ -271,7 +262,7 @@
                     .attr("class", d =>  `circle-label-small ${helpers.slugify(d.data.name)} ${(typeof d.data.type === 'undefined' || d.data.type === '' )  ? 'material-group' : helpers.slugify(d.data.type)}` )
                     .style("fill-opacity", d => d.parent === root ? 1 : 0)
                     .style("display", d => d.parent === root ? "inline" : "none")   
-                    .text(d =>`${helpers.numberFormatters.formatComma(d.value)} tonnes`)
+                    .text(d =>`${helpers.numberFormatters.formatComma(helpers.roundToNearest.hundred(d.value))} tonnes`)
 
             zoomTo([root.x, root.y, root.r * 2]);
 
@@ -333,6 +324,10 @@
             },
             numberParsers: {
                 parseDateSlash: d3.timeParse("%d/%m/%Y")
+            },
+            roundToNearest: {
+                hundred:      (d) => Math.round(d / 100) * 100,
+                thousand:     (d) => Math.round(d / 1000) *1000
             },
             slugify: function (str) {
                 str = str.replace(/^\s+|\s+$/g, '').toLowerCase(); // trim           

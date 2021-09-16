@@ -241,6 +241,9 @@ In most cases, graphics are designed to be flexible enough for use in print and 
 | Victorian bin systems graphic | [kerbside-bin-systems.html](https://sv-data-projects.github.io/waste-report-graphics/kerbisde-bin-systems.html) |  year |  YYYY-YY | 2019-20 | Specifies FY data to display 
 | | | icon | 'bin' or 'block' | bin | Shows collection frequencies as bin icon or rectangular block
 | | | showTitle | true or false | true | Whether to display the graphic title
+| Victorian bin systems graphic by LGA | [kerbside-bin-systems-byLGA.html](https://sv-data-projects.github.io/waste-report-graphics/kerbisde-bin-systems-byLGA.html) |  year |  YYYY-YY | 2019-20 | Specifies FY data to display 
+| | | icon | 'bin' or 'block' | bin | Shows collection frequencies as bin icon or rectangular block
+| | | showTitle | true or false | true | Whether to display the graphic title
 
 
 ## Further customisation of waste report graphics 

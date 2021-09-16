@@ -192,7 +192,7 @@
                     labelXPadding:  5,
                     labelSize:      8
                 },
-                numberFormatter: d3.format(",.1f"),
+                numberFormatter: d3.format(",.0f"),
                 yScale: d3.scaleLinear(),
             }, 
 
@@ -222,7 +222,6 @@
                 numberFormatter: d3.format("$,.1f"),
                 yScale: d3.scaleLinear(),
             }, 
-
 
             // Diversion rate by material  multiple slope chart
             diversionRate: {
@@ -304,8 +303,6 @@
                 numberFormatter: d3.format(",.0f"),
                 yScale: d3.scaleLog(),
             } 
-
-
         }
 
         const data = {          // Initiate data object that populated by the parseData() function, 
@@ -723,6 +720,10 @@
             },
             numberParsers: {
                 parseDateSlash: d3.timeParse("%d/%m/%Y")
+            },
+            roundToNearest: {
+                hundred:      (d) => Math.round(d / 100) * 100,
+                thousand:     (d) => Math.round(d / 1000) *1000
             },
             slugify: function (str) {
                 str = str.replace(/^\s+|\s+$/g, '').toLowerCase(); // trim           

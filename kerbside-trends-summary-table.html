@@ -863,9 +863,9 @@
                 costContainer.append('div').classed('service-summary-table-header metric-label', true).html(`Cost of of waste collected ($)` )
                 costContainer.append('div').classed('service-summary-table-header sparkline-container', true)
                     .append('svg').attr('id', `cost-sparkline-${helpers.slugify(service)}`).classed('minor-sparkline', true)
-                costContainer.append('div').classed('service-summary-table-data year-data', true).html(`${helpers.numberFormatters.formatCost1dec(yearCost / 1000000)} million`)
-                costContainer.append('div').classed('service-summary-table-data lastYear-data', true).html(`${helpers.numberFormatters.formatCost1dec(lastYearCost / 1000000)} million`)
-                costContainer.append('div').classed('service-summary-table-data fiveYear-data', true).html(`${helpers.numberFormatters.formatCost1dec(fiveYearCost / 1000000)} million`)
+                costContainer.append('div').classed('service-summary-table-data year-data', true).html(`${helpers.numberFormatters.formatCostInteger(yearCost / 1000000)} million`)
+                costContainer.append('div').classed('service-summary-table-data lastYear-data', true).html(`${helpers.numberFormatters.formatCostInteger(lastYearCost / 1000000)} million`)
+                costContainer.append('div').classed('service-summary-table-data fiveYear-data', true).html(`${helpers.numberFormatters.formatCostInteger(fiveYearCost / 1000000)} million`)
                 costContainer.append('div').classed('service-summary-table-header', true)
                 costContainer.append('div').classed('service-summary-table-data pct-change performance-label', true).html('% change &rarr;')
                 costContainer.append('div').classed('service-summary-table-data pct-change lastYear-vs-data', true).html(costVsLastYearPct)
@@ -901,9 +901,9 @@
                 costPerHouseholdContainer.append('div').classed('service-summary-table-header metric-label', true).html(`Cost of collection per household` )
                 costPerHouseholdContainer.append('div').classed('service-summary-table-header sparkline-container', true)
                     .append('svg').attr('id', `cost-per-hh-sparkline-${helpers.slugify(service)}`).classed('minor-sparkline', true)
-                costPerHouseholdContainer.append('div').classed('service-summary-table-data year', true).html(helpers.numberFormatters.formatCost2dec(yearCostPerHousehold))
-                costPerHouseholdContainer.append('div').classed('service-summary-table-data year-data-data', true).html(helpers.numberFormatters.formatCost2dec(lastYearCostPerHousehold))
-                costPerHouseholdContainer.append('div').classed('service-summary-table-data fiveYear-data', true).html(helpers.numberFormatters.formatCost2dec(fiveYearCostPerHousehold))
+                costPerHouseholdContainer.append('div').classed('service-summary-table-data year', true).html(helpers.numberFormatters.formatCostInteger(yearCostPerHousehold))
+                costPerHouseholdContainer.append('div').classed('service-summary-table-data year-data-data', true).html(helpers.numberFormatters.formatCostInteger(lastYearCostPerHousehold))
+                costPerHouseholdContainer.append('div').classed('service-summary-table-data fiveYear-data', true).html(helpers.numberFormatters.formatCostInteger(fiveYearCostPerHousehold))
                 costPerHouseholdContainer.append('div').classed('service-summary-table-header', true)
                 costPerHouseholdContainer.append('div').classed('service-summary-table-data pct-change performance-label', true).html('% change &rarr;')
                 costPerHouseholdContainer.append('div').classed('service-summary-table-data pct-change lastYear-vs-data', true).html(costPerHouseholdVsLastYearPct)
@@ -1037,6 +1037,10 @@
                 formatCost2dec:        	d3.format("$,.2f"),  
                 formatPct:          	d3.format(".0%"), 
                 formatPct1dec:          d3.format(".1%")  
+            },
+            roundToNearest: {
+                hundred:      (d) => Math.round(d / 100) * 100,
+                thousand:     (d) => Math.round(d / 1000) *1000
             },
             slugify: function (str) {
                 str = str.replace(/^\s+|\s+$/g, '').toLowerCase(); // trim           

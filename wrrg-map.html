@@ -659,7 +659,7 @@
                         .text('Garbage')
                     garbageGroup.append('text').classed('wrrg-infoPane-data', true)
                         .attr('transform', `translate(${20} , ${110})`)
-                        .text(`${helpers.numberFormatters.formatComma(data.byWRRG[wrrg]['Garbage'].collected)} t`)
+                        .text(`${helpers.numberFormatters.formatComma(helpers.roundToNearest.hundred(data.byWRRG[wrrg]['Garbage'].collected))} t`)
 
                     // f. Recyclables group
                     const recyclablesGroup = wrrgPane.append('g')
@@ -672,10 +672,10 @@
                         .text('Recyclables')
                     recyclablesGroup.append('text').classed('wrrg-infoPane-data', true)
                         .attr('transform', `translate(${20} , ${110})`)
-                        .text(`${helpers.numberFormatters.formatComma(data.byWRRG[wrrg]['Recyclables'].collected)} t`)
+                        .text(`${helpers.numberFormatters.formatComma(helpers.roundToNearest.hundred(data.byWRRG[wrrg]['Recyclables'].collected))} t`)
                     recyclablesGroup.append('text').classed('wrrg-infoPane-data', true)
                         .attr('transform', `translate(${20} , ${125})`)
-                        .text(`${helpers.numberFormatters.formatComma(data.byWRRG[wrrg]['Recyclables'].processed)} t`)
+                        .text(`${helpers.numberFormatters.formatComma(helpers.roundToNearest.hundred(data.byWRRG[wrrg]['Recyclables'].processed))} t`)
 
                     // g. Organics group
                     const organicsGroup = wrrgPane.append('g')
@@ -688,10 +688,10 @@
                         .text('Organics')
                     organicsGroup.append('text').classed('wrrg-infoPane-data', true)
                         .attr('transform', `translate(${20} , ${110})`)
-                        .text(`${helpers.numberFormatters.formatComma(data.byWRRG[wrrg]['Organics'].collected)} t`)
+                        .text(`${helpers.numberFormatters.formatComma(helpers.roundToNearest.hundred(data.byWRRG[wrrg]['Organics'].collected))} t`)
                     organicsGroup.append('text').classed('wrrg-infoPane-data', true)
                         .attr('transform', `translate(${20} , ${125})`)
-                        .text(`${helpers.numberFormatters.formatComma(data.byWRRG[wrrg]['Organics'].processed)} t`)
+                        .text(`${helpers.numberFormatters.formatComma(helpers.roundToNearest.hundred(data.byWRRG[wrrg]['Organics'].processed))} t`)
 
                     // h. Glass group
                     if(includeGlass){
@@ -705,10 +705,10 @@
                             .text('Glass')
                         glassGroup.append('text').classed('wrrg-infoPane-data', true)
                             .attr('transform', `translate(${10} , ${110})`)
-                            .text(`${helpers.numberFormatters.formatComma(data.byWRRG[wrrg]['Glass'].collected)} t`)
+                            .text(`${helpers.numberFormatters.formatComma(helpers.roundToNearest.hundred(data.byWRRG[wrrg]['Glass'].collected))} t`)
                         glassGroup.append('text').classed('wrrg-infoPane-data', true)
                             .attr('transform', `translate(${10} , ${125})`)
-                            .text(`${helpers.numberFormatters.formatComma(data.byWRRG[wrrg]['Glass'].processed)} t`)
+                            .text(`${helpers.numberFormatters.formatComma(helpers.roundToNearest.hundred(data.byWRRG[wrrg]['Glass'].processed))} t`)
                     }
                 })
 
@@ -773,6 +773,10 @@
                 },
                 numberParsers: {
                     parseDateSlash: d3.timeParse("%d/%m/%Y")
+                },
+                roundToNearest: {
+                    hundred:      (d) => Math.round(d / 100) * 100,
+                    thousand:     (d) => Math.round(d / 1000) *1000
                 },
                 slugify: function (str) {
                     str = str.replace(/^\s+|\s+$/g, '').toLowerCase(); // trim           

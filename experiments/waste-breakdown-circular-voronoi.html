@@ -388,7 +388,7 @@
 
                     labels.append("text")
                         .classed("value", true)
-                        .text(d => helpers.numberFormatters.formatComma(d.data.value)+' tonnes' )
+                        .text(d => helpers.numberFormatters.formatComma(helpers.roundToNearest.hundred(d.data.value))+' tonnes' )
                     
                     const hoverers = settings.el.treemapContainer.append("g")
                         .classed('hoverers', true)
@@ -464,6 +464,10 @@
                 },
                 numberParsers: {
                     parseDateSlash: d3.timeParse("%d/%m/%Y")
+                },
+                roundToNearest: {
+                    hundred:      (d) => Math.round(d / 100) * 100,
+                    thousand:     (d) => Math.round(d / 1000) *1000
                 },
                 camelize: function(str) {
                     return str.replace(/(?:^\w|[A-Z]|\b\w|\s+)/g, function(match, index) {

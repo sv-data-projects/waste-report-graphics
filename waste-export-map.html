@@ -435,7 +435,7 @@
                     const countryTotalVol = data.byExportCountry[country].Total
                     countryGroup.append('text').classed('country-total-vol', true)
                         .attr('x', countyGroupWidth )
-                        .text(`${helpers.numberFormatters.formatComma(countryTotalVol)}`)
+                        .text(`${helpers.numberFormatters.formatComma(helpers.roundToNearest.hundred(countryTotalVol))}`)
                     countryGroup.append('rect').classed(`total-bar bar ${helpers.slugify(country)}`, true)
                         .attr('x', 0)
                         .attr('y', 3)
@@ -457,7 +457,7 @@
                                 countryGroup.append('text').classed('country-material-vol', true)
                                     .attr('x', countyGroupWidth )
                                     .attr('y', 15 + materialsCounter * materialYSpace)
-                                    .text(`${helpers.numberFormatters.formatComma(countryMateriaVol)}`)
+                                    .text(`${helpers.numberFormatters.formatComma(helpers.roundToNearest.hundred(countryMateriaVol))}`)
                                 countryGroup.append('rect').classed(`material-bar bar ${helpers.slugify(material)}`, true)
                                     .attr('x', 0)
                                     .attr('y', 17 + materialsCounter * materialYSpace)
@@ -492,7 +492,7 @@
                 .text(`Victoria exported`)
             totalGroup.append('text').classed('total-exports-total', true)
                 .attr('y', 30)
-                .text(`${helpers.numberFormatters.formatComma(totalExports)} tonnes`)
+                .text(`${helpers.numberFormatters.formatComma(helpers.roundToNearest.hundred(totalExports))} tonnes`)
             totalGroup.append('text').classed('total-exports-label', true)
                 .attr('y', 50)
                 .text(`of recyclable material`)
@@ -516,7 +516,7 @@
                 totalGroup.append('text').classed('total-material-vol', true)
                     .attr('x', totalChartWidth )
                     .attr('y', 90 + i * materialYSpace)
-                    .text(`${helpers.numberFormatters.formatComma(materiaVol)} tonnes`)                    
+                    .text(`${helpers.numberFormatters.formatComma(helpers.roundToNearest.hundred(materiaVol))} tonnes`)                    
             })
 
             // d. Title and description
@@ -557,6 +557,10 @@
             },
             numberParsers: {
                 parseDateSlash: d3.timeParse("%d/%m/%Y")
+            },
+            roundToNearest: {
+                hundred:      (d) => Math.round(d / 100) * 100,
+                thousand:     (d) => Math.round(d / 1000) *1000
             },
             slugify: function (str) {
                 str = str.replace(/^\s+|\s+$/g, '').toLowerCase(); // trim           

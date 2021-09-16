@@ -413,7 +413,7 @@
                 .attr('y', headlineOffsetY)
 
             annotationLayer.append('text').classed('lga-label-headline', true)
-                .text(`${helpers.numberFormatters.formatComma1dec(totalCollection/1000000)} million tonnes`)
+                .text(`${helpers.numberFormatters.formatComma2dec(totalCollection/1000000)} million tonnes`)
                 .attr('x', 310)
                 .attr('y', headlineOffsetY+60)
 

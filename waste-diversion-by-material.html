@@ -705,9 +705,9 @@
                     total = this.__data__.total
 
                 d3.select('#material-info-label')
-                    .text(d => `In ${settings.year}, a total of ${helpers.numberFormatters.formatComma(total)} tonnes of ${material.toLowerCase()} waste was collected.
-                         ${helpers.numberFormatters.formatComma(landfill)} tonnes were sent to landfill, while
-                         ${helpers.numberFormatters.formatComma(diverted)} tonnes were diverted.`
+                    .text(d => `In ${settings.year}, a total of ${helpers.numberFormatters.formatComma(helpers.roundToNearest.hundred(total))} tonnes of ${material.toLowerCase()} waste was collected.
+                         ${helpers.numberFormatters.formatComma(helpers.roundToNearest.hundred(landfill))} tonnes were sent to landfill, while
+                         ${helpers.numberFormatters.formatComma(helpers.roundToNearest.hundred(diverted))} tonnes were diverted.`
                     )
                     .call(helpers.wrap, settings.geometry.chartRadius * 0.8, 1.1)
                     .style('opacity', null)
@@ -747,6 +747,10 @@
             },
             numberParsers: {
                 parseDateSlash: d3.timeParse("%d/%m/%Y")
+            },
+            roundToNearest: {
+                hundred:      (d) => Math.round(d / 100) * 100,
+                thousand:     (d) => Math.round(d / 1000) *1000
             },
             slugify: function (str) {
                 str = str.replace(/^\s+|\s+$/g, '').toLowerCase(); // trim           
