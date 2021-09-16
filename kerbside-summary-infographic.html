@@ -291,9 +291,6 @@
                 margin: {
                     top: 100, right: 50, bottom: 50, left: 100
                 }
-            },
-            variables: {
-                peoplePerHousehold:     2.5
             }
         }
 
@@ -374,14 +371,14 @@
             const yearData = data.filter(d => d.year === settings.year)[0],
                 totalCouncilCost = d3.sum(Object.keys(yearData).filter(d => d.slice(d.indexOf('_') + 1) === 'cost').map( d => yearData[d])),
                 totalCollection = d3.sum(Object.keys(yearData).filter(d => d.slice(d.indexOf('_') + 1) === 'volume').map( d => yearData[d])),
-                garbagePerPropertyTonnes = yearData.Garbage_volume / yearData.Population * settings.variables.peoplePerHousehold,
-                garbagePerPropertyCost = yearData.Garbage_cost / yearData.Population * settings.variables.peoplePerHousehold,
+                garbagePerPropertyTonnes = yearData.Garbage_volume / yearData.Garbage_properties,
+                garbagePerPropertyCost = yearData.Garbage_cost / yearData.Garbage_properties,
                 garbagePerTonneCost = yearData.Garbage_cost / yearData.Garbage_volume
-                recyclingPerPropertyTonnes = yearData.Recycling_volume / yearData.Population * settings.variables.peoplePerHousehold,
-                recyclingPerPropertyCost = yearData.Recycling_cost / yearData.Population * settings.variables.peoplePerHousehold,
+                recyclingPerPropertyTonnes = yearData.Recycling_volume / yearData.Recycling_properties,
+                recyclingPerPropertyCost = yearData.Recycling_cost / yearData.Recycling_properties,
                 recyclingPerTonneCost = yearData.Recycling_cost / yearData.Recycling_volume,
-                organicsPerPropertyTonnes = yearData.Organics_volume / yearData.Population * settings.variables.peoplePerHousehold,
-                organicsPerPropertyCost = yearData.Organics_cost / yearData.Population * settings.variables.peoplePerHousehold,
+                organicsPerPropertyTonnes = yearData.Organics_volume / yearData.Organics_properties,
+                organicsPerPropertyCost = yearData.Organics_cost / yearData.Organics_properties,
                 organicsPerTonneCost = yearData.Organics_cost / yearData.Organics_volume
 
             const svg = d3.select(`#${settings.svgID}`),

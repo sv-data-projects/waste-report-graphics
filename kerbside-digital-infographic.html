@@ -698,9 +698,6 @@
                 margin: {
                     top: 100, right: 50, bottom: 50, left: 100
                 }
-            },
-            variables: {
-                peoplePerHousehold:     2.5
             }
         }
 
@@ -795,17 +792,17 @@
                 recycleBinData =  compositionData.filter(d => d.year === settings.year),
                 totalCouncilCost = d3.sum(Object.keys(yearData).filter(d => d.slice(d.indexOf('_') + 1) === 'cost').map( d => yearData[d])),
                 totalCollection = d3.sum(Object.keys(yearData).filter(d => d.slice(d.indexOf('_') + 1) === 'volume').map( d => yearData[d])),
-                garbagePerPropertyTonnes = yearData.Garbage_volume / yearData.Population * settings.variables.peoplePerHousehold,
+                garbagePerPropertyTonnes = yearData.Garbage_volume / yearData.Garbage_properties,
                 garbageCostPerTonne = yearData.Garbage_cost  / yearData.Garbage_volume,
-                garbagePerPropertyCost = yearData.Garbage_cost / yearData.Population * settings.variables.peoplePerHousehold,
+                garbagePerPropertyCost = yearData.Garbage_cost / yearData.Garbage_properties,
                 garbagePerTonneCost = yearData.Garbage_cost / yearData.Garbage_volume
-                recyclingPerPropertyTonnes = yearData.Recycling_volume / yearData.Population * settings.variables.peoplePerHousehold,
+                recyclingPerPropertyTonnes = yearData.Recycling_volume / yearData.Recycling_properties,
                 recyclingCostPerTonne = yearData.Recycling_cost / yearData.Recycling_volume ,
-                recyclingPerPropertyCost = yearData.Recycling_cost / yearData.Population * settings.variables.peoplePerHousehold,
+                recyclingPerPropertyCost = yearData.Recycling_cost / yearData.Recycling_properties,
                 recyclingPerTonneCost = yearData.Recycling_cost / yearData.Recycling_volume,
-                organicsPerPropertyTonnes = yearData.Organics_volume / yearData.Population * settings.variables.peoplePerHousehold,
+                organicsPerPropertyTonnes = yearData.Organics_volume / yearData.Organics_properties,
                 organicsCostPerTonne  = yearData.Organics_cost / yearData.Organics_volume,
-                organicsPerPropertyCost = yearData.Organics_cost / yearData.Population * settings.variables.peoplePerHousehold,
+                organicsPerPropertyCost = yearData.Organics_cost / yearData.Organics_properties,
                 organicsPerTonneCost = yearData.Organics_cost / yearData.Organics_volume
 
             const icons = {
