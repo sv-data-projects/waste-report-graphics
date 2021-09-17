@@ -89,6 +89,7 @@
             }
             .bin-size-label{
                 vertical-align: bottom;
+                line-height: 1;
             }
             .bin-system-annotation-container{
                 padding: 0vw 2vw;
@@ -108,12 +109,7 @@
             ul{
                 padding-inline-start: 1rem;
             }
-            .footnote{
-                font-size: 1vw;
-                font-weight: 300;
-                margin-top: 2vw;
-                height: 5vw;
-            }
+
             /*******************************/
             /*****  COLOUR ASSIGNMENT    ***/
             /*******************************/
@@ -381,12 +377,15 @@
                     // For each service..
                     data.schema.list.service.forEach(service => {
                         // Add Bin size
-                        const binSize = obj[`${service}_binSize`] !== '' ? obj[`${service}_binSize`] : 0,
-                            binLabel = binSize > 0 ? (service === 'Recyclables' && obj[`${service}_type`] !== 'Commingled') 
-                                ? `${helpers.numberFormatters.formatComma(binSize)}L<sup>*</sup>` : 
-                                    `${helpers.numberFormatters.formatComma(binSize)}L` 
-                                :  ''
+                        const binSize =  obj[`${service}_binSize`] !== '' ? obj[`${service}_binSize`] : 0
+                        let binLabel
+                        if(service === 'Recyclables' && obj[`${service}_type`] !== 'Commingled') { // Tied bundle 'exception' case
+                             binLabel =  binSize > 0 ? obj[`${service}_type`] : ''
 
+                        } else { // Expected case for a bin 
+                            binLabel = `${helpers.numberFormatters.formatComma(binSize)}L` 
+                        }
+                           
                         rowContainer.append('td')
                             .classed('bin-size-label', true)
                             .html(binLabel)
@@ -467,12 +466,7 @@
                             .attr('height', chartHeight )
                 })
             
-                // c. Add footnote
-                tableBody.append('tr').classed('table-row footnote', true)
-                    .append('td').attr('colspan', 10)
-                    .html('<sup>*</sup> Recyclables collected as a tied bundle rather than in a commingled bin.')
-
-                // d. Add sidebar annotation
+                // c. Add sidebar annotation
                 const iconType = settings.icon,
                     noSystems = visData.length,
                     mostCommonFrequency =  d3.max(data.schema.list.lgaFrequencies),
@@ -502,7 +496,7 @@
                 annotationContainer.append('p').classed('annotation-text', true)
                     .html(`Bin systems are ranked (top to bottom) by the most widely used to least.`)
 
-                // ** Unused commentary option: left of for use in standalone graphic etc.  **
+                // ** Unused commentary option: kept if ever need for standalone graphic etc.  **
                 // annotationContainer.append('p').classed('annotation-text', true)
                 //    .html(`Bin systems are ranked (top to bottom) by the most widely used to least.`)
                 //     meaning that the most common service 

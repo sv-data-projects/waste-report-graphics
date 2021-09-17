@@ -32,7 +32,7 @@
 
             .bin-system-vis-container{
                 display: grid;
-                grid-template-columns: 3fr 1fr;
+                grid-template-columns: 4fr 1fr;
                 padding-top: 3vw;
             }
             .bin-system-table-container{
@@ -41,9 +41,11 @@
             .bin-system-annotation-container{
                 grid-area: 1 / 2 / 2 / 3;
             }
-
+            .lga-total{
+                width: 25vw;
+            }
             .spark-container{
-                width: 10vw;
+                width: 9vw;
             }
             .spark-container,
             .lga-bar-container,
@@ -51,10 +53,10 @@
                 display: grid;
                 align-self:center;
             }
-
             .table-row{
                 border-top: var(--secondaryGreyLight) 0.5px solid;
             }
+
             /************************/
             /*****  TYPOGRAPHY    ***/
             /************************/
@@ -90,6 +92,7 @@
             .bin-size-label{
                 vertical-align: bottom;
                 text-align: right;
+                line-height: 1;
             }
             .bin-system-annotation-container{
                 padding: 0vw 2vw;
@@ -109,12 +112,7 @@
             ul{
                 padding-inline-start: 1rem;
             }
-            .footnote{
-                font-size: 1vw;
-                font-weight: 300;
-                margin-top: 2vw;
-                height: 5vw;
-            }
+
             /*******************************/
             /*****  COLOUR ASSIGNMENT    ***/
             /*******************************/
@@ -177,10 +175,10 @@
             title:          true,
             dims: {
                 sparkColumn: {            // For each svg collection frequency graphic
-                    height:     60, 
+                    height:     50, 
                     width:      200,
                     blockGap:   10,
-                    margin:     {top: 0, bottom: 7.5, left: 10, right: 50}
+                    margin:     {top: 0, bottom: 5, left: 10, right: 50}
                 }
             } 
         }
@@ -315,7 +313,7 @@
                 // a. Table header
                 const tableHeadings = tableHeader.append('tr').classed('table-row.header', true)
                 tableHeadings.append('th').classed(`lga-total table-header`, true)
-                    .attr('colspan', 3)
+                    .attr('colspan', 4)
                     .html('Local Government Area')
                 data.schema.list.service.forEach(service => {
                     tableHeadings.append('th').classed(`${helpers.slugify(service)} table-header`, true)
@@ -328,16 +326,19 @@
                     const rowContainer = tableBody.append('tr').classed('table-row', true)
                     // LGA ame
                         rowContainer.append('td').classed('lga-label', true)
-                            .attr('colspan', 3)
+                            .attr('colspan', 4)
                             .html(obj.Council)
                     // For each service..
                     data.schema.list.service.forEach(service => {
                         // Add Bin size
-                        const binSize = obj[`${service}_binSize`] !== '' ? obj[`${service}_binSize`] : 0,
-                            binLabel = binSize > 0 ? (service === 'Recyclables' && obj[`${service}_type`] !== 'Commingled') 
-                                ? `${helpers.numberFormatters.formatComma(binSize)}L<sup>*</sup>` : 
-                                    `${helpers.numberFormatters.formatComma(binSize)}L` 
-                                :  ''
+                        const binSize =  obj[`${service}_binSize`] !== '' ? obj[`${service}_binSize`] : 0
+                        let binLabel
+                        if(service === 'Recyclables' && obj[`${service}_type`] !== 'Commingled') { // Tied bundle 'exception' case
+                             binLabel =  binSize > 0 ? obj[`${service}_type`] : ''
+
+                        } else { // Expected case for a bin 
+                            binLabel = `${helpers.numberFormatters.formatComma(binSize)}L` 
+                        }
 
                         rowContainer.append('td')
                             .classed('bin-size-label', true)
@@ -389,12 +390,7 @@
                     })
                 })
             
-                // c. Add footnote
-                tableBody.append('tr').classed('table-row footnote', true)
-                    .append('td').attr('colspan', 10)
-                    .html('<sup>*</sup> Recyclables collected as a tied bundle rather than in a commingled bin.')
-
-                // d. Add sidebar annotation
+                // c. Add sidebar annotation
                 const iconType = settings.icon,
                     noSystems = visData.length,
                     organicsLGAs = visData.filter(d => d.Organics_binSize !== null).length,
