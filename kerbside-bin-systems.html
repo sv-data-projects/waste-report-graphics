@@ -499,35 +499,38 @@
                     `)
                 annotationContainer.append('p').classed('annotation-text', true)
                     .html(`Bin systems are ranked (top to bottom) by the most widely used to least.`)
-<!--                    , meaning that the most common service -->
-<!--                        - offered by ${mostCommonFrequency} LGAs - is:-->
-<!--                        a ${mostCommonGarbageFrequency} garbage service with a ${mostCommonGarbageBinSize}L bin, coupled with -->
-<!--                        a ${mostCommonRecyclablesFrequency} commingled recyclables service (${mostCommonRecyclablesBinSize}L bin), and -->
-<!--                        a ${mostCommonOrganicsFrequency} organics service (${mostCommonOrganicsBinSize}L bin). -->
-<!--                    `)-->
-<!--                const serviceList = annotationContainer.append('ul')-->
-<!--                if(mostCommonGarbageFrequency !== ""){-->
-<!--                    serviceList.append('li').classed('annotation-text', true)-->
-<!--                        .html(`a ${mostCommonGarbageFrequency} garbage service (${mostCommonGarbageBinSize}L bin`)-->
-<!--                }-->
-<!--                if(mostCommonRecyclablesFrequency !== ""){-->
-<!--                    serviceList.append('li').classed('annotation-text', true)-->
-<!--                        .html(`a ${mostCommonRecyclablesFrequency} commingled recyclables service (${mostCommonRecyclablesBinSize}L bin)`)-->
-<!--                }-->
-<!--                if(mostCommonOrganicsFrequency!== ""){-->
-<!--                    serviceList.append('li').classed('annotation-text', true)-->
-<!--                        .html(`a ${mostCommonOrganicsFrequency} organics service (${mostCommonOrganicsBinSize}L bin)`)-->
-<!--                }-->
-<!--                if(mostCommonGlassFrequency!== ""){-->
-<!--                    serviceList.append('li').classed('annotation-text', true)-->
-<!--                        .html(`a ${mostCommonGlassFrequency} glass service (${mostCommonGlassBinSize}L bin)`)-->
-<!--                }-->
 
-<!--                annotationContainer.append('p').classed('annotation-text', true)-->
-<!--                    .html(`This table shows that garbage and commingled services are part of all bin systems offered by all councils.-->
-<!--                        Organic collection services are part of ${organicsSystems} bin systems (offered by ${organicsLGAs} out of ${totalLGAs} LGAs),-->
-<!--                        and glass collection services are part of ${glassSystems} bin systems (offered by ${glassLGAs} out of ${totalLGAs} LGAs).-->
-<!--                    `)-->
+                // ** Unused commentary option: left of for use in standalone graphic etc.  **
+                // annotationContainer.append('p').classed('annotation-text', true)
+                //    .html(`Bin systems are ranked (top to bottom) by the most widely used to least.`)
+                //     meaning that the most common service 
+                //         - offered by ${mostCommonFrequency} LGAs - is:
+                //         a ${mostCommonGarbageFrequency} garbage service with a ${mostCommonGarbageBinSize}L bin, coupled with 
+                //         a ${mostCommonRecyclablesFrequency} commingled recyclables service (${mostCommonRecyclablesBinSize}L bin), and 
+                //         a ${mostCommonOrganicsFrequency} organics service (${mostCommonOrganicsBinSize}L bin).
+                //     `)
+                // const serviceList = annotationContainer.append('ul')
+                // if(mostCommonGarbageFrequency !== ""){
+                //     serviceList.append('li').classed('annotation-text', true)
+                //         .html(`a ${mostCommonGarbageFrequency} garbage service (${mostCommonGarbageBinSize}L bin`)
+                // }
+                // if(mostCommonRecyclablesFrequency !== ""){
+                //     serviceList.append('li').classed('annotation-text', true)
+                //         .html(`a ${mostCommonRecyclablesFrequency} commingled recyclables service (${mostCommonRecyclablesBinSize}L bin)`)
+                
+                // if(mostCommonOrganicsFrequency!== 
+                //     serviceList.append('li').classed('annotation-text', true
+                //         .html(`a ${mostCommonOrganicsFrequency} organics service (${mostCommonOrganicsBinSize}L bin)`)
+                // }
+                // if(mostCommonGlassFrequency!== 
+                //     serviceList.append('li').classed('annotation-text', true
+                //         .html(`a ${mostCommonGlassFrequency} glass service (${mostCommonGlassBinSize}L bin)`)
+                
+                // annotationContainer.append('p').classed('annotation-text', true
+                //     .html(`This table shows that garbage and commingled services are part of all bin systems offered by all councils.
+                //         Organic collection services are part of ${organicsSystems} bin systems (offered by ${organicsLGAs} out of ${totalLGAs} LGAs),
+                //         and glass collection services are part of ${glassSystems} bin systems (offered by ${glassLGAs} out of ${totalLGAs} LGAs)
+                //     `)
 
             // 2. Reveal table
             d3.select('.main-container')
