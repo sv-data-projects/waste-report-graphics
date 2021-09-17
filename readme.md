@@ -236,7 +236,8 @@ In most cases, graphics are designed to be flexible enough for use in print and 
 | | | showGlass | true, false | true | Whether to show the layout with glass collection data (for WRRGs with collection/data)
 | | | colourScale | ramp, categorical | ramp | Whether to show the WRRG regions with data encoded in a colour ramp, or as multi-coloured categorical colours (not recommended)
 | Progress to Recycling Victorian Targets diagrams | [progress-vs-rv-targets.html](https://sv-data-projects.github.io/waste-report-graphics/progress-vs-rv-targets.html) |  year |  YYYY-YY | 2019-20 | Specifies FY data to display actuals up to
-| | | alternate | true or false | true | Alternates between 'text | diagram' and' diagram| text' for each target/row; or just 'text / diagram'
+| | | alternate | true or false | true | Alternates between 'text : diagram' and' diagram : text' for each target : row; or just 'text : diagram'
+| | | alignLeft | true or false | true | If set to true, will collapse the left margin
 | | | target | 0, 1, 2, 3, all | all | Can be used to display just one target at a time
 | Victorian bin systems graphic | [kerbside-bin-systems.html](https://sv-data-projects.github.io/waste-report-graphics/kerbisde-bin-systems.html) |  year |  YYYY-YY | 2019-20 | Specifies FY data to display 
 | | | icon | 'bin' or 'block' | bin | Shows collection frequencies as bin icon or rectangular block
