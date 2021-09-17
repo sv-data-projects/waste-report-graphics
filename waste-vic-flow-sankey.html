@@ -468,8 +468,8 @@
                     .attr('y', () => {
                         const bbox = document.getElementById(`material-label-${helpers.slugify(material)}`).getBBox()
                         return  4 + bbox.height
-                    })
-                    .text(`${helpers.numberFormatters.formatComma(data.byType.material[material].value)} tonnes`)
+                    }).text(`${helpers.numberFormatters.formatComma(helpers.roundToNearest.hundred(data.byType.material[material].value))} tonnes`)
+
 
                 const labelBBox = document.getElementById(`label-group-${helpers.slugify(material)}`).getBBox()
                 label.style('transform', `translate(${-8}px, ${settings.geometry.container.height /2 - labelBBox.height/2}px)`)
@@ -527,7 +527,7 @@
                         const bbox = document.getElementById(`destination-label-${helpers.slugify(destination)}`).getBBox()
                         return  2 + bbox.height
                     })
-                    .text(`${helpers.numberFormatters.formatComma(data.byType.destination[destination].value)} tonnes`)
+                    .text(`${helpers.numberFormatters.formatComma(helpers.roundToNearest.hundred(data.byType.destination[destination].value))} tonnes`)
 
                 const labelBBox = document.getElementById(`destination-group-${helpers.slugify(destination)}`).getBBox()
                 label.style('transform', `translate(${0}px, ${settings.geometry.container.height /2 - labelBBox.height/2}px)`)
@@ -566,7 +566,7 @@
                         const bbox = document.getElementById(`product-label-${helpers.slugify(product)}`).getBBox()
                         return  2 + bbox.height
                     })
-                    .text(`${helpers.numberFormatters.formatComma(data.byType.product[product].value)} tonnes`)
+                    .text(`${helpers.numberFormatters.formatComma(helpers.roundToNearest.hundred(data.byType.product[product].value))} tonnes`)
 
                 const labelBBox = document.getElementById(`product-group-${helpers.slugify(product)}`).getBBox()
                 label.style('transform', `translate(${0}px, ${settings.geometry.container.height /2 - labelBBox.height/2 + 4}px)`)
@@ -682,6 +682,10 @@
             },
             numberParsers: {
                 parseDateSlash: d3.timeParse("%d/%m/%Y")
+            },
+            roundToNearest: {
+                hundred:      (d) => Math.round(d / 100) * 100,
+                thousand:     (d) => Math.round(d / 1000) *1000
             },
             slugify: function (str) {
                 str = str.replace(/^\s+|\s+$/g, '').toLowerCase(); // trim           
