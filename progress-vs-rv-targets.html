@@ -45,17 +45,23 @@
 
             .progress-graphic-container{
                 display: grid;
-                grid-template-columns: 1fr 3fr 3fr 1fr;
+                grid-template-columns: 1fr 4fr 4fr 1fr;
                 grid-template-rows: auto;
                 grid-column-gap: 2vw;
             }
             .align-left  .progress-graphic-container{
-                grid-template-columns: 0fr 3fr 3fr 1fr;
+                grid-template-columns: 0fr 4fr 4fr 1fr;
             }
-                .left-container{
-                    grid-area: 1 / 3 / 2 / 4;
+                .left-container, right-container{
+                    display: grid;
+                    align-content: center;  
+                    justify-content: end;
+
                 }
                 .right-container{
+                    grid-area: 1 / 3 / 2 / 4;
+                }
+                .left-container{
                     grid-area: 1 / 2 / 2 / 3;
                 }
                     .target-label{
@@ -373,19 +379,19 @@
                 // a. Setup DOM
                 const targetContainer = container.append('div').classed('progress-graphic-container', true),
                     infoContainer = targetContainer.append('div').classed(`${i%2 === 0 && settings.display.alternating ? 'left-container' : 'right-container'}`, true),
+                    infoGroup = infoContainer.append('div').classed('info-group', true),
                     svgContainer = targetContainer.append('div').classed(`${i%2 === 1  || !settings.display.alternating ? 'left-container' : 'right-container'}`, true)
 
-                infoContainer.append('div').classed('target-label', true)
-                    // .html(obj.Label)
-                infoContainer.append('div').classed('target-text', true)
+                infoGroup.append('div').classed('target-label', true)
+                infoGroup.append('div').classed('target-text', true)
                     .html(obj.Target)
-                infoContainer.append('div').classed('target-definition', true)
+                infoGroup.append('div').classed('target-definition', true)
                     .html(settings.display.showDefinitions ? obj.Definition : '')
 
                 // b. Add "Performance " graphic
                 const svg = svgContainer.append('svg').attr('id', `vis-target-${i+ 1}`)
                         .attr('viewBox', `0 0 ${settings.dims.width} ${settings.dims.height}`)
-                        .attr('width', `100%`)
+                        .attr('width', `33vw`)
                 const defs = svg.append('defs'),
                     svgTitle = svg.append('title').attr('id', 'svg-title').html(`Comparison actual performance up to ${settings.year.Baseline} vs target to ${obj.Label.toLowerCase()} by ${settings.year.Target} `),
                     svgDescription = svg.append('title').attr('id', 'svg-description')
