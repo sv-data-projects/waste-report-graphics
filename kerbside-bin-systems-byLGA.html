@@ -334,10 +334,9 @@
                         const binSize =  obj[`${service}_binSize`] !== '' ? obj[`${service}_binSize`] : 0
                         let binLabel
                         if(service === 'Recyclables' && obj[`${service}_type`] !== 'Commingled') { // Tied bundle 'exception' case
-                             binLabel =  binSize > 0 ? obj[`${service}_type`] : ''
-
+                            binLabel =  binSize > 0 ? obj[`${service}_type`] : ''
                         } else { // Expected case for a bin 
-                            binLabel = `${helpers.numberFormatters.formatComma(binSize)}L` 
+                            binLabel = binSize > 0 ? `${helpers.numberFormatters.formatComma(binSize)}L` : ''
                         }
 
                         rowContainer.append('td')
