@@ -642,7 +642,10 @@
         // Instantiate settings and data objects
         const settings = {
             year:                   '2019-20', 
-            layout:                  'all', 
+            layout: {
+                type:               'all', 
+                showTitle:         true
+            },
             dims: {
                 major_sparkline: {
                     width: 200,
@@ -721,7 +724,10 @@
                 settings.year = settings.queryParameters.get('year')  
             }
             if (settings.queryParameters.has('layout')) { 
-                settings.layout = settings.queryParameters.get('layout')  
+                settings.layout.type = settings.queryParameters.get('layout')  
+            }
+            if (settings.queryParameters.has('titles')) { 
+                settings.layout.showTitle = settings.queryParameters.get('titles') === 'false' ? false : true
             }
         };
 
@@ -744,16 +750,20 @@
         async function renderVis(dataTable, settings){ 
             // 0. Set headers and layout visibility 
                 d3.select('.main-title').html(`Victorian waste management trends to  ${settings.year}`)
-                switch(settings.layout){
+                if(!settings.layout.showTitle){
+                    d3.selectAll('.main-title, .section-title').style('display', 'none')
+                }                
+
+                switch(settings.layout.type){
                     case 'headlines':
                         d3.selectAll('.headline-tables-container, .divider-block')
                             .style('display', 'none')
-                        d3.select('.main-container').classed(settings.layout, true)
+                        d3.select('.main-container').classed(settings.layout.type, true)
                         break
                     case 'materials':
                         d3.selectAll('.headline-figures-container, .divider-block, .main-title')
                             .style('display', 'none')
-                        d3.select('.main-container').classed(settings.layout, true)
+                        d3.select('.main-container').classed(settings.layout.type, true)
                         break
                     case 'all':
                     default: 

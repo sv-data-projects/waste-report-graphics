@@ -131,6 +131,9 @@
             // Instantiate settings and data objects
             const settings = { 
                 year:                   '2019-20',
+                layout: {
+                    showTitle:      true
+                },
                 el: {
                     svg:    d3.select('#vis'),
                 },
@@ -185,8 +188,8 @@
                 }).then( async (data) => {
                     // 3. Initiate vis build sequence with data now loaded
                     await applyQuerySettings(settings)                   // a. Update settings if a query string is passed in
-                    await transformData(data.table.byMaterialFlow)          // b. Parse data
-                    await renderVis(data.nestedData)                        // c. Render visualisation(s)
+                    await transformData(data.table.byMaterialFlow)       // b. Parse data
+                    await renderVis(data.nestedData)                     // c. Render visualisation(s)
                 })
 
                 // X. Table data parsing function: trim() header white space and prase numbers with "$" and "," stripped. 
@@ -220,6 +223,9 @@
                 }
                 if (settings.queryParameters.has('seed')) { 
                     settings.seed = +settings.queryParameters.get('seed')  
+                }
+                if (settings.queryParameters.has('titles')) { 
+                    settings.layout.showTitle = settings.queryParameters.get('titles') === 'false' ? false : true
                 }
             };
 
@@ -267,7 +273,10 @@
 
                 drawTreemap(hierarchy)
 
-                // Update heading
+                // Update heading 
+                if(!settings.layout.showTitle){
+                    d3.selectAll('.main-title, .main-subtitle').style('display', 'none')
+                }
                 d3.select('.main-subtitle').style('opacity', 0)
                     .html(`Waste by material type in ${settings.year}, broken down by volumes of recovered products and volumes to landfill (shown as darker tessellations)`)
                     .transition().duration(1000)

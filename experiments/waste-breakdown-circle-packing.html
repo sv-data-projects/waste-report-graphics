@@ -73,311 +73,322 @@
         <div class = "svg-container">
             <svg id = "circle-pack-vis"></svg>
         </div>
-    </body>
     
-    <script>
-        ///////////////////////////////
-        // 0. DATA AND SETTINGS     ///
-        ///////////////////////////////
+        <script>
+            ///////////////////////////////
+            // 0. DATA AND SETTINGS     ///
+            ///////////////////////////////
 
-        const settings = {
-            svgID:          'circle-pack-vis',
-            year:           '2019-20', 
-            dims: {
-                height:     720, 
-                width:      720,
-                margin: {
-                    top: 100, right: 100, bottom: 100, left: 100
-                }
-            },    
-        }
-
-        const data = {          // Initiate data object that populated by the parseData() function, 
-            byPeriod:           {},
-            table:              {},
-            list:               {},
-            nestedData:         {}
-        }
-
-        // Call build function
-        buildFromGSheetData(settings)
-
-        function buildFromGSheetData(settings) {
-                // 0. Prepare scene for fade in animation
-                d3.select(`#${settings.svgID}`).style('opacity', 0)
-
-                // 1. Specify data table links for each table used (tsv published output from each separate sheet/table)
-                const gsTableLinks =   {
-                    byMaterialFlow:    'https://docs.google.com/spreadsheets/d/e/2PACX-1vSimVJWCqYLTijgqeU-SPGdAFT6wpGprHgjPdpxEElWurVvl28JYr7dHGE3OCSjF4VYH2_QggJUnveO/pub?gid=272100684&single=true&output=tsv',
-                }
-
-                // 2. Asynchronous data load (with Promise.all) and D3 (Fetch API) 
-                Promise.all(
-                    Object.values(gsTableLinks).map(link => d3.tsv(link))       // Pass in array of d3.tsv loaders with each link
-                ).then( rawData => {
-                    // a. Parse each loaded data table and store in data.tables object, using the parseTable helper 
-                    rawData.forEach((tableData, i) => {  parseTable(Object.keys(gsTableLinks)[i], tableData) })
-                    return data
-                }).then( async (data) => {
-                    // 3. Initiate vis build sequence with data now loaded
-                    await applyQuerySettings(settings)                   // a. Update settings if a query string is passed in
-                    await transformData(data.table.byMaterialFlow)          // b. Parse data
-                    await renderCirclePack(data.nestedData, settings)                        // c. Render visualisation(s)
-                })
-
-                // X. Table data parsing function: trim() header white space and prase numbers with "$" and "," stripped. 
-                const parseTable = (tableName, tableData) => {
-                    data.table[tableName] = tableData.map(row => {
-                        const newObj = {}
-                        Object.entries(row).forEach(([key, value]) => {
-                            switch(key.trim().toLowerCase()){
-                                case 'year':
-                                    newObj[key.trim()] =  value
-                                    break     
-                                default:
-                                    newObj[key.trim()] = isNaN(parseFloat(value.replace(/\$|,/g, ''))) ? value : parseFloat(value.replace(/\$|,/g, '')) 
-                            }
-                        })
-                        return newObj
-                    })
-                };                 
-            };
-
-
-        //////////////////////////////////////
-        // 1. PARSE AND WRANGLE DATA       ///
-        //////////////////////////////////////
-
-            async function applyQuerySettings(settings){
-                // i. Check for query parameters and update material. A date set by the query selector is set while parsing input data 
-                settings.queryParameters = new URLSearchParams(window.location.search)
-                if (settings.queryParameters.has('year')) { 
-                    settings.year = settings.queryParameters.get('year')  
-                }
-            };
-
-            async function transformData(wasteData){
-                // Creates a nested dataset
-                data.nestedData = {
-                    name: "waste",
-                    children: []
-                }
-                data.list.materials = [...new Set(wasteData.filter(d => d.year === settings.year && d.level === 1).map(d => d.source))]
-
-                data.list.materials.forEach(material => {
-                    const materialObj = {
-                        name:       material,
-                        children:   []
+            const settings = {
+                svgID:          'circle-pack-vis',
+                layout: {
+                    showTitle:      true
+                },
+                year:           '2019-20', 
+                dims: {
+                    height:     720, 
+                    width:      720,
+                    margin: {
+                        top: 100, right: 100, bottom: 100, left: 100
                     }
-                    const materialChildrenData = wasteData.filter(d => d.year === settings.year && d.materialClass === helpers.slugify(material) && (d.level === 2 || (d.level === 1 && d.targetClass === 'landfill') ) )
-                    materialChildrenData.forEach(mChildObj => {
-                        materialObj.children.push({
-                            name:   mChildObj.targetClass === 'landfill' ? `Landfilled ${material.toLowerCase()}` : mChildObj.target,
-                            type:   mChildObj.targetClass,
-                            value:  mChildObj.value
-                        })
+                },    
+            }
+
+            const data = {          // Initiate data object that populated by the parseData() function, 
+                byPeriod:           {},
+                table:              {},
+                list:               {},
+                nestedData:         {}
+            }
+
+            // Call build function
+            buildFromGSheetData(settings)
+
+            function buildFromGSheetData(settings) {
+                    // 0. Prepare scene for fade in animation
+                    d3.select(`#${settings.svgID}`).style('opacity', 0)
+
+                    // 1. Specify data table links for each table used (tsv published output from each separate sheet/table)
+                    const gsTableLinks =   {
+                        byMaterialFlow:    'https://docs.google.com/spreadsheets/d/e/2PACX-1vSimVJWCqYLTijgqeU-SPGdAFT6wpGprHgjPdpxEElWurVvl28JYr7dHGE3OCSjF4VYH2_QggJUnveO/pub?gid=272100684&single=true&output=tsv',
+                    }
+
+                    // 2. Asynchronous data load (with Promise.all) and D3 (Fetch API) 
+                    Promise.all(
+                        Object.values(gsTableLinks).map(link => d3.tsv(link))       // Pass in array of d3.tsv loaders with each link
+                    ).then( rawData => {
+                        // a. Parse each loaded data table and store in data.tables object, using the parseTable helper 
+                        rawData.forEach((tableData, i) => {  parseTable(Object.keys(gsTableLinks)[i], tableData) })
+                        return data
+                    }).then( async (data) => {
+                        // 3. Initiate vis build sequence with data now loaded
+                        await applyQuerySettings(settings)                   // a. Update settings if a query string is passed in
+                        await transformData(data.table.byMaterialFlow)          // b. Parse data
+                        await renderCirclePack(data.nestedData, settings)                        // c. Render visualisation(s)
                     })
-                    data.nestedData.children.push(materialObj)
-                })
+
+                    // X. Table data parsing function: trim() header white space and prase numbers with "$" and "," stripped. 
+                    const parseTable = (tableName, tableData) => {
+                        data.table[tableName] = tableData.map(row => {
+                            const newObj = {}
+                            Object.entries(row).forEach(([key, value]) => {
+                                switch(key.trim().toLowerCase()){
+                                    case 'year':
+                                        newObj[key.trim()] =  value
+                                        break     
+                                    default:
+                                        newObj[key.trim()] = isNaN(parseFloat(value.replace(/\$|,/g, ''))) ? value : parseFloat(value.replace(/\$|,/g, '')) 
+                                }
+                            })
+                            return newObj
+                        })
+                    };                 
+                };
+
+
+            //////////////////////////////////////
+            // 1. PARSE AND WRANGLE DATA       ///
+            //////////////////////////////////////
+
+                async function applyQuerySettings(settings){
+                    // i. Check for query parameters and update material. A date set by the query selector is set while parsing input data 
+                    settings.queryParameters = new URLSearchParams(window.location.search)
+                    if (settings.queryParameters.has('year')) { 
+                        settings.year = settings.queryParameters.get('year')  
+                        }
+                    if (settings.queryParameters.has('titles')) { 
+                        settings.layout.showTitle = settings.queryParameters.get('titles') === 'false' ? false : true
+                    }
+                };
+
+                async function transformData(wasteData){
+                    // Creates a nested dataset
+                    data.nestedData = {
+                        name: "waste",
+                        children: []
+                    }
+                    data.list.materials = [...new Set(wasteData.filter(d => d.year === settings.year && d.level === 1).map(d => d.source))]
+
+                    data.list.materials.forEach(material => {
+                        const materialObj = {
+                            name:       material,
+                            children:   []
+                        }
+                        const materialChildrenData = wasteData.filter(d => d.year === settings.year && d.materialClass === helpers.slugify(material) && (d.level === 2 || (d.level === 1 && d.targetClass === 'landfill') ) )
+                        materialChildrenData.forEach(mChildObj => {
+                            materialObj.children.push({
+                                name:   mChildObj.targetClass === 'landfill' ? `Landfilled ${material.toLowerCase()}` : mChildObj.target,
+                                type:   mChildObj.targetClass,
+                                value:  mChildObj.value
+                            })
+                        })
+                        data.nestedData.children.push(materialObj)
+                    })
+                };
+
+
+            //////////////////////////////////////////////
+            // 2. RENDER THE CIRCLE PACK VISUALISATION ///
+            //////////////////////////////////////////////
+
+            async function renderCirclePack(data, settings) {
+                // Transition in
+                if(!settings.layout.showTitle){
+                    d3.selectAll('.main-title, .main-subtitle').style('display', 'none')
+                }
+                d3.select('.main-subtitle').style('opacity', 0)
+                    .html(`Waste by material type in ${settings.year}, broken down by volumes recovered products and volumes to landfill`)
+                    .transition().duration(1000)
+                    .style('opacity', null)
+
+
+
+                // Setup data an SVG element
+                const root = pack(data)
+                let focus = root;
+                let view;
+
+                const svg = d3.select(`#${settings.svgID}`)
+                    .attr("viewBox", `-${settings.dims.width / 2} -${settings.dims.height / 2} ${settings.dims.width} ${settings.dims.height}`)
+                    .style("cursor", "pointer")
+                    .on("click", (event) => zoom(event, root))
+                svg.transition().duration(1000)
+                    .style('opacity', null)
+
+                // Add pattern fills as defs
+                const defs = svg.append('defs')
+                defs.append('pattern')
+                    .attr('id', 'diagonalHatch')
+                    .attr('patternUnits', 'userSpaceOnUse')
+                    .attr('width', 4)
+                    .attr('height', 4)
+                    .append('path')
+                        .attr('d', 'M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2')
+                        .attr('stroke', 'var(--tertiaryCard)')
+                        .attr('stroke-width', 0.25)
+                        .attr("opacity", 1);
+
+                defs.append('pattern')
+                    .attr('id', 'diagonalHatchGreen')
+                    .attr('patternUnits', 'userSpaceOnUse')
+                    .attr('width', 4)
+                    .attr('height', 4)
+                    .append('path')
+                        .attr('d', 'M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2')
+                        .attr('stroke', 'var(--svGreen)')
+                        .attr('stroke-width', 0.25)
+                        .attr("opacity", 1);
+
+                const node = svg.append("g").classed('node-group', true)
+                    .selectAll("circle")
+                    .data(root.descendants().slice(1))
+                    .join("circle")
+                        .attr("class", d =>  `${helpers.slugify(d.data.name)} ${(typeof d.data.type === 'undefined' || d.data.type === '' )  ? 'material-group' : helpers.slugify(d.data.type)}` )
+                        .attr("pointer-events", d => !d.children ? "none" : null)
+                        .on("mouseover", function() { d3.select(this).attr("stroke", "#000"); })
+                        .on("mouseout", function() { d3.select(this).attr("stroke", null); })
+                        .on("click", (event, d) => focus !== d && (zoom(event, d), event.stopPropagation()));
+
+                /////////////////////////
+                ////// ADD LABELS  //////
+                /////////////////////////
+
+                let width
+                const label = svg.append("g").classed('label-group', true)
+                    .attr("pointer-events", "none")
+                    .selectAll("text")
+                    .data(root.descendants())
+                    .join("text")
+                        .attr("class", d =>  `circle-label ${helpers.slugify(d.data.name)} ${(typeof d.data.type === 'undefined' || d.data.type === '' )  ? 'material-group' : helpers.slugify(d.data.type)}`)
+                        .style("fill-opacity", d => d.parent === root ? 1 : 0)
+                        .style("display", d => d.parent === root ? "inline" : "none")   
+                        .text(d => d.data.name)
+
+                const label2 = svg.append("g").classed('label-group', true)
+                    .attr("pointer-events", "none")
+                    .selectAll("text")
+                    .data(root.descendants())
+                    .join("text")
+                        .attr("class", d =>  `circle-label-small ${helpers.slugify(d.data.name)} ${(typeof d.data.type === 'undefined' || d.data.type === '' )  ? 'material-group' : helpers.slugify(d.data.type)}` )
+                        .style("fill-opacity", d => d.parent === root ? 1 : 0)
+                        .style("display", d => d.parent === root ? "inline" : "none")   
+                        .text(d =>`${helpers.numberFormatters.formatComma(helpers.roundToNearest.hundred(d.value))} tonnes`)
+
+                zoomTo([root.x, root.y, root.r * 2]);
+
+                function zoomTo(v) {
+                    const k = settings.dims.width / v[2];
+                    view = v;
+                    label.attr("transform", d => `translate(${(d.x - v[0]) * k},${(d.y - v[1]) * k})`);
+                    label2.attr("transform", d => `translate(${(d.x - v[0]) * k},${(d.y - v[1]) * k + 12})`);
+                    node.attr("transform", d => `translate(${(d.x - v[0]) * k},${(d.y - v[1]) * k})`);
+                    node.attr("r", d => d.r * k);
+                }
+
+                function zoom(event, d) {
+                    const focus0 = focus;
+                    focus = d;
+                    const transition = svg.transition()
+                        .duration(event.altKey ? 7500 : 750)
+                        .tween("zoom", d => {
+                            const i = d3.interpolateZoom(view, [focus.x, focus.y, focus.r * 2]);
+                            return t => zoomTo(i(t));
+                        });
+                    label.filter(function(d) { return d.parent === focus || this.style.display === "inline"; })
+                        .transition(transition)
+                            .style("fill-opacity", d => d.parent === focus ? 1 : 0)
+                            .on("start", function(d) { if (d.parent === focus) this.style.display = "inline"; })
+                            .on("end", function(d) { if (d.parent !== focus) this.style.display = "none"; });
+                    label2.filter(function(d) { return d.parent === focus || this.style.display === "inline"; })
+                        .transition(transition)
+                            .style("fill-opacity", d => d.parent === focus ? 1 : 0)
+                            .on("start", function(d) { if (d.parent === focus) this.style.display = "inline"; })
+                            .on("end", function(d) { if (d.parent !== focus) this.style.display = "none"; });
+                }
+
+                function pack(data) {
+                    return d3.pack()
+                        .size([settings.dims.width * 0.7, settings.dims.height * 0.7])
+                        .padding(3)
+                    (d3.hierarchy(data)
+                        .sum(d => d.value)
+                        .sort((a, b) => b.value - a.value))
+                }
             };
 
 
-        //////////////////////////////////////////////
-        // 2. RENDER THE CIRCLE PACK VISUALISATION ///
-        //////////////////////////////////////////////
+        /////////////////////////////
+        /// X HELPER FUNCTIONS    ///
+        /////////////////////////////
 
-        async function renderCirclePack(data, settings) {
-            // Transition in
-            d3.select('.main-subtitle').style('opacity', 0)
-                .html(`Waste by material type in ${settings.year}, broken down by volumes recovered products and volumes to landfill`)
-                .transition().duration(1000)
-                .style('opacity', null)
+            const helpers= {
+                numberFormatters: {
+                    formatComma:           	d3.format(",.0f"),
+                    formatComma1dec:       	d3.format(",.1f"),
+                    formatComma2dec:       	d3.format(",.2f"),
+                    formatInteger:         	d3.format(".0f"),   
+                    formatCostInteger:     	d3.format("$,.0f"),  
+                    formatCost1dec:        	d3.format("$,.1f"),  
+                    formatPct:          	d3.format(".0%"), 
+                    formatPct1dec:          d3.format(".1%")  
+                },
+                numberParsers: {
+                    parseDateSlash: d3.timeParse("%d/%m/%Y")
+                },
+                roundToNearest: {
+                    hundred:      (d) => Math.round(d / 100) * 100,
+                    thousand:     (d) => Math.round(d / 1000) *1000
+                },
+                slugify: function (str) {
+                    str = str.replace(/^\s+|\s+$/g, '').toLowerCase(); // trim           
+                    const from = "àáäâèéëêìíïîòóöôùúüûñç·/_,:;",      // remove accents, swap ñ for n, etc
+                        to   = "aaaaeeeeiiiioooouuuunc------"
+                    for (var i=0, l=from.length ; i<l ; i++) {
+                        str = str.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
+                    }
+                    str = str.replace(/[^a-z0-9 -]/g, '') // remove invalid chars
+                        .replace(/\s+/g, '-') // collapse whitespace and replace by -
+                        .replace(/-+/g, '-'); // collapse dashes
+                    return str;
+                }, 
+                wrap: function(text, width, lineHeight, centerVertical = false) {
+                    console.log(width)
 
-            // Setup data an SVG element
-            const root = pack(data)
-            let focus = root;
-            let view;
+                    text.each(function() {
+                        let text = d3.select(this),
+                            words = text.text().split(/\s+/).reverse(),
+                            word,
+                            line = [],
+                            lineNumber = 0,
+                            y = text.attr("y"),
+                            x = text.attr("x"),
+                            fontSize = parseFloat(text.style("font-size")),
+                            dy = parseFloat(text.attr("dy")),
+                            tspan = text.text(null).append("tspan").attr("x", x).attr("y", y).attr("dy", dy + "em");
 
-            const svg = d3.select(`#${settings.svgID}`)
-                .attr("viewBox", `-${settings.dims.width / 2} -${settings.dims.height / 2} ${settings.dims.width} ${settings.dims.height}`)
-                .style("cursor", "pointer")
-                .on("click", (event) => zoom(event, root))
-            svg.transition().duration(1000)
-                .style('opacity', null)
-
-            // Add pattern fills as defs
-            const defs = svg.append('defs')
-            defs.append('pattern')
-                .attr('id', 'diagonalHatch')
-                .attr('patternUnits', 'userSpaceOnUse')
-                .attr('width', 4)
-                .attr('height', 4)
-                .append('path')
-                    .attr('d', 'M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2')
-                    .attr('stroke', 'var(--tertiaryCard)')
-                    .attr('stroke-width', 0.25)
-                    .attr("opacity", 1);
-
-            defs.append('pattern')
-                .attr('id', 'diagonalHatchGreen')
-                .attr('patternUnits', 'userSpaceOnUse')
-                .attr('width', 4)
-                .attr('height', 4)
-                .append('path')
-                    .attr('d', 'M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2')
-                    .attr('stroke', 'var(--svGreen)')
-                    .attr('stroke-width', 0.25)
-                    .attr("opacity", 1);
-
-            const node = svg.append("g").classed('node-group', true)
-                .selectAll("circle")
-                .data(root.descendants().slice(1))
-                .join("circle")
-                    .attr("class", d =>  `${helpers.slugify(d.data.name)} ${(typeof d.data.type === 'undefined' || d.data.type === '' )  ? 'material-group' : helpers.slugify(d.data.type)}` )
-                    .attr("pointer-events", d => !d.children ? "none" : null)
-                    .on("mouseover", function() { d3.select(this).attr("stroke", "#000"); })
-                    .on("mouseout", function() { d3.select(this).attr("stroke", null); })
-                    .on("click", (event, d) => focus !== d && (zoom(event, d), event.stopPropagation()));
-
-            /////////////////////////
-            ////// ADD LABELS  //////
-            /////////////////////////
-
-            let width
-            const label = svg.append("g").classed('label-group', true)
-                .attr("pointer-events", "none")
-                .selectAll("text")
-                .data(root.descendants())
-                .join("text")
-                    .attr("class", d =>  `circle-label ${helpers.slugify(d.data.name)} ${(typeof d.data.type === 'undefined' || d.data.type === '' )  ? 'material-group' : helpers.slugify(d.data.type)}`)
-                    .style("fill-opacity", d => d.parent === root ? 1 : 0)
-                    .style("display", d => d.parent === root ? "inline" : "none")   
-                    .text(d => d.data.name)
-
-            const label2 = svg.append("g").classed('label-group', true)
-                .attr("pointer-events", "none")
-                .selectAll("text")
-                .data(root.descendants())
-                .join("text")
-                    .attr("class", d =>  `circle-label-small ${helpers.slugify(d.data.name)} ${(typeof d.data.type === 'undefined' || d.data.type === '' )  ? 'material-group' : helpers.slugify(d.data.type)}` )
-                    .style("fill-opacity", d => d.parent === root ? 1 : 0)
-                    .style("display", d => d.parent === root ? "inline" : "none")   
-                    .text(d =>`${helpers.numberFormatters.formatComma(helpers.roundToNearest.hundred(d.value))} tonnes`)
-
-            zoomTo([root.x, root.y, root.r * 2]);
-
-            function zoomTo(v) {
-                const k = settings.dims.width / v[2];
-                view = v;
-                label.attr("transform", d => `translate(${(d.x - v[0]) * k},${(d.y - v[1]) * k})`);
-                label2.attr("transform", d => `translate(${(d.x - v[0]) * k},${(d.y - v[1]) * k + 12})`);
-                node.attr("transform", d => `translate(${(d.x - v[0]) * k},${(d.y - v[1]) * k})`);
-                node.attr("r", d => d.r * k);
-            }
-
-            function zoom(event, d) {
-                const focus0 = focus;
-                focus = d;
-                const transition = svg.transition()
-                    .duration(event.altKey ? 7500 : 750)
-                    .tween("zoom", d => {
-                        const i = d3.interpolateZoom(view, [focus.x, focus.y, focus.r * 2]);
-                        return t => zoomTo(i(t));
-                    });
-                label.filter(function(d) { return d.parent === focus || this.style.display === "inline"; })
-                    .transition(transition)
-                        .style("fill-opacity", d => d.parent === focus ? 1 : 0)
-                        .on("start", function(d) { if (d.parent === focus) this.style.display = "inline"; })
-                        .on("end", function(d) { if (d.parent !== focus) this.style.display = "none"; });
-                label2.filter(function(d) { return d.parent === focus || this.style.display === "inline"; })
-                    .transition(transition)
-                        .style("fill-opacity", d => d.parent === focus ? 1 : 0)
-                        .on("start", function(d) { if (d.parent === focus) this.style.display = "inline"; })
-                        .on("end", function(d) { if (d.parent !== focus) this.style.display = "none"; });
-            }
-
-            function pack(data) {
-                return d3.pack()
-                    .size([settings.dims.width * 0.7, settings.dims.height * 0.7])
-                    .padding(3)
-                (d3.hierarchy(data)
-                    .sum(d => d.value)
-                    .sort((a, b) => b.value - a.value))
-            }
-        };
-
-
-    /////////////////////////////
-    /// X HELPER FUNCTIONS    ///
-    /////////////////////////////
-
-        const helpers= {
-            numberFormatters: {
-                formatComma:           	d3.format(",.0f"),
-                formatComma1dec:       	d3.format(",.1f"),
-                formatComma2dec:       	d3.format(",.2f"),
-                formatInteger:         	d3.format(".0f"),   
-                formatCostInteger:     	d3.format("$,.0f"),  
-                formatCost1dec:        	d3.format("$,.1f"),  
-                formatPct:          	d3.format(".0%"), 
-                formatPct1dec:          d3.format(".1%")  
-            },
-            numberParsers: {
-                parseDateSlash: d3.timeParse("%d/%m/%Y")
-            },
-            roundToNearest: {
-                hundred:      (d) => Math.round(d / 100) * 100,
-                thousand:     (d) => Math.round(d / 1000) *1000
-            },
-            slugify: function (str) {
-                str = str.replace(/^\s+|\s+$/g, '').toLowerCase(); // trim           
-                const from = "àáäâèéëêìíïîòóöôùúüûñç·/_,:;",      // remove accents, swap ñ for n, etc
-                    to   = "aaaaeeeeiiiioooouuuunc------"
-                for (var i=0, l=from.length ; i<l ; i++) {
-                    str = str.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
-                }
-                str = str.replace(/[^a-z0-9 -]/g, '') // remove invalid chars
-                    .replace(/\s+/g, '-') // collapse whitespace and replace by -
-                    .replace(/-+/g, '-'); // collapse dashes
-                return str;
-            }, 
-            wrap: function(text, width, lineHeight, centerVertical = false) {
-                console.log(width)
-
-                text.each(function() {
-                    let text = d3.select(this),
-                        words = text.text().split(/\s+/).reverse(),
-                        word,
-                        line = [],
-                        lineNumber = 0,
-                        y = text.attr("y"),
-                        x = text.attr("x"),
-                        fontSize = parseFloat(text.style("font-size")),
-                        dy = parseFloat(text.attr("dy")),
-                        tspan = text.text(null).append("tspan").attr("x", x).attr("y", y).attr("dy", dy + "em");
-
-                    while (word = words.pop()) {
-                        line.push(word);
-                        tspan.text(line.join(" "));
-
-                        if (tspan.node().getComputedTextLength() > width) {
-                            line.pop();
+                        while (word = words.pop()) {
+                            line.push(word);
                             tspan.text(line.join(" "));
-                            line = [word];
-                            tspan = text.append("tspan")
-                                .attr("x", x)
-                                .attr("y",  y)
-                                .attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
-                        }                    
-                    }            
-                    if(centerVertical){
-                        text.style("transform",  "translateY(-"+(10 * (lineNumber))+"px)")
-                    }
-                })
+
+                            if (tspan.node().getComputedTextLength() > width) {
+                                line.pop();
+                                tspan.text(line.join(" "));
+                                line = [word];
+                                tspan = text.append("tspan")
+                                    .attr("x", x)
+                                    .attr("y",  y)
+                                    .attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+                            }                    
+                        }            
+                        if(centerVertical){
+                            text.style("transform",  "translateY(-"+(10 * (lineNumber))+"px)")
+                        }
+                    })
+                }
             }
-        }
 
 
-    </script>
+        </script>
+    </body>
 </html>
 

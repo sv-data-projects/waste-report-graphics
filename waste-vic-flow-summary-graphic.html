@@ -358,6 +358,9 @@
         const settings = {
             svgID:          'summary-vis',
             year:           '2019-20', 
+            layout: {
+                showTitle:      true
+            },
             theme:          'light',        // default "light" or "dark" mode
             themeChange:    true,          // boolean for whether the theme can be changed with keypress (assigned to 'Shift' key) 
             dims: {
@@ -470,6 +473,9 @@
                 if(settings.mode === 'dark'){
                     d3.selectAll(`.svg-container`).classed("dark", true)
                 }  
+            }
+            if (settings.queryParameters.has('titles')) { 
+                settings.layout.showTitle = settings.queryParameters.get('titles') === 'false' ? false : true
             }
         };
 
@@ -867,6 +873,9 @@
                     .text(`Where did Victoria's waste go in ${settings.year}?`) 
                     .attr('x', 50)
                     .attr('y', 30)
+                if(!settings.layout.showTitle){
+                    d3.selectAll('.main-title').style('display', 'none')
+                }
 
             // X. Helper method for rendering donut chart
              function renderDonut(container, coords, dims, data ){

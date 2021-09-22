@@ -160,8 +160,11 @@
 
         const settings = { 
             svgID:                  'map',
-            year:                   '2019-20',              
-            showSparklines:         true,              
+            year:                   '2019-20',     
+            layout: {
+                showTitle:          true,
+                showSparklines:     true,     
+            },                 
             dims: {
                 width:              1080,
                 height:             720,
@@ -249,7 +252,10 @@
                 settings.year = settings.queryParameters.get('year')  
             }
             if (settings.queryParameters.has('showSparklines')) { 
-                settings.showSparklines = settings.queryParameters.get('showSparklines') === 'false' ? false : true 
+                settings.layout.showSparklines = settings.queryParameters.get('showSparklines') === 'false' ? false : true 
+            }
+            if (settings.queryParameters.has('titles')) { 
+                settings.layout.showTitle = settings.queryParameters.get('titles') === 'false' ? false : true
             }
         };
 
@@ -473,7 +479,7 @@
 
             // 7. ADD ANNOTATION
             const titleMargin = {left: 30, top: 30}
-            // a. Main title
+            // a. Main titles
             titles.append('text').classed('main-title', true)
                 .attr('x', titleMargin.left)
                 .attr('y', titleMargin.top)
@@ -484,6 +490,10 @@
                 .attr('y', titleMargin.top + 35)
                 .attr('dy', 0)
                 .text(`a breakdown by export destination and materials in ${settings.year}`)
+
+            if(!settings.layout.showTitle){
+                d3.selectAll('.main-title, .main-subtitle').style('display', 'none')
+            }
 
             // b. Totals group (bottom left)
             const totalGroup = titles.append('g')
@@ -526,7 +536,7 @@
 
             // 8. APPLY LAYOUT SETTINGS: 
             // a. Toggle display of sparkline bars  
-            if(!settings.showSparklines){
+            if(!settings.layout.showSparklines){
                 d3.selectAll('.bar').attr('display', 'none')
             }
         }; // end renderMap()

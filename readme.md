@@ -12,9 +12,6 @@ It is hoped that over time however, these graphics can be updated by other contr
 
 > A reminder: if changes are made, features added or new visualisations or methods added....**don't forget to update this documentation!**
 
-&nbsp;
-## Known bugs and to do's
-List TBA
 
 &nbsp;
 ***
@@ -211,40 +208,57 @@ In most cases, graphics are designed to be flexible enough for use in print and 
 &nbsp;
 
 ## Waste report graphics and their options
+### **Local Government graphics**
 | Visualisation name | html filename | Query parameter name | Query parameter value format |  Query parameter default |  Query parameter description
 | --- | --- | --- |---| ---| ---|
+| Kerbside waste illustrative summary infographic (half page)| [kerbside-flow-infographic.html](https://sv-data-projects.github.io/waste-report-graphics/kerbside-summary-infographic.html) |  year  | YYYY-YY | 2019-20 | Specifies FY data to display
+| | | titles | true or false | true | Whether to display the headline title (and subtitle)
+| Kerbside waste illustrative infographic (full page)| [kerbside-summary-infographic.html](https://sv-data-projects.github.io/waste-report-graphics/kerbside-flow-infographic.html) | YYYY-YY |  year | 2019-20 | Specifies FY data to display
+| | | extended-typography | true, false | true | Show title text with with handwriting typeface
+| Kerbside bin composition graphic (single bin)| [kerbside-bin-composition.html](https://sv-data-projects.github.io/waste-report-graphics/kerbside-bin-composition.html) | year | YYYY-YY | 2019-20
+| | | yellow-bin-lid | true, false | false | Whether to colour bin lid yellow (note: default is false colour clashes with a material colour)
+| Kerbside trends summary tables (headlines and by services summary) | kerbside-trends-summary-table.html |  year | YYYY-YY | 2019-20 | Specifies FY data to display
+| | | titles | true or false | true | Whether to display the headline title (and subtitle)
+| Victorian bin systems graphic | [kerbside-bin-systems.html](https://sv-data-projects.github.io/waste-report-graphics/kerbisde-bin-systems.html) |  year |  YYYY-YY | 2019-20 | Specifies FY data to display 
+| | | icon | 'bin' or 'block' | bin | Shows collection frequencies as bin icon or rectangular block
+| | | titles | true or false | true | Whether to display the headline title (and subtitle)
+| Victorian bin systems graphic by LGA | [kerbside-bin-systems-byLGA.html](https://sv-data-projects.github.io/waste-report-graphics/kerbisde-bin-systems-byLGA.html) |  year |  YYYY-YY | 2019-20 | Specifies FY data to display 
+| | | icon | 'bin' or 'block' | bin | Shows collection frequencies as bin icon or rectangular block
+| | | titles | true or false | true | Whether to display the headline title (and subtitle)
+
+
+&nbsp;
+### **Recycling industry graphics**
+| Visualisation name | html filename | Query parameter name | Query parameter value format |  Query parameter default |  Query parameter description
+| --- | --- | --- |---| ---| ---|
+| Victorian waste flow (sankey) diagram | [waste-vic-flow-sankey.html](https://sv-data-projects.github.io/waste-report-graphics/waste-vic-flow-sankey.html) |  year | YYYY-YY | 2019-20 | Specifies FY data to display
+| | | titles | true or false | true | Whether to display the headline title (and subtitle)
 | Victorian waste flow illustrative graphic (full page) | [waste-vic-flow-infographic.html](https://sv-data-projects.github.io/waste-report-graphics/waste-vic-flow-infographic.html) | year | YYYY-YY |  2019-20 | Specifies FY data to display
 | | | extended-typography | true, false | true |  Show title text with with handwriting typeface
 | Victorian waste flows summary graphic (half page 'flow loop')| [waste-vic-flow-summary-graphic.html](https://sv-data-projects.github.io/waste-report-graphics/waste-vic-flow-summary-graphic.html) |  year | YYYY-YY | 2019-20 | Specifies FY data to display
 | | | theme | dark, light | light | Show the graphic with 'dark mode' option
 | | | themeChange | true, false | true | Whether the theme can be changed by pressing the 'Shift' key
-| Kerbside waste illustrative summary infographic (half page)| [kerbside-flow-infographic.html](https://sv-data-projects.github.io/waste-report-graphics/kerbside-summary-infographic.html) |  year  | YYYY-YY | 2019-20 | Specifies FY data to display
-| Kerbside waste illustrative infographic (full page)| [kerbside-summary-infographic.html](https://sv-data-projects.github.io/waste-report-graphics/kerbside-flow-infographic.html) | YYYY-YY |  year | 2019-20 | Specifies FY data to display
-| | | extended-typography | true, false | true | Show title text with with handwriting typeface
-| Kerbside bin composition graphic (single bin)| [kerbside-bin-composition.html](https://sv-data-projects.github.io/waste-report-graphics/kerbside-bin-composition.html) | year | YYYY-YY | 2019-20
-| | | yellow-bin-lid | true, false | false | Whether to colour bin lid yellow (note: default is false colour clashes with a material colour)
-| Victorian waste flow (sankey) diagram (full page)| [waste-vic-flow-sankey.html](https://sv-data-projects.github.io/waste-report-graphics/waste-vic-flow-sankey.html) |  year | YYYY-YY | 2019-20 | Specifies FY data to display
+| | | titles | true or false | true | Whether to display the headline title (and subtitle)
 | Waste metrics trends tables (headlines and by material summary) | waste-trends-summary-table.html |  year | YYYY-YY | 2019-20 | Specifies FY data to display
-| Kerbside trends summary tables (headlines and by services summary) | kerbside-trends-summary-table.html |  year | YYYY-YY | 2019-20 | Specifies FY data to display
+| | | titles | true or false | true | Whether to display the headline title (and subtitle)
 | Waste diversion radial bar chart and table | [waste-diversion-by-material.html](https://sv-data-projects.github.io/waste-report-graphics/waste-diversion-by-material.html) | year |  YYYY-YY | 2019-20 | Specifies FY data to display
 | | | theme | dark, light | light | Show the graphic with 'dark mode' option
 | | | themeChange | true, false | true | Whether the theme can be changed by pressing the 'Shift' key
 | | | layout | portrait, landscape, chart-only | portrait | Layout options for chart and accompanying data table (or to not show the table)
+| | | titles | true or false | true | Whether to display the headline title (and subtitle)
 | Victorian recovered waste export map | [waste-export-map.html](https://sv-data-projects.github.io/waste-report-graphics/waste-export-map.html) | year | YYYY-YY | 2019-20 | Specifies FY data to display
+| | | titles | true or false | true | Whether to display the headline title (and subtitle)
 | | | showSparklines | true, false | true | Hides all bar chart sparklines
 | Victorian WRRG waste data map | [wrrg-map.html](https://sv-data-projects.github.io/waste-report-graphics/wrrg-map.html) | year | YYYY-YY | 2019-20 | Specifies FY data to display
 | | | showGlass | true, false | true | Whether to show the layout with glass collection data (for WRRGs with collection/data)
 | | | colourScale | ramp, categorical | ramp | Whether to show the WRRG regions with data encoded in a colour ramp, or as multi-coloured categorical colours (not recommended)
+| | | titles | true or false | true | Whether to display the headline title (and subtitle)
 | Progress to Recycling Victorian Targets diagrams | [progress-vs-rv-targets.html](https://sv-data-projects.github.io/waste-report-graphics/progress-vs-rv-targets.html) |  year |  YYYY-YY | 2019-20 | Specifies FY data to display actuals up to
 | | | alternate | true or false | true | Alternates between 'text : diagram' and' diagram : text' for each target : row; or just 'text : diagram'
 | | | alignLeft | true or false | true | If set to true, will collapse the left margin
 | | | target | 0, 1, 2, 3, all | all | Can be used to display just one target at a time
-| Victorian bin systems graphic | [kerbside-bin-systems.html](https://sv-data-projects.github.io/waste-report-graphics/kerbisde-bin-systems.html) |  year |  YYYY-YY | 2019-20 | Specifies FY data to display 
-| | | icon | 'bin' or 'block' | bin | Shows collection frequencies as bin icon or rectangular block
-| | | showTitle | true or false | true | Whether to display the graphic title
-| Victorian bin systems graphic by LGA | [kerbside-bin-systems-byLGA.html](https://sv-data-projects.github.io/waste-report-graphics/kerbisde-bin-systems-byLGA.html) |  year |  YYYY-YY | 2019-20 | Specifies FY data to display 
-| | | icon | 'bin' or 'block' | bin | Shows collection frequencies as bin icon or rectangular block
-| | | showTitle | true or false | true | Whether to display the graphic title
+| | | titles | true or false | true | Whether to display the headline title (and subtitle)
+
 
 
 ## Further customisation of waste report graphics 
@@ -252,6 +266,4 @@ Some visualisations can be tweaked and customised further:
 - **Victorian recovered waste export map:** Customisation of the country to country links can be made via the source data table ('exportWasteData'). This allows for the curved links to be adjusted by country, and for the 'path endpoint' to be adjusted
 - **Victorian waste flow (sankey) diagram:** The sankey layout is customised within using hte data fields of 'level' and 'sourceKey' (and filtered by the field 'sankey') in the source data table ('wasteByMaterialFlow'). These layout configurations reasonably complex and adjustments are likely to require some code changes.
 
-## Interactive waste report graphics
-Section TBA: this will cover any animation or customised interaction options for web-first graphics (currently being considered)
 

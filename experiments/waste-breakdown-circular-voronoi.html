@@ -147,6 +147,9 @@
    
             const  settings = {
                 year:   '2019-20',
+                layout: {
+                    showTitle:      true
+                },
                 el: {
                     svg:    d3.select('#vis'),
                 },
@@ -232,6 +235,9 @@
                 if (settings.queryParameters.has('showMaterialLabels')) { 
                     settings.showMaterialLabels = settings.queryParameters.get('showMaterialLabels') === 'false' ? false : true 
                 }
+                if (settings.queryParameters.has('titles')) { 
+                    settings.layout.showTitle = settings.queryParameters.get('titles') === 'false' ? false : true
+                }
             };
 
             async function transformData(wasteData){
@@ -282,6 +288,9 @@
                 drawTreemap(hierarchy)
 
                 // Update heading
+                if(!settings.layout.showTitle){
+                    d3.selectAll('.main-title, .main-subtitle').style('display', 'none')
+                }
                 d3.select('.main-subtitle').style('opacity', 0)
                     .html(`Waste by material type in ${settings.year}, broken down by volumes of recovered products and volumes to landfill (shown as darker tessellations)`)
                     .transition().duration(1000)

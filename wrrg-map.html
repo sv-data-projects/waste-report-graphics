@@ -191,8 +191,11 @@
             const settings = { 
                 svgID:                  'map',
                 year:                   '2019-20',
-                colourScale:         'ramp',         // 'ramp' or 'categorical'
-                showGlass:              true,
+                layout: {
+                    showTitle:          true,
+                    colourScale:        'ramp',         // 'ramp' or 'categorical'
+                    showGlass:          true,
+                },
                 dims: {
                     width:              1080,
                     height:             720,
@@ -284,12 +287,15 @@
                     settings.year = settings.queryParameters.get('year')  
                 }
                 if (settings.queryParameters.has('colourScale')) { 
-                    settings.colourScale = settings.queryParameters.get('colourScale')  
-                    d3.select(`#${settings.svgID}`).classed('multi-colour', settings.colourScale === 'categorical')
+                    settings.layout.colourScale = settings.queryParameters.get('colourScale')  
+                    d3.select(`#${settings.svgID}`).classed('multi-colour', settings.layout.colourScale === 'categorical')
                 }
                 if (settings.queryParameters.has('showGlass')) { 
-                    settings.showGlass = settings.queryParameters.get('showGlass').toLowerCase() === 'false' ? false : true  
-                }   
+                    settings.layout.showGlass = settings.queryParameters.get('showGlass').toLowerCase() === 'false' ? false : true  
+                }  
+                if (settings.queryParameters.has('titles')) { 
+                    settings.layout.showTitle = settings.queryParameters.get('titles') === 'false' ? false : true
+                } 
             };
 
             async function transformData(wrrgData){
@@ -322,7 +328,7 @@
 
             async function renderMap(settings, mapShapeData, mapMetaData){
                 // 0. OPTIMISE LAYOUT FOR GLASS INCLUSION/EXCLUSION
-                switch(settings.showGlass){
+                switch(settings.layout.showGlass){
                     case true: 
                         // Center map
                         settings.geometry.translationPctX =  0.47,             // Setting used (as a proportion of width to horizontally position the map 
@@ -508,8 +514,8 @@
                             className +=  typeof(lgaNameWrrgMap[d.properties.vic_lga__3]) !== 'undefined' ? helpers.slugify(lgaNameWrrgMap[d.properties.vic_lga__3]) : '' 
                             return className
                         })
-                        .style('fill',  d => settings.colourScale === 'ramp' ? wrrgColor(diversionRate[lgaNameWrrgMap[d.properties.vic_lga__3]]) : null)
-                        .style('stroke', d => settings.colourScale === 'ramp' ? d =>  wrrgColor(diversionRate[lgaNameWrrgMap[d.properties.vic_lga__3]]) : null )
+                        .style('fill',  d => settings.layout.colourScale === 'ramp' ? wrrgColor(diversionRate[lgaNameWrrgMap[d.properties.vic_lga__3]]) : null)
+                        .style('stroke', d => settings.layout.colourScale === 'ramp' ? d =>  wrrgColor(diversionRate[lgaNameWrrgMap[d.properties.vic_lga__3]]) : null )
                         .on('mouseover', onWrrgMouseover)
                         .on('mouseout', onWrrgMouseout)
 
@@ -557,7 +563,7 @@
                         organicsOffset = 200,
                         glassOffset = 250,
                         extraWidth = glassOffset - organicsOffset - 10,
-                        includeGlass = (data.byWRRG[wrrg]['Glass'].collected > 0 && settings.showGlass) ? true :false           // Test for whether to add glass to the WRGg pane
+                        includeGlass = (data.byWRRG[wrrg]['Glass'].collected > 0 && settings.layout.showGlass) ? true :false           // Test for whether to add glass to the WRGg pane
 
                     // a. Pane background and pointer
                     const wrrgPane = infoPanes.append('g')
@@ -571,7 +577,7 @@
                         .attr('ry', settings.infoPane.dims.ry)
 
                     let pointerCoords
-                    switch(settings.showGlass){
+                    switch(settings.layout.showGlass){
                         case true:
                             pointerCoords = {
                                 top: {
@@ -719,6 +725,9 @@
             annotation.append('text').classed('main-subtitle', true)
                 .attr('transform', `translate(${settings.dims.margin.left}, ${settings.dims.margin.top + 25})`)
                 .text(`by Waste Resource and Recovery Group in ${settings.year}`)
+            if(!settings.layout.showTitle){
+                d3.selectAll('.main-title, .main-subtitle').style('display', 'none')
+            }
 
             svgTitle.html(`Victorian waste collection data by Waste Resource and Recovery Group in ${settings.year}`)
             svgDescription.html(`A map of Victoria showing WRRG regions and waste and resource recovery collection data for each WRRG.`)

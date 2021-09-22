@@ -197,7 +197,7 @@
 
             /* Headline Typography */
             .main-title,
-            .sub-title,
+            .main-subtitle,
             .section-title{
                 font-size: 3.25vw;
                 font-weight: 500;
@@ -207,7 +207,7 @@
                 margin-block-end: 0.5vw;
                 line-height: 0.8;
             }
-            .sub-title{
+            .main-subtitle{
                 font-size: 1.75vw;
             }
             .headline-label,
@@ -646,9 +646,9 @@
 
             }).then( async (data) => {
                 // 3. Initiate vis build sequence with data now loaded
-                await applyQuerySettings(config)            // a. Apply query string settings
-                await transformData(data.table.kerbsideCollectionData5yr)                           // b.  Transform and shape data
-                await renderVis(data.table.kerbsideCollectionData5yr, config)  
+                await applyQuerySettings(config)                                // a. Apply query string settings
+                await transformData(data.table.kerbsideCollectionData5yr)       // b.  Transform and shape data
+                await renderVis(data.table.kerbsideCollectionData5yr, config)   // c. Render visualisation(s)
             })
 
             // X. Table data parsing function: trim() header white space and prase numbers with "$" and "," stripped. 
@@ -680,6 +680,12 @@
             if (settings.queryParameters.has('year')) { 
                 settings.year = settings.queryParameters.get('year')  
             }
+            if (settings.queryParameters.has('titles')) { 
+                settings.layout.showTitle = settings.queryParameters.get('titles') === 'false' ? false : true
+            }
+            if (settings.queryParameters.has('titles')) { 
+                settings.layout.showTitle = settings.queryParameters.get('titles') === 'false' ? false : true
+            }
         };
 
         async function transformData(dataTable) {   
@@ -699,8 +705,11 @@
         /////////////////////////////////////
 
         async function renderVis(dataTable, settings){ 
-            // 0. Add main title
-            d3.select('.main-title').html(`Victorian local government waste services <br><span class='sub-title'>trends to  ${settings.year}</span>`)
+            // 0. Add main title and set visibility
+            d3.select('.main-title').html(`Victorian local government waste services <br><span class='main-subtitle'>trends to  ${settings.year}</span>`)
+            if(!settings.layout.showTitle){
+                d3.selectAll('.main-title, .main-subtitle, .section-title').style('display', 'none')
+            }
 
             // 1. Build the headline containers
             // a. Get data

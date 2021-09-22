@@ -205,6 +205,7 @@
                 showY0:         false
             },
             display:{
+                showTitle:          true,
                 alignLeft:          false,
                 targets:            'all',      // Show 'all' targets by default or single target by index
                 alternating:        true,      // Show alternating labels
@@ -294,6 +295,9 @@
             if (settings.queryParameters.has('alignLeft')) { 
                 settings.display.alignLeft = settings.queryParameters.get('alignLeft') === 'true' ? true : false
             }
+            if (settings.queryParameters.has('titles')) { 
+                settings.display.showTitle = settings.queryParameters.get('titles') === 'false' ? false : true
+            }
         };
 
         async function transformData(dataTable) {   
@@ -365,7 +369,9 @@
             if(settings.display.alignLeft){
                 d3.select('.main-container').classed('align-left', true)
             }
-
+            if(!settings.display.showTitle){
+                d3.selectAll('.main-title').style('display', 'none')
+            }
             const container = d3.select('.progress-graphics-container')
 
             // 2. Setup vis scales

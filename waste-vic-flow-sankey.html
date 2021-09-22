@@ -221,6 +221,9 @@
         const settings = { 
             svgID:                  'flow-vis',
             year:                   '2019-20',
+            layout: {
+                showTitle:          true
+            },
             dims: {
                 width:              780,
                 height:             1080,
@@ -307,6 +310,9 @@
             settings.queryParameters = new URLSearchParams(window.location.search)
             if (settings.queryParameters.has('year')) { 
                 settings.year = settings.queryParameters.get('year')  
+            }
+            if (settings.queryParameters.has('titles')) { 
+                settings.layout.showTitle = settings.queryParameters.get('titles') === 'false' ? false : true
             }
         };
 
@@ -470,7 +476,6 @@
                         return  4 + bbox.height
                     }).text(`${helpers.numberFormatters.formatComma(helpers.roundToNearest.hundred(data.byType.material[material].value))} tonnes`)
 
-
                 const labelBBox = document.getElementById(`label-group-${helpers.slugify(material)}`).getBBox()
                 label.style('transform', `translate(${-8}px, ${settings.geometry.container.height /2 - labelBBox.height/2}px)`)
             })
@@ -621,6 +626,9 @@
             annotationGroup.append('text').classed('main-subtitle', true)
                 .text(`Tonnes of collected waste to destination and recycled products in ${settings.year}`)
                 .attr('transform', `translate(${30}, ${70})`)
+            if(!settings.layout.showTitle){
+                d3.selectAll('.main-title, .main-subtitle').style('display', 'none')
+            }
 
             // b. Title and description
             svgTitle.html(`A diagram of key waste flows in Victoria by tonnes of collected waste to destination and recycled products in ${settings.year}`)

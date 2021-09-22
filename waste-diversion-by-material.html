@@ -242,7 +242,10 @@
         const settings = {
             svgID:        'radial-bar-vis',
             year:         '2019-20', 
-            layout:       'landscape',           // Options are 'portrait', 'landscape' and 'chart-only'
+            layout: {
+                type:       'landscape',           // Options are 'portrait', 'landscape' and 'chart-only'
+                showTitle:      true
+            },            
             theme:          'light',        // default "light" or "dark" mode
             themeChange:    false,          // boolean for whether the theme can be changed with keypress (assigned to 'Shift' key) 
         }
@@ -310,7 +313,7 @@
                 d3.selectAll(`.svg-container`).classed("dark", settings.queryParameters.get('mode') === 'dark')
             }
             if (settings.queryParameters.has('layout')) { 
-                settings.layout = settings.queryParameters.get('layout') 
+                settings.layout.type = settings.queryParameters.get('layout') 
             }
             if (settings.queryParameters.has('themeChange')) { 
                 settings.themeChange = settings.queryParameters.get('themeChange')  
@@ -320,6 +323,9 @@
                 if(settings.mode === 'dark'){
                     d3.selectAll(`.svg-container`).classed("dark", true)
                 }  
+            }
+            if (settings.queryParameters.has('titles')) { 
+                settings.layout.showTitle = settings.queryParameters.get('titles') === 'false' ? false : true
             }
         };
 
@@ -387,9 +393,8 @@
                 chartData = chartData.sort((a,b) => b.diversionRate - a.diversionRate ).filter( d => d.diversionRate !== 0)
 
                 // Setup geometry for each layout       
-                switch(settings.layout){
+                switch(settings.layout.type){
                     case 'landscape':
-
                         settings.dims = {
                             height:     720, 
                             width:      1080,
@@ -474,7 +479,7 @@
                     getInnerRadius = (index) => settings.geometry.arcMinRadius + (chartData.length - (index + 1)) * (arcWidth + settings.geometry.arcPadding) 
         
             // 2. Setup SVG
-                const viewBoxHeight = settings.layout !== 'chart-only' ? settings.dims.height : settings.dims.width * 1.1
+                const viewBoxHeight = settings.layout.type !== 'chart-only' ? settings.dims.height : settings.dims.width * 1.1
                 const svg= d3.select(`#${settings.svgID}`).attr("viewBox", `0 0 ${settings.dims.width} ${viewBoxHeight}`)
 
                 const defs = svg.append('defs'),
@@ -515,7 +520,7 @@
                         .attrTween('d', arcTween)
 
             // 5. Add table/axis group
-                if(settings.layout !== 'chart-only'){
+                if(settings.layout.type !== 'chart-only'){
                     const  tableHeaders = canvas.append('g').classed('table-headers', true),
                         tableAxis = canvas.append('g').classed('r axis table', true)
                             .selectAll('g')
@@ -563,15 +568,19 @@
                         .text(d => `${helpers.numberFormatters.formatComma(d.diverted /1000)} kt`)
                 }
 
-            // 6. Add background layer and annotation
+            // 6. Add background layer and title annotation
                 backgroundLayer.append('rect').classed('bg-rect', true)
                     .attr('width', settings.dims.width)
                     .attr('height', settings.dims.height)
 
                 annotationLayer.append('text').classed('main-title', true)
-                    .classed('centered', settings.layout === 'landscape' ? false : true)
-                    .attr('transform', `translate(${settings.layout === 'landscape' ? settings.dims.margin.left : settings.dims.width * 0.5} , ${settings.dims.margin.top})`)
+                    .classed('centered', settings.layout.type === 'landscape' ? false : true)
+                    .attr('transform', `translate(${settings.layout.type === 'landscape' ? settings.dims.margin.left : settings.dims.width * 0.5} , ${settings.dims.margin.top})`)
                     .text(`What materials did Victorians recover in ${settings.year}?`)
+
+                if(!settings.layout.showTitle){
+                    d3.selectAll('.main-title').style('display', 'none')
+                }
 
             // 7. Add a curved labels for diversion radial chart 
                 chartData.forEach((d, i) => {
@@ -614,7 +623,7 @@
                                 .style('opacity', null)
                 })
 
-            // 8. Add title labels
+            // 8. Add main title labels
             const titleOffset = 10, 
                 titleLabelRadius = settings.geometry.chartRadius + titleOffset
                 titleStartPos = {

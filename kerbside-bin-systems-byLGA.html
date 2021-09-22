@@ -151,7 +151,7 @@
             <!-- Main title -->
             <div class = 'title-container'>
                 <h1 class = 'main-title'></h1>
-                <div class = 'sub-title'></div>
+                <div class = 'main-subtitle'></div>
             </div>
             <!-- Bin system table -->
             <div class = 'bin-system-vis-container'>
@@ -170,9 +170,11 @@
         const settings = {
             svgID:          'bin-vis',
             year:           '2019-20', 
+            layout: {
+                showTitle:      true,
+                icon:           'bin',
+            },
             tableName:      'binSystemData',
-            icon:           'bin',
-            title:          true,
             dims: {
                 sparkColumn: {            // For each svg collection frequency graphic
                     height:     50, 
@@ -260,10 +262,10 @@
                 settings.year = settings.queryParameters.get('year')  
             }
             if (settings.queryParameters.has('icon')) { 
-                settings.icon = settings.queryParameters.get('icon')  
+                settings.layout.icon = settings.queryParameters.get('icon')  
             }
-            if (settings.queryParameters.has('showTitle')) { 
-                settings.title = settings.queryParameters.get('showTitle') === 'true' ? true : false
+            if (settings.queryParameters.has('titles')) { 
+                settings.layout.showTitle = settings.queryParameters.get('titles') === 'true' ? true : false
             }
         };
 
@@ -295,10 +297,10 @@
                 bin:        "M16.444-2.62a.889.864 0 01-.888.864.889.864 0 01-.89-.864.889.864 0 01.89-.865.889.864 0 01.888.865M15.4-6.07l.582-12.974H1.796l.8 17.776c.028.693.615 1.24 1.328 1.24h9.29A3.386 3.386 0 0112.2-3.77c.482-1.33 1.75-2.242 3.199-2.3zm4.156-15.567h-1.334v.865h1.334a.438.438 0 00.444-.432.438.438 0 00-.444-.433zM15.809-5.2h-.005a2.348 2.348 0 00-.248-.013c-1.456-.008-2.652 1.116-2.694 2.531-.042 1.415 1.085 2.604 2.539 2.678 1.453.075 2.702-.993 2.813-2.404.111-1.412-.957-2.651-2.405-2.792zm-.253 4.308c-.982 0-1.778-.773-1.778-1.728s.796-1.729 1.778-1.729c.981 0 1.777.774 1.777 1.729 0 .458-.187.898-.52 1.222a1.803 1.803 0 01-1.257.506zm1.333-19.015a.439.439 0 00.444-.432v-.432H.444A.438.438 0 000-20.34c0 .239.199.432.444.432zm.444-2.16c0-.24-.199-.433-.444-.433H2.667c-.565 0-1.069.347-1.258.864h15.924z",
                 bundle:     "M8.432-16.706h6.365v-2.749H8.432Zm-6.985 0h6.365v-2.749H1.447Zm6.985 3.317h6.365v-2.75H8.432Zm-6.985 0h6.365v-2.75H1.447Zm6.985 3.317h6.365v-2.75H8.432Zm-6.985 0h6.365v-2.75H1.447Zm6.985 3.316h6.365v-2.75H8.432Zm-6.985 0h6.365v-2.75H1.447Zm6.985 3.317h6.365v-2.75H8.432Zm-6.985 0h6.365v-2.75H1.447ZM8.432-.123h6.365v-2.749H8.432Zm-6.985 0h6.365v-2.749H1.447Z"
             }
-            d3.select('.bin-system-vis-container').classed(settings.icon, true)
-            if(settings.title){
+            d3.select('.bin-system-vis-container').classed(settings.layout.icon, true)
+            if(settings.layout.showTitle){
                 d3.select('.main-title').html(`Victorian bin systems in ${settings.year}`)
-                d3.select('.sub-title').html('a visual representation of the different combinations of monthly bin collection services offered by each LGA')
+                d3.select('.main-subtitle').html('a visual representation of the different combinations of monthly bin collection services offered by each LGA')
             } else {
                 d3.select('.title-container').style('display', 'none')
             }
@@ -360,7 +362,7 @@
                             maxBinSize  = d3.max(data.schema.list.binSize),
                             binScale    = d3.scaleSqrt()     // Use to scale block height to bin volume
                                             .domain([0, maxBinSize])
-                                            .range([0, settings.icon === 'bin' ? 1.75 : chartHeight])
+                                            .range([0, settings.layout.icon === 'bin' ? 1.75 : chartHeight])
 
                         let blocksToPlot = 0        // Determine no blocks to plot based on frequency
                         switch(obj[`${service}_collectionFrequency`]){
@@ -371,7 +373,7 @@
                         }
 
                         for(i = 0; i < blocksToPlot; i++){
-                            if(settings.icon === 'bin'){
+                            if(settings.layout.icon === 'bin'){
                                 const iconPath = (service === 'Recyclables' && obj[`${service}_type`] === 'Tied bundle') ? icons.bundle :  icons.bin
                                 collectionChart.append('path')
                                     .attr('class', `block ${helpers.slugify(service)}` )
@@ -390,20 +392,21 @@
                 })
             
                 // c. Add sidebar annotation
-                const iconType = settings.icon,
+                const iconType = settings.layout.icon,
                     noSystems = visData.length,
                     organicsLGAs = visData.filter(d => d.Organics_binSize !== null).length,
                     glassLGAs = visData.filter(d => d.Glass_binSize !== null).length,
                     totalLGAs = visData.length
+
                 const annotationContainer = d3.select('.bin-system-annotation-container')
                 annotationContainer.append('div').classed('annotation-header', true)
                     .html('How to read this graphic')
                 annotationContainer.append('p').classed('annotation-text', true)
                     .html(`This table shows the different combinations of bin collection services (a 'bin system') offered by the ${totalLGAs} Victorian LGAs.
-                        For each (colour-coded) collection service, bin volumes are labelled and represented by size, and service frequency 'per month' is represented by the number of coloured ${settings.icon}s. 
+                        For each (colour-coded) collection service, bin volumes are labelled and represented by size, and service frequency 'per month' is represented by the number of coloured ${settings.layout.icon}s. 
                     `)
                 annotationContainer.append('p').classed('annotation-text', true)
-                    .html(`For example, a weekly collection is shown by four coloured ${settings.icon}s, and a monthly service with one coloured ${settings.icon}.
+                    .html(`For example, a weekly collection is shown by four coloured ${settings.layout.icon}s, and a monthly service with one coloured ${settings.layout.icon}.
                     `)
 
                 annotationContainer.append('p').classed('annotation-text', true)
