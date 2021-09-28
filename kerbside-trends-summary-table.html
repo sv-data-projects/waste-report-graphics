@@ -891,7 +891,7 @@
                     recoveryContainer.append('div').classed('service-summary-table-header', true)
                     recoveryContainer.append('div').classed('service-summary-table-data pct-change performance-label', true).html('% change &rarr;')
                     recoveryContainer.append('div').classed('service-summary-table-data pct-change lastYear-vs-data', true).html(recoveryVsLastYearPct)
-                    recoveryContainer.append('div').classed('service-summary-table-data pct-change fiveYear-vs-data', true).html(wasteVsFiveYearPct)
+                    recoveryContainer.append('div').classed('service-summary-table-data pct-change fiveYear-vs-data', true).html(recoveryVsFiveYearPct)
                     renderSparkline(`recovery-sparkline-${helpers.slugify(service)}`, serviceRecoveryData, settings.dims.minor_sparkline)                
                 }
 
