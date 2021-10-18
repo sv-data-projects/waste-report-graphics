@@ -39,6 +39,9 @@
                 font-size: 26px;
                 text-anchor: middle;
             }
+            .case.main-title{
+                text-transform : none;
+            }
             .diversion-sub-label,
             .diversion-main-label, 
             #material-info-label{
@@ -244,7 +247,8 @@
             year:         '2019-20', 
             layout: {
                 type:       'landscape',           // Options are 'portrait', 'landscape' and 'chart-only'
-                showTitle:      true
+                showTitle:      true,
+                sentCase:       false
             },            
             theme:          'light',        // default "light" or "dark" mode
             themeChange:    false,          // boolean for whether the theme can be changed with keypress (assigned to 'Shift' key) 
@@ -327,6 +331,9 @@
             if (settings.queryParameters.has('titles')) { 
                 settings.layout.showTitle = settings.queryParameters.get('titles') === 'false' ? false : true
             }
+            if (settings.queryParameters.has('sentCase')){
+                settings.layout.sentCase = settings.queryParameters.get('sentCase') === 'true' ? true: false
+            }
         };
 
         async function transformData(wasteStreamData, materialData) {      
@@ -377,6 +384,7 @@
         ////////////////////////////////////////////////////////////////////////
 
         async function renderVis(data, settings){
+
             // 0. Re-shape chartData (for better clarity when defining data binding accessors) and setup geometry
                 let chartData = []
                 Object.entries(data).sort().forEach(([material, d]) => {
@@ -458,7 +466,6 @@
                         break
                     default:
                 }
-
 
             // 1. Setup scales and helper functions for shape and layout of radial 
                 const arcScale = d3.scaleLinear()
@@ -569,6 +576,8 @@
                 }
 
             // 6. Add background layer and title annotation
+
+
                 backgroundLayer.append('rect').classed('bg-rect', true)
                     .attr('width', settings.dims.width)
                     .attr('height', settings.dims.height)
@@ -580,6 +589,9 @@
 
                 if(!settings.layout.showTitle){
                     d3.selectAll('.main-title').style('display', 'none')
+                }
+                if(settings.layout.sentCase){
+                    d3.select('.main-title').classed('case', true)
                 }
 
             // 7. Add a curved labels for diversion radial chart 
