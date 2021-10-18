@@ -26,6 +26,10 @@
             font-family: 'DIN Next LT Pro';
             margin: 0;
         }
+
+        .case.main-title{
+            text-transform: none;
+        }
         .main-title,
         .main-subtitle{
             fill: #000;
@@ -36,6 +40,7 @@
             font-weight: 500;
             text-transform: uppercase;
         }
+
         .main-subtitle{
             font-size: 14px;
             font-weight: 400;
@@ -222,7 +227,8 @@
             svgID:                  'flow-vis',
             year:                   '2019-20',
             layout: {
-                showTitle:          true
+                showTitle:          true,
+                sentCase:           false
             },
             dims: {
                 width:              780,
@@ -313,6 +319,9 @@
             }
             if (settings.queryParameters.has('titles')) { 
                 settings.layout.showTitle = settings.queryParameters.get('titles') === 'false' ? false : true
+            }
+            if (settings.queryParameters.has('sentCase')) {
+                settings.layout.sentCase = settings.queryParameters.get('sentCase') === 'true' ? true : false
             }
         };
 
@@ -626,8 +635,13 @@
             annotationGroup.append('text').classed('main-subtitle', true)
                 .text(`Tonnes of collected waste to destination and recycled products in ${settings.year}`)
                 .attr('transform', `translate(${30}, ${70})`)
+
+            if (settings.layout.sentCase){
+                d3.select('.main-title').classed('case',true)
+            }
+
             if(!settings.layout.showTitle){
-                d3.selectAll('.main-title, .main-subtitle').style('display', 'none')
+              d3.selectAll('.main-title, .main-subtitle').style('display', 'none')
             }
 
             // b. Title and description

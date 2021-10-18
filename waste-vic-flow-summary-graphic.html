@@ -137,6 +137,10 @@
                 .main-title{
                     text-transform: uppercase;
                 }
+
+                .case.main-title{
+                    text-transform: none;
+                }
                 .main-title, 
                 .title-label{
                     font-size: 30px;
@@ -359,7 +363,8 @@
             svgID:          'summary-vis',
             year:           '2019-20', 
             layout: {
-                showTitle:      true
+                showTitle:      true,
+                sentCase:       false
             },
             theme:          'light',        // default "light" or "dark" mode
             themeChange:    true,          // boolean for whether the theme can be changed with keypress (assigned to 'Shift' key) 
@@ -476,6 +481,9 @@
             }
             if (settings.queryParameters.has('titles')) { 
                 settings.layout.showTitle = settings.queryParameters.get('titles') === 'false' ? false : true
+            }
+            if (settings.queryParameters.has('sentCase')) {
+                settings.layout.sentCase = settings.queryParameters.get('sentCase') === 'true' ? true : false
             }
         };
 
@@ -875,6 +883,9 @@
                     .attr('y', 30)
                 if(!settings.layout.showTitle){
                     d3.selectAll('.main-title').style('display', 'none')
+                }
+                if(settings.layout.sentCase){
+                    d3.select('.main-title').classed('case', true)
                 }
 
             // X. Helper method for rendering donut chart

@@ -55,6 +55,9 @@
             text-transform: uppercase;
             fill: #000;
         }
+        .case.main-title{
+            text-transform: none;
+        }
         .main-subtitle{
             font-size: 16px;
             font-weight: 500;
@@ -163,7 +166,8 @@
             year:                   '2019-20',     
             layout: {
                 showTitle:          true,
-                showSparklines:     true,     
+                showSparklines:     true,
+                sentCase:           false
             },                 
             dims: {
                 width:              1080,
@@ -257,6 +261,10 @@
             if (settings.queryParameters.has('titles')) { 
                 settings.layout.showTitle = settings.queryParameters.get('titles') === 'false' ? false : true
             }
+
+            if (settings.queryParameters.has('sentCase')){
+                settings.layout.sentCase = settings.queryParameters.get('sentCase') === 'true' ? true : false
+            }
         };
 
         // Parse input data for export volumes by country
@@ -286,6 +294,7 @@
 
         // Render the map visualisation, using the map shape data and parse export data 
         async function renderMap(settings, worldShapeData, statesShapeData){
+
             // 1. SPECIFY LAYOUT GROUPS: Layers appended in rendering order
             const svg = d3.select(`#${settings.svgID}`).attr('viewBox', `0 0 ${settings.dims.width} ${settings.dims.height}`),
                 svgTitle = svg.append('title').attr('id', 'svg-title'),
@@ -480,6 +489,7 @@
             // 7. ADD ANNOTATION
             const titleMargin = {left: 30, top: 30}
             // a. Main titles
+            d3.select('main').classed('case',true)
             titles.append('text').classed('main-title', true)
                 .attr('x', titleMargin.left)
                 .attr('y', titleMargin.top)
@@ -489,10 +499,13 @@
                 .attr('x', titleMargin.left)
                 .attr('y', titleMargin.top + 35)
                 .attr('dy', 0)
-                .text(`a breakdown by export destination and materials in ${settings.year}`)
+                .text(`A breakdown by export destination and materials in ${settings.year}`)
 
             if(!settings.layout.showTitle){
                 d3.selectAll('.main-title, .main-subtitle').style('display', 'none')
+            }
+            if (settings.layout.sentCase){
+                d3.select('.main-title').classed('case',true)
             }
 
             // b. Totals group (bottom left)

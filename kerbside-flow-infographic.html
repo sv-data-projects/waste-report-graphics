@@ -51,6 +51,11 @@
                 fill:  #000;
                 text-transform: uppercase;
             }
+            .case.main-title,
+            .case.lga-stream-title,
+            .case.waste-destination-title{
+                text-transform: none;
+            }
             .waste-destination-title,
             .lga-stream-title{
                 font-size: 24px;
@@ -928,7 +933,10 @@
 
         const settings = {
             svgID:          'kerbside-graphic',
-            year:           '2019-20', 
+            year:           '2019-20',
+            layout: {
+                sentCase:   false,
+            },
             dims: {
                 height:     1530, 
                 width:      1080,
@@ -1009,7 +1017,10 @@
             }
             if (settings.queryParameters.has('extended-typography')) { 
                 d3.select(`#${settings.svgID}`).classed('extended-typography', settings.queryParameters.get('extended-typography') === "false" ? false  : true)
-             }
+            }
+            if (settings.queryParameters.has('sentCase')){
+                settings.layout.sentCase = settings.queryParameters.get('sentCase') === 'true' ? true : false
+            }
         };
 
         async function transformData(kerbsideData, recycleBinData) {      
@@ -1079,7 +1090,7 @@
                 // d. Flow settings
                 const facilityY = 385, mrfX = 110, mrfXOut = 340, organicsFacilityX = 160, organicsFacilityXOut = -80, landfillX = settings.dims.width / 2, 
                     landfillY = 430, flowRadius = 80, contaminationRadius = 50
-        
+
             // 2. Setup title and desc for screen reader accessibility
             const svgTitleText = `An illustrated data graphic showing household waste flows in ${settings.year})`,
                 svgDescText = `An illustrated data graphic showing household waste flows in ${settings.year}). The graphic is split into three panes. The top pane shows the collection volumes by three bin types (commingled recyclables, garbage and organics). The middle pane shows how this collected waste is either recovered or sent to landfill, with a summary callout to describe the overall diversion rate (from landfill), and the breakdown of recovered materials.  The final (bottom) pane summarises the costs of each waste collection service for local governments. `
@@ -1416,6 +1427,10 @@
                 .html(`of waste from Victorian households`)
                 .attr('x', xMargin)
                 .attr('y', headlineOffsetY + 50)
+
+            if (settings.layout.sentCase){
+                d3.selectAll('.main-title, .lga-stream-title, .waste-destination-title').classed('case',true)
+            }
 
             // 10. Council spend data table
             annotationLayer.append('text').classed('lga-label-headline council', true)

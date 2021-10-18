@@ -71,6 +71,9 @@
                 text-transform: uppercase;
                 margin-block-end: 0.5vw;
             }
+            .case .main-title{
+                text-transform: none;
+            }
             .table-header{
                 font-weight: 500;
                 font-size: 1.5vw;
@@ -171,6 +174,7 @@
             layout: {
                 showTitle:      true,
                 icon:           'bin',
+                sentCase:      false
             },
             dims: {
                 sparkColumn: {            // For each svg collection frequency graphic
@@ -269,6 +273,9 @@
             if (settings.queryParameters.has('titles')) { 
                 settings.layout.showTitle = settings.queryParameters.get('titles') === 'true' ? true : false
             }
+            if (settings.queryParameters.has('sentCase')) {
+                settings.layout.sentCase = settings.queryParameters.get('sentCase') === 'true' ? true : false
+            }
         };
 
         async function transformData(binSystemData) { 
@@ -353,6 +360,10 @@
                 d3.select('.main-subtitle').html('A visual representation of the different combinations of monthly bin collection services offered by LGAs')
             } else {
                 d3.select('.title-container').style('display', 'none')
+            }
+            // if ?sentCase=true then set case to true = transform text = none
+            if (settings.layout.sentCase){
+                d3.select('main').classed('case',true)
             }
 
             // 1. Add HTML table with icon frequency graphics

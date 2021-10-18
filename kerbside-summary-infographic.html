@@ -54,6 +54,9 @@
                 text-transform: uppercase;
                 letter-spacing: 1px;
             }
+            .case.lga-label{
+                text-transform: none;
+            }
             .middle{
                 text-anchor: middle;
             }
@@ -286,7 +289,8 @@
             svgID:          'streetscene-vis',
             year:           '2019-20', 
             layout: {
-                showTitle:      true
+                showTitle:      true,
+                sentCase:       false
             },
             dims: {
                 height:     720, 
@@ -361,6 +365,9 @@
             if (settings.queryParameters.has('titles')) { 
                 settings.layout.showTitle = settings.queryParameters.get('titles') === 'true' ? true : false
             }
+            if (settings.queryParameters.has('sentCase')) {
+                settings.layout.sentCase = settings.queryParameters.get('sentCase') === 'true' ? true : false
+            }
         };
 
         async function transformData(kerbsideData) {      
@@ -398,7 +405,7 @@
                 .attr('y', 60)
 
             annotationLayer.append('text').classed('lga-label-small', true)
-                .text("Council's spent")
+                .text("Councils spent")
                 .attr('x', 50)
                 .attr('y', headlineOffsetY)
 
@@ -467,6 +474,9 @@
                 .attr('dy', 0)
                 .call(helpers.wrap, 160, 1.1)
 
+            if (settings.layout.sentCase){
+                d3.selectAll('.lga-label').classed('case',true)
+            }
             // 2. Setup title and desc for screen reader accessibility
             if(!settings.layout.showTitle){
                 d3.selectAll('.main-title, .main-subtitle').style('display', 'none')

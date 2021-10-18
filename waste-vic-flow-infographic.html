@@ -56,6 +56,13 @@
             .destination-title{
                 text-transform: uppercase;
             }
+
+            .case.vis-title,
+            .case.product,
+            .case.destination-title{
+                text-transform: none;
+            }
+
             .vis-title{
                 font-size: 60px;
             }
@@ -1286,7 +1293,10 @@
 
         const settings = {
             svgID:          'scene-vis',
-            year:           '2019-20', 
+            year:           '2019-20',
+            layout: {
+                sentCase:   false
+            },
             dims: { 
                 height:     3508, 
                 width:      2481,
@@ -1446,9 +1456,12 @@
             if (settings.queryParameters.has('year')) { 
                 settings.year = settings.queryParameters.get('year')  
             }
+            if (settings.queryParameters.has('sentCase')) {
+                settings.layout.sentCase = settings.queryParameters.get('sentCase') === 'true' ? true : false
+            }
             if (settings.queryParameters.has('extended-typography')) { 
                 d3.select(`#${settings.svgID}`).classed('extended-typography', settings.queryParameters.get('extended-typography') === "false" ? false  : true)
-             }
+            }
         };
 
         async function transformData(materialData) {
@@ -1791,6 +1804,7 @@
 
 
             // 3. GENERAL ANNOTATION
+
                 // a. Main title
                 annotationLayer.append('text').attr('id', 'main-title')
                     .classed('vis-title', true)
@@ -1885,6 +1899,7 @@
                     .attr('dy', 0)
                     .call(helpers.wrap,  400, 1,1)
 
+
                 //  e. Material information label
                 const materialInfoGroup = annotationLayer.append('g').attr('id', 'materials-info-group')
                     .attr('transform', `translate(${settings.geometry.generationPos.x}, ${settings.geometry.generationPos.y })`)
@@ -1915,6 +1930,9 @@
                     .attr('y', settings.dims.height * 0.5)
                     .attr('dy', 0)
 
+                if(settings.layout.sentCase){
+                    d3.selectAll('.vis-title, .product-title, .destination-title').classed('case', true)
+                }
 
             // 5. Interaction methods 
                 d3.selectAll('.building-group')
@@ -1932,6 +1950,7 @@
                 d3.select('#total-generation-node-group')
                     .on('mouseover', totalGenMouseover)
                     .on('mouseout', totalGenMouseout)
+
 
                 function nodeMouseover(){
                     const materialClass = this.classList[0],

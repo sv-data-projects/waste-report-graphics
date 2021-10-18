@@ -146,6 +146,12 @@
                 text-transform: uppercase;
                 margin-block-end: 0.5vw;
             }
+            .case.main-title,
+            .case.section-title,
+            .case.headline-label,
+            .case.material-summary-label{
+                text-transform: none;
+            }
             .materials .title-container{
                 border: none;
             }
@@ -627,7 +633,7 @@
             <!-- Trend tables-->
             <div class = 'headline-tables-container'>
                 <h3 class = 'section-title'>Trends by materials recovered for reprocessing</h3>
-                <div class = 'annotation'>A breakdown for each recovered materials by recovered materials for local reprocessing (Local recovery) and materials exported for reprocessed (Export).</div>
+                <div class = 'annotation'>A breakdown for each recovered materials by recovered materials for local reprocessing (local recovery) and materials exported for reprocessed (export).</div>
                 <div class = 'materials-tables-container'></div>
             </div>
         </main>        
@@ -644,7 +650,8 @@
             year:                   '2019-20', 
             layout: {
                 type:               'all', 
-                showTitle:         true
+                showTitle:         true,
+                sentCase:           false
             },
             dims: {
                 major_sparkline: {
@@ -729,6 +736,9 @@
             if (settings.queryParameters.has('titles')) { 
                 settings.layout.showTitle = settings.queryParameters.get('titles') === 'false' ? false : true
             }
+            if (settings.queryParameters.has('sentCase')) {
+                settings.layout.sentCase = settings.queryParameters.get('sentCase') === 'true' ? true : false
+            }
         };
 
         async function transformData(dataTable) {   
@@ -752,7 +762,10 @@
                 d3.select('.main-title').html(`Victorian waste management trends to  ${settings.year}`)
                 if(!settings.layout.showTitle){
                     d3.selectAll('.main-title, .section-title').style('display', 'none')
-                }                
+                }
+                if(settings.layout.sentCase){
+                    d3.selectAll('.main-title, .section-title, .headline-label').classed('case', true)
+                }
 
                 switch(settings.layout.type){
                     case 'headlines':
@@ -916,7 +929,9 @@
                 const sparkData  = dataTable.map(d => d[`${material}_${data.schema.list.destination[1]}`] + d[`${material}_${data.schema.list.destination[2]}`])
                 renderSparkline(`${helpers.slugify(material)}-sparkline`, sparkData, settings.dims.minor_sparkline)
             })
-
+            if(settings.layout.sentCase){
+                d3.selectAll('.material-summary-label').classed('case', true)
+            }
             // 4. Fade in vis
             d3.select('.main-container').transition().duration(2000).style('opacity', null)  
         };

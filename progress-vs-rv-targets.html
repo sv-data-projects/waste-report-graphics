@@ -43,6 +43,10 @@
                 padding: 0 2vw;
             }
 
+            .case .main-title{
+                text-transform: none;
+            }
+
             .progress-graphic-container{
                 display: grid;
                 grid-template-columns: 1fr 4fr 4fr 1fr;
@@ -199,6 +203,9 @@
                 milestones:     {},
                 actuals:        []
             },
+            layout: {
+                sentCase:       false
+            },
             dims: { 
                 height:         360,
                 width:          360,
@@ -298,6 +305,9 @@
             if (settings.queryParameters.has('titles')) { 
                 settings.display.showTitle = settings.queryParameters.get('titles') === 'false' ? false : true
             }
+            if (settings.queryParameters.has('sentCase')) {
+                settings.layout.sentCase = settings.queryParameters.get('sentCase') === 'true' ? true : false
+            }
         };
 
         async function transformData(dataTable) {   
@@ -364,14 +374,21 @@
         async function renderVis(dataTable, settings){ 
             // 1. Set title/layout  and reference
             if(settings.display.targets === 'all'){
-                d3.select('.main-title').html(`${settings.year.Baseline}-${settings.year.Baseline+1 - 2000} Progress toward Recycling Victoria Targets`)
+                d3.select('.main-title').html(`${settings.year.Baseline}-${settings.year.Baseline+1 - 2000} Progress toward Recycling Victoria targets`)
             }
             if(settings.display.alignLeft){
                 d3.select('.main-container').classed('align-left', true)
             }
+
+            if(settings.layout.sentCase){
+                d3.select('main').classed('case', true)
+            }
+
             if(!settings.display.showTitle){
                 d3.selectAll('.main-title').style('display', 'none')
             }
+
+
             const container = d3.select('.progress-graphics-container')
 
             // 2. Setup vis scales

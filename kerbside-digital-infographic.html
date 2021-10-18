@@ -51,6 +51,11 @@
                 fill:  #000;
                 text-transform: uppercase;
             }
+            .case.main-title,
+            .case.lga-stream-title{
+                text-transform: none;
+            }
+
             .waste-destination-title,
             .lga-stream-title{
                 font-size: 24px;
@@ -691,7 +696,10 @@
 
         const settings = {
             svgID:          'kerbside-graphic',
-            year:           '2019-20', 
+            year:           '2019-20',
+            layout: {
+                sentCase:   false
+            },
             dims: {
                 height:     1080, 
                 width:      1080,
@@ -769,6 +777,9 @@
             if (settings.queryParameters.has('year')) { 
                 settings.year = settings.queryParameters.get('year')  
             }
+            if (settings.queryParameters.has('sentCase')) {
+                settings.layout.sentCase = settings.queryParameters.get('sentCase') === 'true' ? true : false
+            }
             if (settings.queryParameters.has('extended-typography')) { 
                 d3.select(`#${settings.svgID}`).classed('extended-typography', settings.queryParameters.get('extended-typography') === "false" ? false  : true)
              }
@@ -787,6 +798,7 @@
         //////////////////////////////////////////////
 
         async function renderVis(collectionData, compositionData, settings){
+
             // 0. Data
             const yearData = collectionData.filter(d => d.year === settings.year)[0],
                 recycleBinData =  compositionData.filter(d => d.year === settings.year),
@@ -839,7 +851,7 @@
                 // d. Flow settings
                 const facilityY = 385, mrfX = 110, mrfXOut = 340, organicsFacilityX = 160, organicsFacilityXOut = -80, landfillX = settings.dims.width / 2, 
                     landfillY = 430, flowRadius = 80, contaminationRadius = 50
-        
+
             // 1. Add Kerbside waste stream headers
             annotationLayer.append('text').classed('lga-stream-title recycling-group', true)
                 .attr('x', settings.dims.width / 6)
@@ -996,7 +1008,7 @@
                 .attr('x', 50)
                 .attr('y', 60)
             annotationLayer.append('text').classed('lga-label-small street', true)
-                .text("Council's collected a total of")
+                .text("Councils collected a total of")
                 .attr('x', xMargin)
                 .attr('y', headlineOffsetY)
             annotationLayer.append('text').classed('lga-label-headline street', true)
@@ -1008,13 +1020,17 @@
                 .attr('x', xMargin)
                 .attr('y', headlineOffsetY + 50)
 
+            if (settings.layout.sentCase){
+                d3.selectAll('.main-title, .lga-stream-title').classed('case', true)
+            }
+
             // 10. Council spend data table
             annotationLayer.append('text').classed('lga-label-headline council', true)
                 .text(`${helpers.numberFormatters.formatCostInteger(totalCouncilCost/1000000)} million`)
                 .attr('x', councilSpendLabel.x)
                 .attr('y', councilSpendLabel.y)
             annotationLayer.append('text').classed('lga-label-small council', true)
-                .html(`spent by Councils on waste services in ${settings.year}, to collect`)
+                .html(`spent by councils on waste services in ${settings.year}, to collect`)
                 .attr('x', councilSpendLabel.x)
                 .attr('y', councilSpendLabel.y + 24)
 
@@ -1023,7 +1039,7 @@
                 .attr('x', councilSpendLabel.x)
                 .attr('y', councilSpendLabel.y + 44)
             annotationLayer.append('text').classed('lga-label-small council', true)
-                .html(`at average cost to Council of <tspan class ="bold">${helpers.numberFormatters.formatCostInteger(totalCouncilCost/totalCollection)} per tonne collected</tspan> `)
+                .html(`at average cost to council of <tspan class ="bold">${helpers.numberFormatters.formatCostInteger(totalCouncilCost/totalCollection)} per tonne collected</tspan> `)
                 .attr('x', councilSpendLabel.x)
                 .attr('y', councilSpendLabel.y + 64)
 

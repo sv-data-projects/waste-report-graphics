@@ -207,6 +207,15 @@
                 margin-block-end: 0.5vw;
                 line-height: 0.8;
             }
+
+            .case.main-title,
+            .case.main-subtitle,
+            .case.section-title,
+            .case.headline-label,
+            .case.service-summary-label{
+                text-transform: none;
+            }
+
             .main-subtitle{
                 font-size: 1.75vw;
             }
@@ -614,7 +623,9 @@
             },
             layout: {
                 showDefinitions:        true,
-                circularLabels:         false
+                circularLabels:         false,
+                sentCase:               false,
+                showTitle:              true
             }
 
         }
@@ -683,8 +694,8 @@
             if (settings.queryParameters.has('titles')) { 
                 settings.layout.showTitle = settings.queryParameters.get('titles') === 'false' ? false : true
             }
-            if (settings.queryParameters.has('titles')) { 
-                settings.layout.showTitle = settings.queryParameters.get('titles') === 'false' ? false : true
+            if (settings.queryParameters.has('sentCase')) {
+                settings.layout.sentCase = settings.queryParameters.get('sentCase') === 'true' ? true : false
             }
         };
 
@@ -706,9 +717,13 @@
 
         async function renderVis(dataTable, settings){ 
             // 0. Add main title and set visibility
-            d3.select('.main-title').html(`Victorian local government waste services <br><span class='main-subtitle'>trends to  ${settings.year}</span>`)
+            d3.select('.main-title').html(`Victorian local government waste services <br><span class='main-subtitle'>Trends to  ${settings.year}</span>`)
+
             if(!settings.layout.showTitle){
                 d3.selectAll('.main-title, .main-subtitle, .section-title').style('display', 'none')
+            }
+            if(settings.layout.sentCase){
+                d3.selectAll('.main-title, .main-subtitle, .section-title, .headline-label').classed('case', true)
             }
 
             // 1. Build the headline containers
@@ -948,6 +963,9 @@
                 binLidShadow.append('path').attr('d',"M.52-15.134l11.01.028c.199.006 3.684-1.513 3.591-.999-.124.69-.225.615-3.662 1.81H.521z")
             })
 
+            if(settings.layout.sentCase){
+                d3.selectAll('.service-summary-label').classed('case', true)
+            }
             // 4. Fade in vis
             d3.select('.main-container').transition().duration(2000).style('opacity', null)  
         };

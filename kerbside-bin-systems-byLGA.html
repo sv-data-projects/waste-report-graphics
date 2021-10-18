@@ -73,6 +73,10 @@
                 text-transform: uppercase;
                 margin-block-end: 0.5vw;
             }
+            .case .main-title{ /* triggered if digital query exists in url*/
+                text-transform: none;
+            }
+
             .table-header{
                 font-weight: 500;
                 font-size: 1.5vw;
@@ -173,6 +177,7 @@
             layout: {
                 showTitle:      true,
                 icon:           'bin',
+                sentCase:    false,
             },
             tableName:      'binSystemData',
             dims: {
@@ -267,6 +272,9 @@
             if (settings.queryParameters.has('titles')) { 
                 settings.layout.showTitle = settings.queryParameters.get('titles') === 'true' ? true : false
             }
+           if (settings.queryParameters.has('sentCase')) { //check for query digitalType, then reset setting
+                settings.layout.sentCase = settings.queryParameters.get('sentCase') === 'true' ? true : false
+           }
         };
 
         async function transformData(binSystemData) { 
@@ -300,9 +308,14 @@
             d3.select('.bin-system-vis-container').classed(settings.layout.icon, true)
             if(settings.layout.showTitle){
                 d3.select('.main-title').html(`Victorian bin systems in ${settings.year}`)
-                d3.select('.main-subtitle').html('a visual representation of the different combinations of monthly bin collection services offered by each LGA')
+                d3.select('.main-subtitle').html('A visual representation of the different combinations of monthly bin collection services offered by each LGA')
             } else {
                 d3.select('.title-container').style('display', 'none')
+            }
+
+            // if digitalType is true, then no upper casing true
+            if (settings.layout.sentCase){
+                d3.select('main').classed('case', true)
             }
 
             // 1. Add HTML table with icon frequency graphics

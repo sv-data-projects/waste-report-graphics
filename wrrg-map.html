@@ -42,6 +42,9 @@
                     font-weight: 500;
                     text-transform: uppercase;
                 }
+                .case.main-title{
+                    text-transform: none;
+                }
                 .main-subtitle{
                     font-size: 14px;
                 }
@@ -195,6 +198,7 @@
                     showTitle:          true,
                     colourScale:        'ramp',         // 'ramp' or 'categorical'
                     showGlass:          true,
+                    sentCase:           false
                 },
                 dims: {
                     width:              1080,
@@ -295,7 +299,10 @@
                 }  
                 if (settings.queryParameters.has('titles')) { 
                     settings.layout.showTitle = settings.queryParameters.get('titles') === 'false' ? false : true
-                } 
+                }
+                if (settings.queryParameters.has('sentCase')) {
+                    settings.layout.sentCase = settings.queryParameters.get('sentCase') === 'true' ? true : false
+                }
             };
 
             async function transformData(wrrgData){
@@ -725,6 +732,11 @@
             annotation.append('text').classed('main-subtitle', true)
                 .attr('transform', `translate(${settings.dims.margin.left}, ${settings.dims.margin.top + 25})`)
                 .text(`by Waste Resource and Recovery Group in ${settings.year}`)
+
+            if (settings.layout.sentCase){
+                d3.select('.main-title').classed('case',true)
+            }
+
             if(!settings.layout.showTitle){
                 d3.selectAll('.main-title, .main-subtitle').style('display', 'none')
             }
