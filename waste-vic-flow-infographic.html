@@ -1965,15 +1965,16 @@
                         exportText      = mt_toExport === 0 ? '' : `${helpers.numberFormatters.formatComma2dec(mt_toExport)} Mt exported for reprocessing`
 
                     // Create Materials infor text string
-                    let materialsText = `In ${settings.year} a total of ${helpers.numberFormatters.formatComma(materialData.value)} tonnes of ${materialName.toLocaleLowerCase() !== 'other materials' ? `${materialName.toLocaleLowerCase()} waste materials` : `${materialName.toLocaleLowerCase()}}`}  
-                        were collected in Victoria. ` 
+                    //let materialsText = `In ${settings.year} a total of ${helpers.numberFormatters.formatComma(helpers.roundToNearest.hundred(materialData.value))} tonnes of ${materialName.toLocaleLowerCase() !== 'other materials' ? `${materialName.toLocaleLowerCase()} waste materials` : `${materialName.toLocaleLowerCase()}}`}
+                    let materialsText = `In ${settings.year} a total of ${helpers.numberFormatters.formatComma(helpers.roundToNearest.hundred(materialData.value))} tonnes of ${materialName.toLocaleLowerCase() !== 'other materials' ? `${materialName.toLocaleLowerCase()} waste materials` : `${materialName.toLocaleLowerCase()}`}
+                        were collected in Victoria. `
                     if(materialData.diversion !== 0){
                         materialsText += `In total, ${helpers.numberFormatters.formatPct1dec(materialData.diversion)} of these materials were diverted from landfill`
                         if(materialData.mt_toExport !== 0){
-                            materialsText += `: ${helpers.numberFormatters.formatComma(mt_toMRF * 1000000)} tonnes were reprocessed in Victoria (${helpers.numberFormatters.formatPct1dec(mt_toMRF / (mt_toMRF + mt_toExport))} of all recovered materials),
-                                while ${helpers.numberFormatters.formatComma(mt_toExport * 1000000)} tonnes were exported for reprocessing.`
+                            materialsText += `: ${helpers.numberFormatters.formatComma(helpers.roundToNearest.hundred(mt_toMRF * 1000000))} tonnes were reprocessed in Victoria (${helpers.numberFormatters.formatPct1dec(mt_toMRF / (mt_toMRF + mt_toExport))} of all recovered materials),
+                                while ${helpers.numberFormatters.formatComma(helpers.roundToNearest.hundred(mt_toExport * 1000000))} tonnes were exported for reprocessing.`
                         } else {
-                            materialsText += `, and all recovered materials (${helpers.numberFormatters.formatComma(mt_toMRF * 1000000)} tonnes) were reprocessed in Victoria.`
+                            materialsText += `, and all recovered materials (${helpers.numberFormatters.formatComma(helpers.roundToNearest.hundred(mt_toMRF * 1000000))} tonnes) were reprocessed in Victoria.`
                         }
                     } else {
                         materialsText += ` All of these waste materials were sent to landfill.`
