@@ -43,6 +43,10 @@
     --tertiaryBlue:                 #005E88;
     --tertiaryBlueLight:            #A0D6E9;
 
+    /*** ADDITIONAL codes based on feedback of Comms ***/
+    --dcGold:                       #946D0A;
+    --dcRed:                        #DB3C24;
+
     /*** EXTENDED PALETTE  ***/
     --xLightestPurple:              #A59DC8;     
     --xOrange:                      #feb076;     
@@ -58,10 +62,11 @@
     --xDarkYellow:                  #A57A0E; 
     --xDarkCard:                    #6F5843; 
     --xDarkBlueCyan:                #177283; 
-    --xDarkMagenta:                 #73264C; 
+    --xDarkMagenta:                 #73264C;
 
     /*** EXTENDED MONOCHROME  ***/
     --xGrey100:                     rgb(100, 100, 100);
+
 }
 
 /***************************************/
