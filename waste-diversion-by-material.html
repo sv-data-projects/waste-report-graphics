@@ -124,10 +124,10 @@
                 fill: var(--tertiaryBlue);
             }
             .arc.glass{
-                fill: var(--tertiaryPurpleLight)
+                fill: var(--xLightestPurple);
             }
             .material-data-table.glass{
-                fill: var(--tertiaryPurple)
+                fill: var(--tertiaryPurple);
             }
             .arc.organics{
                 fill: var(--xGreen );
@@ -615,9 +615,9 @@
                         .classed(`radialBar-material-label text-on-path ${slugMaterialName}` , true)
                         .append('textPath').attr("xlink:href", `#label-path-${slugMaterialName}`)
                             .attr('startOffset', '3px')
-                            .text(d.material)	
+                            .text(d.material)
                             .style('opacity', 0)
-                                .transition()               
+                                .transition()
                                 .delay(d  => i * 500)
                                 .duration(500)
                                 .style('opacity', null)
@@ -629,7 +629,7 @@
                             .attr('startOffset', helpers.numberFormatters.formatPct1dec(d.diversionRate - 0.005))
                             .text(helpers.numberFormatters.formatPct1dec(d.diversionRate))
                             .style('opacity', 0)
-                                .transition()               
+                                .transition()
                                 .delay(d => 1000 + (i * 550))
                                 .duration(250)
                                 .style('opacity', null)
