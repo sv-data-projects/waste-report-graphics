@@ -44,8 +44,20 @@
     --tertiaryBlueLight:            #A0D6E9;
 
     /*** ADDITIONAL codes based on feedback of Comms ***/
-    --dcGold:                       #946D0A;
-    --dcRed:                        #DB3C24;
+    --dcxDarkYellow:                #946D0A;
+    --dctertiaryRed:                #DB3C24; /* replaces TertiaryRed (in kerbside-callout-summary) */
+    --dctertiaryRedLight:           #D33A22; /* replaces TertiaryRed (in waste trends summary table), TertiaryRedLight */
+    --dctertiaryPurple:             #51284F; /* replaces tertiaryPurple, tertiaryPurpleLight */
+
+    --dctertiaryCard:               #896D52; /* replaces xDarkCard, tertiaryCard*/
+    --dcBottleGreen:                #467C78; /* replaces secondaryBottleGreenLight, xMidBottleGreen */
+
+    --dcxOrange:                    #863F13; /* replace xOrange, xDarkOrange */
+    --dcxMidBlue:                   #035D87; /* replaces xMidBLue, tertiaryBlue */
+    --dcxBlueCyan:                  #327D8E; /* replaces xBlueCyan, xDarkBlueCyan */
+    --dcxGreen:                     #00805B; /* replaces xGreen, tertiaryEmerald*/
+    --dcxMagenta:                   #73264C; /* replaces xMagenta, xDarkMagenta*/
+
 
     /*** EXTENDED PALETTE  ***/
     --xLightestPurple:              #A59DC8;     
