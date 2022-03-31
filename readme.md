@@ -12,7 +12,6 @@ It is hoped that over time however, these graphics can be updated by other contr
 
 > A reminder: if changes are made, features added or new visualisations or methods added....**don't forget to update this documentation!**
 
-
 &nbsp;
 ***
 &nbsp;
@@ -21,14 +20,15 @@ It is hoped that over time however, these graphics can be updated by other contr
 - [**How web based graphics work**](#how-web-based-graphics-work)
     - [A guide for context and not a 'how to'](#a-guide-for-context-and-not-a-how-to)
     - [Using the web browser for rendering graphics](#using-the-web-browser-for-rendering-graphics)
-    - [Data driven graphics:connecting to editable data sources](#data-driven-graphics-connecting-to-editable-data-sources)
-    - [Using JavaScript for creating visualisation layouts](#using-javascript-to-create-visualisation-layouts)
+    - [Data driven graphics: connecting to editable data sources](#data-driven-graphics-connecting-to-editable-data-sources)
+    - [Using JavaScript to create visualisation layouts](#using-javascript-to-create-visualisation-layouts)
     - [Using CSS for styling (where possible)](#using-css-for-styling-where-possible)
     - [Using plain SVG for illustration layers](#using-plain-svg-for-illustration-layers)
+    - [A note on SVG (and general) accessibility](#a-note-on-svg-and-general-accessibility)
 &nbsp;
-- [**How to use these graphcis in different mediums**](#how-to-use-these-graphics-in-different-mediums)
+- [**How to use these graphics in different mediums**](#how-to-use-these-graphics-in-different-mediums)
     - [i. Published web links (for viewing and embedding)](#i-published-web-links-for-viewing-and-embedding)
-    - [ii. Exporting vector graphics for designed print publications](#ii-exporting-vector-graphics-for-print-design-publications)
+    - [ii. Exporting vector graphics for designed print publications](#ii-exporting-vector-graphics-for-designed-print-publications)
     - [iii. Creating raster image files for MS documents (Word and PowerPoint)](#iii-creating-raster-image-files-for-ms-documents-word-and-powerpoint)
     - [iv. Embedding (iframe) on the SV website (or other web applications)](#iv-embedding-iframe-on-the-sv-website-or-other-web-applications)
 
@@ -36,7 +36,8 @@ It is hoped that over time however, these graphics can be updated by other contr
 **Developer guidance**
 - [**How code is structured**](#how-code-is-structured)
     - [Using self-contained HTML pages](#using-self-contained-html-pages)
-    - [General scripting structure](#general-scripting-structure)
+    - [Global Objects](#global-objects)
+    - [The basic build sequence](#the-basic-build-sequence)
 
 
 **User guidance**
@@ -45,7 +46,6 @@ It is hoped that over time however, these graphics can be updated by other contr
     - [Using query strings for setting visualisation options](#using-query-strings-for-setting-visualisation-options)
     - [Waste report graphics and their options](#waste-report-graphics-and-their-options)
     - [Further customisation of waste report graphics](#further-customisation-of-waste-report-graphics)
-    - [Interactive waste report graphics](#interactive-waste-report-graphics)
 
 
 &nbsp;
@@ -106,6 +106,7 @@ Colours are mostly referenced throughout the CSS using [CSS Variable names](http
 Some visualisations contain more illustrative graphic layers. These are SVG-based graphics and illustrations whose code is copied into HTML code (note: SVG is web-native HTML). This SVG code can be directly edited but for the most part, these illustration were created in a vector graphics editor, cleanup up in the [SVG OMG](https://jakearchibald.github.io/svgomg/) tool, and imported into the HTML code. 
 Further (data vis) SVG is added over the top using JavaScript and [D3.js](https://d3js.org/) 
 
+&nbsp;
 
 ## A note on SVG (and general) accessibility
 Best efforts have been made to make data visualisations accessible - particularly for screen readers and keyboard-only users. On the positive side, SVG text elements are natively accessible through the DOM, and both `Title` and `Description` tags have been programmatically added as children to main SVG elements, as well appropriate reference attributes and [WCAG ARIA roles](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles). However providing optimised accessed to data encoded in visual forms (e.g. charts) - through listed elements for screen readers - and for hovered tooltips, is limited (although as mentioned, visible key text elements can be reached). More effort could be done here (and to improve accessibility in general). The rationale for not going further (at this time) is simply a lack of time, and the expectation that some design implications would take an unreasonable amount of time to resolve.
@@ -196,12 +197,12 @@ Certain graphics have been designed to be embedded in another web page or applic
 In most cases, graphics are designed to be flexible enough for use in print and digital mediums. The exceptions are mostly interactive graphics that have information designed to be displayed only when a user interacts with part of the graphic. 
 
 &nbsp;
-> ## Using query strings for setting visualisation options
+## Using query strings for setting visualisation options
 > Most data visualisations have been developed to accept a [query string](https://en.wikipedia.org/wiki/Query_string) that is added to its URL. Query strings are simply an specially formatted text string at the end of a URL, after a '?". You can think of a query string as sending a bunch of 'settings' for the data vis application to apply. This means that the application must first be setup to do something with query string it receives. The table below outlines what options are available for each graphic.
 >
 >You can read about how query strings are structure [here](https://en.wikipedia.org/wiki/Query_string#Structure) - it'll only take a few seconds or minutes to work out. But another simple way to figure them out is to see an example: a visualisation might be setup to receive a 'year' parameter from a query string, in a financial year format like '2018-19'. It would  then use that 'specified year' to display the right data. 
-> - The query string would be simply be **'?year=2018-19'** and the URL would look something like www.xxxx.com/vis.html?**year=2018-19**. 
-> - Multiple parameters can be appended wih an '&'. So www.xxxx.com/vis.html**?year=2018-19&showGlass=false** would also send the value 'false' for the parameter 'showGlass'.
+> - The query string would be simply be **'?year=2018-19'** and the URL would look something like www[]().xxxx.com/vis.html?**year=2018-19**. 
+> - Multiple parameters can be appended wih an '&'. So www[]().xxxx.com/vis.html?**year=2018-19&showGlass=false** would also send the value 'false' for the parameter 'showGlass'.
 >
 > And thats all there is to query strings!
 
@@ -211,18 +212,18 @@ In most cases, graphics are designed to be flexible enough for use in print and 
 ### **Local Government graphics**
 | Visualisation name | html filename | Query parameter name | Query parameter value format |  Query parameter default |  Query parameter description
 | --- | --- | --- |---| ---| ---|
-| Kerbside waste illustrative summary infographic (half page)| [kerbside-flow-infographic.html](https://sv-data-projects.github.io/waste-report-graphics/kerbside-summary-infographic.html) |  year  | YYYY-YY | 2019-20 | Specifies FY data to display
+| Kerbside waste illustrative summary infographic (half page)| [kerbside-summary-infographic.html](https://sv-data-projects.github.io/waste-report-graphics/kerbside-summary-infographic.html) |  year  | YYYY-YY | 2019-20 | Specifies FY data to display
 | | | titles | true or false | true | Whether to display the headline title (and subtitle)
-| Kerbside waste illustrative infographic (full page)| [kerbside-summary-infographic.html](https://sv-data-projects.github.io/waste-report-graphics/kerbside-flow-infographic.html) | YYYY-YY |  year | 2019-20 | Specifies FY data to display
+| Kerbside waste illustrative infographic (full page)| [kerbside-flow-infographic.html](https://sv-data-projects.github.io/waste-report-graphics/kerbside-flow-infographic.html) | YYYY-YY |  year | 2019-20 | Specifies FY data to display
 | | | extended-typography | true, false | true | Show title text with with handwriting typeface
 | Kerbside bin composition graphic (single bin)| [kerbside-bin-composition.html](https://sv-data-projects.github.io/waste-report-graphics/kerbside-bin-composition.html) | year | YYYY-YY | 2019-20
 | | | yellow-bin-lid | true, false | false | Whether to colour bin lid yellow (note: default is false colour clashes with a material colour)
-| Kerbside trends summary tables (headlines and by services summary) | kerbside-trends-summary-table.html |  year | YYYY-YY | 2019-20 | Specifies FY data to display
+| Kerbside trends summary tables (headlines and by services summary) | [kerbside-trends-summary-table.html](https://sv-data-projects.github.io/waste-report-graphics/kerbside-trends-summary-table.html) |  year | YYYY-YY | 2019-20 | Specifies FY data to display
 | | | titles | true or false | true | Whether to display the headline title (and subtitle)
-| Victorian bin systems graphic | [kerbside-bin-systems.html](https://sv-data-projects.github.io/waste-report-graphics/kerbisde-bin-systems.html) |  year |  YYYY-YY | 2019-20 | Specifies FY data to display 
+| Victorian bin systems graphic | [kerbside-bin-systems.html](https://sv-data-projects.github.io/waste-report-graphics/kerbside-bin-systems.html) |  year |  YYYY-YY | 2019-20 | Specifies FY data to display 
 | | | icon | 'bin' or 'block' | bin | Shows collection frequencies as bin icon or rectangular block
 | | | titles | true or false | true | Whether to display the headline title (and subtitle)
-| Victorian bin systems graphic by LGA | [kerbside-bin-systems-byLGA.html](https://sv-data-projects.github.io/waste-report-graphics/kerbisde-bin-systems-byLGA.html) |  year |  YYYY-YY | 2019-20 | Specifies FY data to display 
+| Victorian bin systems graphic by LGA | [kerbside-bin-systems-byLGA.html](https://sv-data-projects.github.io/waste-report-graphics/kerbside-bin-systems-byLGA.html) |  year |  YYYY-YY | 2019-20 | Specifies FY data to display 
 | | | icon | 'bin' or 'block' | bin | Shows collection frequencies as bin icon or rectangular block
 | | | titles | true or false | true | Whether to display the headline title (and subtitle)
 
@@ -239,7 +240,7 @@ In most cases, graphics are designed to be flexible enough for use in print and 
 | | | theme | dark, light | light | Show the graphic with 'dark mode' option
 | | | themeChange | true, false | true | Whether the theme can be changed by pressing the 'Shift' key
 | | | titles | true or false | true | Whether to display the headline title (and subtitle)
-| Waste metrics trends tables (headlines and by material summary) | waste-trends-summary-table.html |  year | YYYY-YY | 2019-20 | Specifies FY data to display
+| Waste metrics trends tables (headlines and by material summary) | [waste-trends-summary-table.html](https://sv-data-projects.github.io/waste-report-graphics/waste-trends-summary-table.html) |  year | YYYY-YY | 2019-20 | Specifies FY data to display
 | | | titles | true or false | true | Whether to display the headline title (and subtitle)
 | Waste diversion radial bar chart and table | [waste-diversion-by-material.html](https://sv-data-projects.github.io/waste-report-graphics/waste-diversion-by-material.html) | year |  YYYY-YY | 2019-20 | Specifies FY data to display
 | | | theme | dark, light | light | Show the graphic with 'dark mode' option
@@ -259,7 +260,7 @@ In most cases, graphics are designed to be flexible enough for use in print and 
 | | | target | 0, 1, 2, 3, all | all | Can be used to display just one target at a time
 | | | titles | true or false | true | Whether to display the headline title (and subtitle)
 
-
+&nbsp;
 
 ## Further customisation of waste report graphics 
 Some visualisations can be tweaked and customised further:
